@@ -1,0 +1,459 @@
+%%% Presentaciones para Lenguajes de programacion y sus paradigmas 
+
+\documentclass[xcolor=dvipsnames,table,handout]{beamer}
+%\documentclass[xcolor=dvipsnames,table]{beamer}
+
+\newcommand{\espc}{\vspace{0.3cm}}
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{hyperref}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+
+%%%% paquetes matematicas
+\usepackage{amssymb,amsmath,amscd}
+\usepackage{extarrows}
+\usepackage{stmaryrd}
+\usepackage{mathabx}
+\usepackage{mathrsfs}
+% \usepackage{mathabx}
+\usepackage{amsthm}
+
+%%%%%
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{pifont}
+\usepackage{xcolor}
+\usepackage{etex}
+\usepackage{tikz}
+\usepackage{array}
+%\usepackage{pgfplots}
+
+%%%% cosmetics
+% D.Remy package for pretty display of rules
+\usepackage{mathpartir}
+
+% para insertar codigo con formato particular 
+\usepackage{listing} 
+
+% comillas 
+\usepackage[autostyle=true,spanish=mexican]{csquotes}
+
+% codigo 
+\usepackage{verbatim}
+\usepackage{alltt}
+
+% footnotes
+\usepackage[bottom]{footmisc}
+\usepackage{setspace}
+
+\usepackage{wrapfig}
+\usepackage{caption}
+
+
+\hfuzz=5.002pt %parameter to allow hbox overfulled by length before error!
+
+% Options for presentation
+% ------------------------
+% \definecolor{mycolor}{RGB}{255,192,3}
+\definecolor{mycolor}{RGB}{17,132,221}
+\mode<presentation>
+{
+% \usetheme[secheader]{Boadilla}
+% \usecolortheme{orchid}
+\useoutertheme{infolines}
+\useinnertheme{rectangles}
+\setbeamertemplate{itemize items}[square]
+\setbeamertemplate{enumerate items}[square]
+\setbeamersize{text margin left=6mm, text margin right=6mm}
+
+\setbeamercolor{alerted text}{fg=red,bg=red!70!white}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{frametitle}{bg=mycolor,fg=white}
+\setbeamercolor{normal text}{bg=white,fg=black}
+\setbeamercolor{structure}{bg=black,fg=mycolor}
+\setbeamercolor{title}{bg=mycolor,fg=white}
+\setbeamercolor{subtitle}{bg=mycolor,fg=white}
+\setbeamercolor{titlelike}{bg=white,fg=mycolor}
+
+\setbeamercovered{invisible}
+
+\setbeamercolor*{palette primary}{fg=mycolor,bg=white}
+\setbeamercolor*{palette secondary}{bg=white,fg=white}
+\setbeamercolor*{palette tertiary}{fg=mycolor,bg=white}
+\setbeamercolor*{palette quaternary}{fg=white,bg=white}
+
+\setbeamercolor{separation line}{bg=mycolor,fg=mycolor}
+\setbeamercolor{fine separation line}{bg=white,fg=red}
+\setbeamercolor{author in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{title in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{date in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{institute in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{section in head/foot}{bg=mycolor!60!white, fg=Red}
+\setbeamercolor{subsection in head/foot}
+{bg=mycolor!50!white,fg=mycolor!50!white}
+
+
+\setbeamertemplate{headline}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.65ex,dp=1.5ex,center]{section in 
+head/foot}%
+    \usebeamerfont{section in head/foot}\insertsectionhead\hspace*{2ex}
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.65ex,dp=1.5ex,center]{subsection 
+in head/foot}%
+    \usebeamerfont{subsection in head/foot}\hspace*{2ex}\insertsubsectionhead
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+% \beamerdefaultoverlayspecification{<+->}
+\beamertemplatenavigationsymbolsempty
+% \setbeamertemplate{footline}[frame number]
+}
+
+\input{macroslc}
+
+\title[]{Lógica computacional}
+\subtitle{Tema: Semántica de la Lógica Proposicional }
+\author[]{}
+\institute[UNAM-FC]{Facultad de Ciencias\\ 
+Universidad Nacional Aut\'onoma de M\'exico}
+\date[]{
+\newline{\tiny{Material desarrollado bajo el proyecto UNAM-PAPIME PE102117.}}}
+ 
+
+\beamerdefaultoverlayspecification{<+->}
+ 
+\titlegraphic{\includegraphics[width=16mm]{fc2.png}}
+ 
+
+\begin{document}
+
+\begin{frame}
+\titlepage 
+\end{frame}
+\note{}
+
+
+\frame{\titulos{Significado de los conectivos lógicos}{}
+\begin{block}{{\bf Negación.}}
+La {\bf negación} de la fórmula $P$ es la fórmula $\mathbf{\neg P}$. \\
+\pause
+\espc
+Corresponde en español a : {\em No, no es cierto que, es falso que, etc.}\\
+\pause
+\espc
+Tabla de verdad: 
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+P & $\neg P$ \\ \hline
+0 & 1 \\ \hline
+1 & 0 \\ \hline
+\end{tabular}
+\end{center}
+\end{block}
+}
+
+\frame{\titulos{Significado de los conectivos lógicos}{}
+\begin{block}{{\bf Disyunción.}}
+La {\bf disyunción} de las fórmulas $P, Q$ es la fórmula $\mathbf{ P \lor Q}$. \\
+\pause
+\espc
+Corresponde en español a : {\em o}\\
+\pause
+\espc
+Tabla de verdad: 
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+P & Q& $ P \lor Q$ \\ \hline
+0 & 0 & 0 \\ \hline
+0 & 1 & 1 \\ \hline
+1 & 0 & 1 \\ \hline
+1 & 1 & 1 \\ \hline
+\end{tabular}
+\end{center}
+\end{block}
+
+}
+
+\frame{\titulos{Significado de los conectivos lógicos}{}
+\begin{block}{{\bf Disyunción.}}
+La {\bf conjunción} de las fórmulas $P, Q$ es la fórmula $\mathbf{ P \land Q}$. \\
+\pause
+\espc
+Corresponde en español a : {\em y, pero}\\
+\pause
+\espc
+Tabla de verdad: 
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+P & Q& $ P \land Q$ \\ \hline
+0 & 0 & 0 \\ \hline
+0 & 1 & 0 \\ \hline
+1 & 0 & 0 \\ \hline
+1 & 1 &  1 \\ \hline
+\end{tabular}
+\end{center}
+
+\end{block}
+
+}
+
+
+\frame{\titulos{Significado de los conectivos lógicos}{}
+\begin{block}{{\bf Implicación o condicional.}}
+La {\bf implicación} de las fórmulas $P, Q$ es la fórmula $\mathbf{ P \imp Q}$. Donde $P$ es el {\em antecedente} y $Q$ el {\em consecuente} de la implicación.\\
+\pause
+\espc
+Corresponde en español a: {\em si P entonces Q; P es condición suficiente para Q; Q, si P; P sólo si Q; Q es condición necesaria para P.}\\
+\pause
+\espc
+Tabla de verdad: 
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+P & Q& $ P \imp Q$ \\ \hline
+0 & 0 & 1 \\ \hline
+0 & 1 & 1 \\ \hline
+1 & 0 & 0 \\ \hline
+1 & 1 & 1 \\ \hline
+\end{tabular}
+\end{center}
+
+
+\end{block}
+
+}
+
+
+
+\frame{\titulos{Significado de los conectivos lógicos}{}
+\begin{block}{{\bf Equivalencia o bicondicional.}}
+La {\bf equivalencia} de las fórmulas $P, Q$ es la fórmula $\mathbf{ P \iff Q}$. \\
+\pause
+\espc
+Corresponde en español a: {\em  P es equivalente a Q, P si y sólo si Q,  P es condición necesaria y suficiente para Q.}\\
+\pause
+\espc
+Tabla de verdad: 
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+P & Q& $ P \iff Q$ \\ \hline
+0 & 0 & 1 \\ \hline
+0 & 1 & 0 \\ \hline
+1 & 0 & 0 \\ \hline
+1 & 1 & 1 \\ \hline
+\end{tabular}
+\end{center}
+
+
+\end{block}
+
+}
+
+\frame{\titulos{Formalización}{}
+\begin{block}{{\bf Estado o asignación de las variables}}
+Un {\bf estado o asignación} de las variables proposicionales es una función
+\[ \mathcal{I} : VarP \rightarrow \{ 0,1 \} \]
+\end{block}
+\pause
+\[  \mathcal{I}(r) = 1 \qquad  \mathcal{I}(p) = 0 \qquad \mathcal{I}(t_{16}) = 1 \]
+}
+
+\frame{\titulos{Formalización}{}
+\begin{block}{{\bf Función de Interpretación}}
+Dado un estado de las variables $\mathcal{I} : VarP \rightarrow \{ 0,1 \}$, definimos la {\bf interpretación de las fórmulas} con respecto a $\mathcal{I}$ como la función $\mathcal{I}^{*}: PROP \rightarrow \{ 0,1 \}$ tal que:
+\begin{itemize}
+\item $\mathcal{I}^{*}(p) = \mathcal{I}(p) $ con $p \in VarP$.
+\item $\mathcal{I}^{*}(\top) = 1$  y $\mathcal{I}^{*}(\bot) = 0$.
+\item $\mathcal{I}^{*}(\neg \varphi) = 1$ syss $\mathcal{I}^{*}(\varphi) = 0$.
+\item $\mathcal{I}^{*}(\varphi_{1} \land \varphi_{2}) = 1 $ syss $\mathcal{I}^{*}(\varphi_{1}) = \mathcal{I}^{*}(\varphi_{2})=1 $.
+\item $\mathcal{I}^{*}(\varphi_{1} \lor \varphi_{2}) = 0 $ syss $\mathcal{I}^{*}(\varphi_{1}) = \mathcal{I}^{*}(\varphi_{2})= 0$.
+\item $\mathcal{I}^{*}(\varphi_{1} \imp \varphi_{2}) = 0 $ syss $\mathcal{I}^{*}(\varphi_{1}) = 1$ e $ \mathcal{I}^{*}(\varphi_{2})=0 $.
+\item $\mathcal{I}^{*}(\varphi_{1} \iff \varphi_{2}) = 1 $ syss $\mathcal{I}^{*}(\varphi_{1}) = \mathcal{I}^{*}(\varphi_{2})$.
+\end{itemize}
+\end{block}
+Haremos abuso de notación: escribiremos simplemente $\varphi$ en lugar de $\varphi^{*}$.
+}
+
+
+\frame{\titulos{Semántica }{}
+\begin{exampleblock}{{\bf Lema de Coincidencia}}
+Sean  $\mathcal{I}_{1}, \mathcal{I}_{2} : PROP \imp \{ 0,1 \}$, dos estados que coinciden en las variables proposicionales de la fórmula $\varphi$, es decir, $\mathcal{I}_{1}(p) = \mathcal{I}_{2}(p)$ para toda $p \in vars(\varphi)$. Entonces 
+\[ \mathcal{I}_{1}(\varphi) = \mathcal{I}_{2}(\varphi)\]
+\end{exampleblock}
+}
+
+
+
+\frame{\titulos{Semántica}{}
+\begin{block}{{\bf Estado modificado o actualizado}}
+Sean $\mathcal{I}: varp \imp \{ 0,1\}$ un estado de las variables, $p$ una variable proposicional y $v\in\{ 0,1\}$. Definimos la actualizaci\'on de $\mathcal{I}$ en $p$ por $v$, denotado $\mathcal{I}_{[p/v]}$ como sigue:
+\[
+\mathcal{I}_{[p/v\;]}(q) =\left\{\ba{rl}
+v & \text{ si } q=p \\ \\
+\mathcal{I}(q) & \text{ si } q \neq p
+\ea
+\right.
+\]
+El estado $\mathcal{I}_{[p/v]}$ se conoce como un estado modificado o una actualizaci\'on 
+de $\varphi$.
+
+\end{block}
+}
+
+
+\frame{\titulos{Semántica }{}
+\begin{exampleblock}{{\bf Lema de Sustitución}}
+Sean $\mathcal{I}$ una interpretaci\'on, $p$ una variable proposicional y $\psi$ una f\'ormula tal que $\mathcal{I}(\psi)=v$. Entonces
+\[\mathcal{I}\big(\varphi[p:=\psi\;]\big) = \mathcal{I}_{[p/v\;]}(\varphi)\]
+\end{exampleblock}
+}
+
+
+\frame{\titulos{Conceptos Semánticos básicos}{}
+¿Cuántas interpretaciones hacen verdadera a $\varphi $?
+\begin{block}{}
+\begin{itemize}
+\item Si $\mathcal{I}(\varphi)=1$ para {\bf toda interpretaci\'on} $\mathcal{I}$ decimos que $\varphi$ es una
+  {\bf  tautolog\'ia o f\'ormula v\'alida} y escribimos $\models\varphi$. \\
+\espc
+\item Si $\mathcal{I}(\varphi)=1$ para {\bf alguna interpretaci\'on} $\mathcal{I}$ decimos que $\varphi$ es   {\bf satisfacible}, que $\varphi$ es verdadera en $\mathcal{I}$ o que $\mathcal{I}$ es {\bf modelo} de
+  $\varphi$ y escribimos $\mathcal{I}\models\varphi$
+\espc
+\item Si $\mathcal{I}(\varphi)=0$ para {\bf alguna interpretaci\'on} $\mathcal{I}$ decimos que $\varphi$ es   {\bf falsa o insatisfacible} en $\mathcal{I}$ o que $\mathcal{I}$ no es modelo de $\varphi$ y
+  escribimos $\mathcal{I}\not\models\varphi$
+\espc
+\item Si $\mathcal{I}(\varphi)=0$ para {\bf toda interpretaci\'on} $\mathcal{I}$ decimos que $\varphi$ es una  {\bf  contradicci\'on} o f\'ormula no satisfacible.    
+\espc
+\ei
+\end{block}
+}
+
+\frame{\titulos{Conceptos Semánticos básicos}{} 
+Similarmente si $\Gamma$ es un conjunto de f\'ormulas decimos que:
+\begin{block}{{}}
+\bi
+\item $\Gamma$ {\bf es satisfacible} si tiene un modelo, es decir, si existe una 
+interpretaci\'on $\mathcal{I}$ tal que
+$\mathcal{I}(\varphi)=1$ para toda $\varphi \in\Gamma$. Lo cual denotamos a veces,
+abusando de la notaci\'on, con $\mathcal{I}(\Gamma)=1$.
+\espc
+\item $\Gamma$ {\bf es insatisfacible }o no satisfacible si no tiene un
+  modelo, es decir, si no existe una
+  interpretaci\'on $\mathcal{I}$ tal que $\mathcal{I}(\varphi)=1$ para toda $\varphi\in\Gamma$.
+\espc
+\end{itemize}
+\end{block}
+
+}
+
+
+\frame{\titulos{Conceptos Semánticos básicos}{} 
+\begin{exampleblock}{{\bf Propiedades}}
+Sea $\Gamma$ un conjunto de f\'ormulas, $\varphi \in \Gamma$, $\tau$ una tautología y $\chi$ una contradicción.
+\bi
+\item Si $\Gamma$ es satisfacible entonces :
+	\bi
+	\item $\Gamma \backslash \{ \varphi \}$ es satisfacible.
+	\item $\Gamma \cup \{ \tau \}$ es satisfacible.
+	\item $\Gamma \cup \{ \chi \}$ es insatisfacible.
+	\ei
+\espc
+\item Si $\Gamma$ es insatisfacible entonces :
+	\bi
+	\item $\Gamma \cup \{ \psi \}$ es insatisfacible, para cualquier $\psi \in PROP$.
+	\item $\Gamma \backslash \{ \tau \}$ es insatisfacible. 
+\espc
+	\ei
+
+\ei
+\end{exampleblock}
+}
+
+\frame{\titulos{Equivalencia de Fórmulas}{} 
+\begin{block}{{\bf Equivalencia}}
+Dos fórmulas $\varphi , \psi$ son {\bf equivalentes} si $\mathcal{I}(\varphi) = \mathcal{I}(\psi)$ para toda interpretación $\mathcal{I}$. En tal caso escribimos 
+\[ \varphi \equiv \psi \]
+
+\end{block}
+
+\begin{exampleblock}{{\bf Proposición :}}
+Sean $\varphi , \psi$ dos  fórmulas. Entonces
+\[ \varphi \equiv \psi  \mbox{ si y sólo si }  \vDash \varphi \iff \psi \]
+\espc
+\end{exampleblock}
+}
+
+\frame{\titulos{Equivalencia de Fórmulas}{} 
+
+\begin{exampleblock}{{\bf Regla de Leibniz}}
+Sean $\varphi , \psi, \chi$ fórmulas y $p \in varP$
+\[ \frac{\varphi \equiv \psi}{\chi[p:=\varphi] \equiv \chi[p:=\psi]} \]
+\espc
+\end{exampleblock}
+}
+
+\frame{\titulos{Consecuencia Lógica}{} 
+\begin{block}{{\bf Consecuencia Lógica}}
+Sean $\Gamma$ un conjunto de f\'ormulas y $\varphi$ una f\'ormula. Decimos que $\varphi$ es {\bf consecuencia l\'ogica} de $\Gamma$ si para toda interpretaci\'on $\mathcal{I}$ que sastisface a $\Gamma$, se tiene $\mathcal{I}(\varphi)=1$.  \\
+\pause
+\espc
+Es decir, si se cumple que siempre que $\mathcal{I}$ satisface a $\Gamma$ entonces necesariamente $\mathcal{I}$ satisface a $\varphi$. En tal caso escribimos 
+\[ \Gamma\models\varphi \]
+\end{block}
+
+}
+
+\frame{\titulos{Consecuencia Lógica}{} 
+\begin{exampleblock}{{}}
+La relaci\'on de consecuencia l\'ogica cumple las 
+siguientes propiedades:
+\bi
+\item Si $\varphi\in\Gamma$ entonces $\Gamma\models\varphi$. \vspace{0.2cm}
+\item Principio de refutaci\'on: $\Gamma\models\varphi$ syss 
+$\Gamma\cup\{\lnot\varphi\}$
+  es insatisfacible. \vspace{0.2cm}
+\item $\Gamma\models\varphi\imp\psi$ syss $\Gamma\cup\{\varphi\}\models\psi$. \vspace{0.2cm}
+\item Insatisfacibilidad implica trivialidad: Si $\Gamma$ es insatisfacible
+entonces $\Gamma\models\varphi$ para toda $\varphi\in PROP$. \vspace{0.2cm}
+\item Si $\Gamma\models\bot$ entonces $\Gamma$ es insatisfacible. \vspace{0.2cm}
+\item $\varphi\equiv\psi$ syss $\varphi\models\psi$ y $\psi\models\varphi$. \vspace{0.2cm}
+\item $\models\varphi$ (es decir si $\varphi$ es tautolog\'ia) syss
+  $\emptyset \models\varphi$ (es decir $\varphi$ es consecuencia l\'ogica del conjunto 
+vac\'io). \espc
+\ei 
+\end{exampleblock}
+}
+
+\frame{\titulos{Consecuencia Lógica}{} 
+\begin{block}{{\bf Correctud de argumentos lógicos}}
+Un argumento con premisas $\varphi_{1}, ... , \varphi_{n}$ y conclusión $\psi$ es {\bf lógicamente correcto} si la conclusión se sigue de las premisas, es decir, si $\{ \varphi_{1}, ... , \varphi{n} \} \vDash \psi$. \\
+\pause
+\espc
+Para mostrar la correctud del argumento l\'ogico 
+$\varphi_1,\ldots,\varphi_n\;/\therefore\; \psi$
+mediante interpretaciones, se puede proceder de alguna de las siguientes formas:
+
+\bi
+\item {\bf M\'etodo directo:} probar la consecuencia $\varphi_1,\ldots,\varphi_n\models \psi$.
+
+\item {\bf M\'etodo indirecto (refutaci\'on):} probar que el conjunto
+$\{\varphi_1,\ldots, \varphi_n,\lnot \psi\}$ es insatisfacible. 
+\espc
+\ei
+
+\end{block}
+
+}
+
+
+\end{document}

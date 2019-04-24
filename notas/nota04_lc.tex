@@ -1,0 +1,471 @@
+%%% Presentaciones para Lenguajes de programacion y sus paradigmas 
+
+\documentclass[xcolor=dvipsnames,table,handout]{beamer}
+%\documentclass[xcolor=dvipsnames,table]{beamer}
+
+\newcommand{\espc}{\vspace{0.3cm}}
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{hyperref}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+
+%%%% paquetes matematicas
+\usepackage{amssymb,amsmath,amscd}
+\usepackage{extarrows}
+\usepackage{stmaryrd}
+\usepackage{mathabx}
+\usepackage{mathrsfs}
+% \usepackage{mathabx}
+\usepackage{amsthm}
+
+%%%%%
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{pifont}
+\usepackage{xcolor}
+\usepackage{etex}
+\usepackage{tikz}
+\usepackage{array}
+%\usepackage{pgfplots}
+
+%%%% cosmetics
+% D.Remy package for pretty display of rules
+\usepackage{mathpartir}
+
+% para insertar codigo con formato particular 
+\usepackage{listing} 
+
+% comillas 
+\usepackage[autostyle=true,spanish=mexican]{csquotes}
+
+% codigo 
+\usepackage{verbatim}
+\usepackage{alltt}
+
+% footnotes
+\usepackage[bottom]{footmisc}
+\usepackage{setspace}
+
+\usepackage{wrapfig}
+\usepackage{caption}
+
+
+\hfuzz=5.002pt %parameter to allow hbox overfulled by length before error!
+
+% Options for presentation
+% ------------------------
+% \definecolor{mycolor}{RGB}{255,192,3}
+\definecolor{mycolor}{RGB}{17,132,221}
+\mode<presentation>
+{
+% \usetheme[secheader]{Boadilla}
+% \usecolortheme{orchid}
+\useoutertheme{infolines}
+\useinnertheme{rectangles}
+\setbeamertemplate{itemize items}[square]
+\setbeamertemplate{enumerate items}[square]
+\setbeamersize{text margin left=6mm, text margin right=6mm}
+
+\setbeamercolor{alerted text}{fg=red,bg=red!70!white}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{frametitle}{bg=mycolor,fg=white}
+\setbeamercolor{normal text}{bg=white,fg=black}
+\setbeamercolor{structure}{bg=black,fg=mycolor}
+\setbeamercolor{title}{bg=mycolor,fg=white}
+\setbeamercolor{subtitle}{bg=mycolor,fg=white}
+\setbeamercolor{titlelike}{bg=white,fg=mycolor}
+
+\setbeamercovered{invisible}
+
+\setbeamercolor*{palette primary}{fg=mycolor,bg=white}
+\setbeamercolor*{palette secondary}{bg=white,fg=white}
+\setbeamercolor*{palette tertiary}{fg=mycolor,bg=white}
+\setbeamercolor*{palette quaternary}{fg=white,bg=white}
+
+\setbeamercolor{separation line}{bg=mycolor,fg=mycolor}
+\setbeamercolor{fine separation line}{bg=white,fg=red}
+\setbeamercolor{author in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{title in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{date in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{institute in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{section in head/foot}{bg=mycolor!60!white, fg=Red}
+\setbeamercolor{subsection in head/foot}
+{bg=mycolor!50!white,fg=mycolor!50!white}
+
+
+\setbeamertemplate{headline}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.65ex,dp=1.5ex,center]{section in 
+head/foot}%
+    \usebeamerfont{section in head/foot}\insertsectionhead\hspace*{2ex}
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.65ex,dp=1.5ex,center]{subsection 
+in head/foot}%
+    \usebeamerfont{subsection in head/foot}\hspace*{2ex}\insertsubsectionhead
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+% \beamerdefaultoverlayspecification{<+->}
+\beamertemplatenavigationsymbolsempty
+% \setbeamertemplate{footline}[frame number]
+}
+
+\input{macroslc}
+
+\title[]{Lógica computacional}
+\subtitle{Tema: Lógica de primer orden: Especificación Formal y Semántica.  }
+\author[]{}
+\institute[UNAM-FC]{Facultad de Ciencias\\ 
+Universidad Nacional Aut\'onoma de M\'exico}
+\date[]{
+\newline{\tiny{Material desarrollado bajo el proyecto UNAM-PAPIME PE102117.}}}
+ 
+
+\beamerdefaultoverlayspecification{<+->}
+ 
+\titlegraphic{\includegraphics[width=16mm]{fc2.png}}
+ 
+
+\begin{document}
+
+\begin{frame}
+\titlepage 
+\end{frame}
+\note{}
+
+\frame{\titulos{Especificación Formal}{}
+Algunos consejos:
+\bi
+\item Nuestro objetivo es extraer predicados a partir de los enunciados dados 
+  en español de manera que el enunciado completo se construya al combinar 
+  dichos predicados mediante conectivos y cuantificadores.\\
+\espc
+{\em La Luna \textcolor<2-7>{blue}{brilla}}. \\
+%\pause
+\espc
+{\em Daniela \textcolor<3-7>{blue}{compró} \textcolor<4-7>{purple}{una película}}. \\
+%\pause
+\espc
+{\em Los leones \textcolor<5-7>{blue}{comen} \textcolor<6-7>{purple}{carne cruda}}. \\
+%\pause
+\espc
+{\em Todos los días \textcolor<7>{blue}{están soleados}}.
+\ei
+}
+
+
+\frame{\titulos{Especificación Formal}{}
+Algunos consejos:
+\bi
+
+\item Si en el español aparecen frases como \textit{para todos, para 
+cualquier,   todos, cualquiera,los, las etc.} debe usarse el {\bf cuantificador 
+universal}.
+
+
+ \item Si en el español frases como \textit{para alg\'un, existe un, 
+  alguno,alguna, uno, una etc.} debe usarse el {\bf cuantificador 
+  existencial.}\\ 
+
+\item En ciertas ocasiones, frases en español que
+  involucran \textit{alguien, algo} deben especificarse con un cuantificador 
+  universal y no un existencial. \\ \pause \espc
+  Por ejemplo, el enunciado \textit{si alguien demasiado alto entra por la puerta entonces se 
+  pegará con el marco}, se puede reescribir en español como
+  \textit{cualquiera demasiado alto que entre por la puerta se pegará con el marco },
+  lo cual nos lleva a la f\'ormula  ~$\fa x(A(x) \land E(x)\imp P(x))$.\\
+\ei
+}
+
+
+\frame{\titulos{Especificación Formal}{}
+Algunos consejos:
+\bi
+\item Cualquier especificación compuesta que involucre cuantificadores puede
+  formarse identificando en ella alguno de los cuatro juicios aristotélicos: \\
+\espc
+  \bi
+   \item Universal afirmativo:  \textit{Todo S es P} \\
+    \hspace{1cm}$\fa x(S(x)\imp P(x))$. \espc
+
+   \item Existencial afirmativo. \textit{Alg\'un S es P} \\
+\hspace{1cm}    $\ex x(S(x)\land P(x)).$ \espc
+
+   \item Universal negativo: \textit{Ning\'un S es P} \\ 
+\hspace{1cm}    $\fa x(S(x)\imp \neg P(x))$ \espc
+
+   \item Existencial negativo:  \textit{Alg\'un S no es P} \\
+\hspace{1cm}    $\ex x(S(x)\land \neg P(x))$ \espc
+
+  \ei
+\ei
+}
+
+
+
+\frame{\titulos{Especificación Formal}{}
+Algunos consejos:
+\bi
+\item Las fórmulas~$\exists x P(x)$ y~$\exists x\exists y(P(x)\land P(y))$ expresan 
+ lo mismo: un objeto del universo cumple~$P$.  \\
+\pause 
+\espc
+Para indicar que x, y representan elementos diferentes, se debe agregar explícitamente la propiedad ~$x\ne y$.
+\ei
+}
+
+
+
+\frame{\titulos{Especificación Formal}{}
+Ejemplos:
+\bi
+\item {\em Todo \textcolor{purple}{día} que \textcolor{blue}{está soleado} no \textcolor{blue}{está nublado}}. 
+\[ \forall x (D(x) \land S(x) \imp \neg N(x) )\]
+\small{ Donde $D(x)=x \, es \, día$, $S(x)=x \, está \, soleado$ y $N(x)=x \, está \, nublado$.}
+\item {\em Hay una \textcolor{purple}{lanza} que \textcolor{blue}{perfora} a todos los \textcolor{purple}{escudos}}. 
+\[ \ex x (L(x) \land \forall y (E(y) \imp D(x,y)))\]
+\small{ Donde $L(x)=x \, es \, lanza$, $E(x)=x \, es \, escudo$ y $P(x,y)=x \, perfora \, a \, y$.}
+\item {\em Hay un \textcolor<2-5>{purple}{profesor} al que ningún \textcolor<3-5>{purple}{estudiante} le ha \textcolor<4-5>{blue}{preguntado} alguna \textcolor<5>{purple}{duda}}. 
+\vspace{-0.3cm}
+\[ \exists w (P(w) \land \neg \exists z (E(z) \land \exists u (D(u) \land A(z,u,w))))\]
+\small{ Donde $P(x)=x \, es \, profesor$, $E(x)=x \, es \, estudiante$, $D(x)=x\,es\,duda$ y $A(x,y,z)=x \, le \, pregunta \, y \, a \, z$.}
+\ei
+}
+
+\frame{\titulos{Semántica Informal}{}
+\begin{tabular}{|c||p{4cm}|p{4cm}|}
+\hline
+\textbf{Fórmula }& \textbf{¿Cuándo es verdadera?} &
+\textbf{¿Cuándo es Falsa?}  \\
+\hline
+\textcolor<1>{purple}{$\forall x  P(x)$}&\textcolor<1>{purple}{ $P(x)$ es verdadera para todo $x$ en el universo de discurso} &\textcolor<1>{purple}{ Existe un $x$ para el cual $P(x)$ es falsa.}  \\
+\hline
+\textcolor<2>{purple}{$\exists x P(x)$} &\textcolor<2>{purple}{Existe un $x$ para el cual $P(x)$ es verdadera.   }& \textcolor<2>{purple}{$P(x)$ es falsa para todo $x$ en el universo de discurso.} \\
+\hline
+\end{tabular}
+}
+
+
+\frame{\titulos{Semántica Informal}{}
+\begin{tabular}{|c||p{4cm}|p{4cm}|}
+\hline
+\textbf{Fórmula }& \textbf{¿Cuándo es verdadera?} &
+\textbf{¿Cuándo es Falsa?}  \\
+\hline
+\textcolor<1>{purple}{$\forall x \forall y  P(x,y)$}& \textcolor<1>{purple}{$P(x,y)$ es verdadera para cualquier par de elementos $x,y$.}&\textcolor<1>{purple}{ Existe un par $x,y$ para el cual $P(x,y)$ es falsa. } \\
+\hline
+\textcolor<2>{purple}{$\exists x  \exists y P(x,y)$} &\textcolor<2>{purple}{Existe un par $x,y$ para el cual $P(x,y)$ es verdadera.  } &\textcolor<2>{purple}{ $P(x,y)$ es falsa para todo par de elementos $x,y$. }\\
+\hline
+\textcolor<3>{purple}{$\forall x \exists y  P(x,y)$}&\textcolor<3>{purple}{ Para todo elemento $x$, podemos encontrar un $y$ tal que $P(x,y)$ es verdadera.} &\textcolor<3>{purple}{ Existe un $x$ tal que $P(x,y)$ es falsa para todo $y$.  }\\
+\hline
+\textcolor<4>{purple}{$\exists x  \forall y P(x,y)$} &\textcolor<4>{purple}{Existe un $x$ para el cual $P(x,y)$ es verdadera para cualquier $y$.  } &\textcolor<4>{purple}{ Para todo $x$ existe un $y$ tal que $P(x,y)$ es falsa.} \\
+\hline
+\end{tabular}
+}
+
+\frame{\titulos{Semántica Formal}{}
+\begin{block}{{\bf Interpretación o estructura}}
+Sea $\L=\Pe\cup\F\cup\C$ un lenguaje de primer orden. Una {\bf estructura o
+  interpretación} para $\L$ es un par $\M=\pt{M,\I}$ donde $M\neq\varnothing$ es un conjunto
+  no vacío llamado el universo de la estructura, e $\I$ es una función con
+  dominio $\L$ tal que: \\
+\bi
+\item Si $P^{(n)}\in\Pe$ entonces $\I(P)$ es una función booleana que decide si una tupla está o no en la relación deseada, es decir, $\I(P): M^n \to Bool$. \\
+\espc
+\item Si $f^{(n)}\in\F$ entonces $\I(f)$ es una función $\I(f):M^n\imp M$. \espc
+\item Si $c\in\C$ entonces $\I(c)$ es un elemento de $M$, es decir $\I(c)\in M$. \espc
+\ei 
+
+\end{block}
+}
+
+
+\frame{\titulos{Semántica Formal}{Términos}
+\begin{block}{{\bf Estado o Asignación}}
+ Un {\bf estado, asignación o valuación de las variables} es una función $\sigma:\mathsf{Var}\imp M$. \espc
+\end{block}
+\pause
+\begin{block}{{\bf Estado modificado o actualizado}}
+Sea $\sigma:\mathsf{Var}\imp M$ un estado de las variables. \pause Dadas las
+  variables $x_1,\ldots,x_n$ y los elementos del universo $m_1,\ldots,m_n\in
+  M$ definimos el {\bf estado modificado o actualizado} en $x_1,\ldots,x_n$ por
+  $m_1,\ldots,m_n$ denotado $\sigma[x_1,\ldots,x_n/m_1,\ldots,m_n]$ o $\sigma[\vx/\vec{m}\;]$ como sigue: \pause
+\beqs
+\sigma[\vx/\vec{m}\;](y) =\left\{\ba{rl}
+\sigma(y) & \mbox{si}\; y\notin\{x_1,\ldots,x_n\} \\ \\
+m_i      & \mbox{si}\; y = x_i\;\;\;\;1\leq i\leq n 
+\ea
+\right.
+\eeqs
+\espc
+\end{block}
+}
+
+\frame{\titulos{Semántica Formal}{Términos}
+\begin{block}{{\bf Interpretación de Términos}}
+Sea $\sigma$ un estado de las variables. Definimos la {\bf función de interpretación} con respecto a $\sigma$, $\I_\sigma:\term\imp |\M|$ como sigue:\pause
+\beqs
+\ba{lll}
+\I_\sigma(x) &\; = \; & \sigma(x) \\ \\ 
+\I_\sigma(c) &\; = \; & \I(c) \\ \\  %= c^\I \\ 
+\I_\sigma\big(f(t_1,\ldots,t_n)\big)  & \; = \; &  
+f^\I_\sigma(\I(t_1),\ldots,\I_\sigma(t_n))
+\ea
+\eeqs
+\end{block}
+}
+
+\frame{\titulos{Semántica Formal}{Términos}
+\begin{exampleblock}{{\bf Lema de coincidencia para términos}}
+Sean $t\in\term$ y $\sigma_1,\sigma_2$ dos estados de las variables tales que $\sigma_1(x)=\sigma_2(x)$ para toda variable $x$
+  que figura en $t$. Entonces \pause
+ \[\I_{\sigma_1}(t)=\I_{\sigma_2}(t) .\]
+\end{exampleblock}
+}
+
+
+\frame{\titulos{Semántica Formal}{Términos}
+\begin{exampleblock}{{\bf Lema de sustitución para términos}}
+Sean $r\in\term$, $\sigma$ un estado de   las variables, $[\vx:=\vt\;]$ una sustitución y $m_1,\ldots,m_n\in
+  M$ tales que $\I_\sigma(t_i)=m_i\;\;1\leq i\leq n$. Entonces \pause
+\beqs
+\I_\sigma\big(r[\vx:=\vt\;]\big) = \I_{\sigma[\vx/\vec{m}\;]}(r)
+\eeqs
+\end{exampleblock}
+}
+
+\frame{\titulos{Semántica Formal}{Fórmulas}
+\begin{block}{{\bf Interpretación de Fórmulas}}
+Sea $\sigma$ un estado de las variables. Definimos la {\bf función de interpretación} sobre fórmulas con respecto a $\sigma$, $\I_\sigma:\form\imp\{0,1\}$ como sigue: \pause
+\[
+\ba{lcl}
+\I_\sigma(\bot) \; = \;  0  & \I_\sigma(\top) \; = \;  1 & \\ \\ \pause
+\I_\sigma\big(P(t_1,\ldots,t_m)\big)\; = \;1 & \;\mbox{si y sólo si}\; &
+\big(\I_\sigma(t_1),\ldots,\I_\sigma(t_m)\big)\in P^\I \\ \\ \pause
+\I_\sigma(t_1=t_2) \; = \;  1 & \;\mbox{si y sólo si}\; & \I_\sigma(t_1)=\I_\sigma(t_2) \\ \\ \pause
+\I_\sigma(\neg\vp) \; = \; 1 & \;\mbox{si y sólo si}\; & \I_\sigma(\vp)=0 \\ \\ \pause
+\I_\sigma(\vp\land\psi) \; = \;  1 & \;\mbox{si y sólo si}\; &
+\I_\sigma(\vp)=\I_\sigma(\psi)=1 \\ \\ \pause
+\I_\sigma(\vp\lor\psi) \; = \;  0 & \;\mbox{si y sólo si}\; &
+\I_\sigma(\vp)=\I_\sigma(\psi)=0 \\ \\ 
+\ea
+\]
+\end{block}
+}
+
+
+\frame{\titulos{Semántica Formal}{Fórmulas}
+\begin{block}{{\bf Interpretación de Fórmulas}}
+continuación: 
+\[
+\ba{lcl}
+\I_\sigma(\vp\imp\psi) \; = \;  0 & \;\mbox{si y sólo si}\; &
+\I_\sigma(\vp)=1\;\mbox{e}\;\I_\sigma(\psi)=0 \\ \\ \pause
+\I_\sigma(\vp\iff\psi) \; = \;  1 & \;\mbox{si y sólo si}\; &
+\I_\sigma(\vp)=\I_\sigma(\psi) \\ \\ \pause
+\I_\sigma(\fa x\vp) \; = \;  1 & \;\mbox{si y sólo si}\; &
+\I_{\sigma[x/m]}(\vp)=1\;\;\mbox{para todo}\;m\in M \\ \\ \pause
+\I_\sigma(\ex x\vp) \; = \;  1 & \;\mbox{si y sólo si}\; &
+\I_{\sigma[x/m]}(\vp)=1\;\;\mbox{para algún}\;m\in M \\ \\
+\ea
+\]
+
+\end{block}
+}
+
+\frame{\titulos{Semántica Formal}{Fórmulas}
+\begin{exampleblock}{{\bf Lema de coincidencia para fórmulas}}
+Sean $\vp$ una fórmula y 
+$\sigma_1,\sigma_2$ dos estados de las variables tales que 
+$\sigma_1(x)=\sigma_2(x)$ para toda variable
+$x\in FV(\vp)$. Entonces  \pause
+ \[ \I_{\sigma_1}(\vp)=\I_{\sigma_2}(\vp). \]
+ \espc
+\end{exampleblock}
+}
+
+
+\frame{\titulos{Semántica Formal}{Fórmulas}
+\begin{exampleblock}{{\bf Lema de sustitución para fórmulas}}
+Sean $\vp\in\form$, $\sigma$ un estado de las variables, $[\vx:=\vt\;]$ una sustitución y $m_1,\ldots,m_n\in M$ 
+  tales que $\I_\sigma(t_i) = m_i \;\;1\leq i\leq n$. Entonces \pause
+\[
+\I_\sigma\big(\vp[\vx:=\vt\;]\big) = \I_{\sigma[\vx/\vec{m}\;]}(\vp) 
+\]
+\end{exampleblock}
+}
+
+\frame{\titulos{Semántica Formal}{Fórmulas}
+\begin{block}{{\bf Verdad y Satisfacibilidad}}
+Sean $\vp$ una fórmula y $\M=\pt{M,\I}$ una 
+interpretación. Entonces \\
+\bi
+\item $\vp$ es
+  {\bf satisfacible en} $\mathbf{\M}$ si existe un
+  estado de las variables $\sigma$ tal que $\I_\sigma(\vp)=1$, lo cual suele
+  denotarse con $\M\models\vp[\sigma]$ o con $\M\models_\sigma\vp$.  
+\item $\vp$ es {\bf verdadera
+  en} $\M$ si para todo estado de las variables $\sigma$  se tiene $\I_\sigma(\vp)=1$,
+  es decir, si $\vp$ es satisfacible en $\M$ en todos los estados posibles. \\
+  \pause
+  En tal caso también decimos que $\M$ es un {\bf modelo} de $\vp$ lo cual se
+  denotará con $\M\models\vp$. \espc
+\ei
+\end{block}
+}
+
+\frame{\titulos{Semántica Formal}{Fórmulas}
+\begin{block}{{\bf Falsedad}}
+Sean $\M=\pt{M,\I}$ una interpretación y $\vp$ una fórmula. Decimos que 
+$\vp$ es {\bf falsa en} $\M$ si y sólo si $\M\models\neg\vp$. \pause Es decir $\vp$ es falsa 
+si y sólo si su negación $\neg\vp$ es verdadera.
+
+\end{block}
+}
+
+\frame{\titulos{Semántica Formal}{Fórmulas}
+En lógica proposicional las nociones de ser falsa y no ser verdadera coinciden. Sin embargo, en lógica de predicados la equivalencia se pierde. \\
+\espc
+Una fórmula no verdadera es  aquella tal que es insatisfacible en algún estado de sus variables, o bien tal que su negación es satisfacible en algún estado de sus variables. Sin embargo, para poder afirmar que  $\vp$ es falsa, por definición tendríamos que mostrar que $\M\models\neg\vp$, es decir que~$\neg\vp$ es satisfacible en \textbf{todos} los estados posibles. Por lo tanto la noción de falsedad es más fuerte que la noción de no ser verdadera.
+}
+
+\frame{\titulos{Semántica Formal}{Propiedades de la relación de verdad}
+La relaci\'on de verdad en lógica de predicados no tiene las mismas propiedades que su contraparte en la lógica proposicional. \\
+\espc
+Por ejemplo, sean $\L=\{P^{(1)},Q^{(1)}\},\;\M=\langle \mathbb{N},\I\rangle$ 
+donde $P^\I$ es la propiedad \enquote{ser par} y $Q^\I$ es la
+propiedad \enquote{ser impar}. \\
+Entonces $\M\models P(x)\lor Q(x)$ puesto que cualquier n\'umero natural es
+par o es impar. \\
+\espc
+Sin embargo, no se cumple que $\M\models P(x)$ ni que $\M\models Q(x)$. Puesto 
+que el valor de~$x$ no puede ser siempre par o siempre impar, todo depende del 
+estado de las variables. 
+}
+
+
+\frame{\titulos{Semántica Formal}{Propiedades de la relación de verdad}
+\begin{block}{{Propiedades de la relación de verdad}}
+Sean $\M$ una $\L$-interpretaci\'on y $\vp,\psi$ f\'ormulas. Entonces
+\bi
+\item Si $\M\models\vp$ entonces $\M\not\models\neg\vp$. \espc
+\item Si $\M\models\vp\imp\psi$ y $\M\models\vp$ entonces
+  $\M\models\psi$. \espc
+\item Si $\M\models\vp$ entonces $\M\models\vp\lor\psi$. \espc
+  \item $\M\models\vp\land\psi$ si y sólo si $\M\models\vp$ y $\M\models\psi$. \espc
+\item $\M\models\vp\;\mbox{si y sólo si}\;\M\models\fa\vp.$ donde
+  $\fa\vp$ denota a la cerradura universal de $\vp$, es decir a la
+  fórmula obtenida al cuantificar universalmente todas las variables
+  libres de $\vp$.
+  
+\ei
+\end{block}
+
+}
+
+\end{document}

@@ -1,0 +1,465 @@
+	%%% Presentaciones para Lenguajes de programacion y sus paradigmas 
+
+\documentclass[xcolor=dvipsnames,table,handout]{beamer}
+%\documentclass[xcolor=dvipsnames,table]{beamer}
+\newcommand{\espc}{\vspace{0.3cm}}
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{hyperref}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+
+%%%% paquetes matematicas
+\usepackage{amssymb,amsmath,amscd}
+\usepackage{extarrows}
+\usepackage{stmaryrd}
+\usepackage{mathabx}
+\usepackage{mathrsfs}
+% \usepackage{mathabx}
+\usepackage{amsthm}
+
+%%%%%
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{pifont}
+\usepackage{xcolor}
+\usepackage{etex}
+\usepackage{tikz}
+\usepackage{array}
+%\usepackage{pgfplots}
+
+%%%% cosmetics
+% D.Remy package for pretty display of rules
+\usepackage{mathpartir}
+
+% para insertar codigo con formato particular 
+\usepackage{listing} 
+
+% comillas 
+\usepackage[autostyle=true,spanish=mexican]{csquotes}
+
+% codigo 
+\usepackage{verbatim}
+\usepackage{alltt}
+
+% footnotes
+\usepackage[bottom]{footmisc}
+\usepackage{setspace}
+
+\usepackage{wrapfig}
+\usepackage{caption}
+
+
+\hfuzz=5.002pt %parameter to allow hbox overfulled by length before error!
+
+% Options for presentation
+% ------------------------
+% \definecolor{mycolor}{RGB}{255,192,3}
+\definecolor{mycolor}{RGB}{17,132,221}
+\mode<presentation>
+{
+% \usetheme[secheader]{Boadilla}
+% \usecolortheme{orchid}
+\useoutertheme{infolines}
+\useinnertheme{rectangles}
+\setbeamertemplate{itemize items}[square]
+\setbeamertemplate{enumerate items}[square]
+\setbeamersize{text margin left=6mm, text margin right=6mm}
+
+\setbeamercolor{alerted text}{fg=red,bg=red!70!white}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{frametitle}{bg=mycolor,fg=white}
+\setbeamercolor{normal text}{bg=white,fg=black}
+\setbeamercolor{structure}{bg=black,fg=mycolor}
+\setbeamercolor{title}{bg=mycolor,fg=white}
+\setbeamercolor{subtitle}{bg=mycolor,fg=white}
+\setbeamercolor{titlelike}{bg=white,fg=mycolor}
+
+\setbeamercovered{invisible}
+
+\setbeamercolor*{palette primary}{fg=mycolor,bg=white}
+\setbeamercolor*{palette secondary}{bg=white,fg=white}
+\setbeamercolor*{palette tertiary}{fg=mycolor,bg=white}
+\setbeamercolor*{palette quaternary}{fg=white,bg=white}
+
+\setbeamercolor{separation line}{bg=mycolor,fg=mycolor}
+\setbeamercolor{fine separation line}{bg=white,fg=red}
+\setbeamercolor{author in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{title in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{date in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{institute in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{section in head/foot}{bg=mycolor!60!white, fg=Red}
+\setbeamercolor{subsection in head/foot}
+{bg=mycolor!50!white,fg=mycolor!50!white}
+
+
+\setbeamertemplate{headline}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.65ex,dp=1.5ex,center]{section in 
+head/foot}%
+    \usebeamerfont{section in head/foot}\insertsectionhead\hspace*{2ex}
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.65ex,dp=1.5ex,center]{subsection 
+in head/foot}%
+    \usebeamerfont{subsection in head/foot}\hspace*{2ex}\insertsubsectionhead
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+% \beamerdefaultoverlayspecification{<+->}
+\beamertemplatenavigationsymbolsempty
+% \setbeamertemplate{footline}[frame number]
+}
+
+\input{macroslc}
+
+\title[]{Lógica computacional}
+\subtitle{Tema: Lógica de primer orden: Introducción y sintaxis. }
+\author[]{}
+\institute[UNAM-FC]{Facultad de Ciencias\\ 
+Universidad Nacional Aut\'onoma de M\'exico}
+\date[]{
+\newline{\tiny{Material desarrollado bajo el proyecto UNAM-PAPIME PE102117.}}}
+ 
+
+\beamerdefaultoverlayspecification{<+->}
+ 
+\titlegraphic{\includegraphics[width=16mm]{fc2.png}}
+ 
+
+\begin{document}
+
+\begin{frame}
+\titlepage 
+\end{frame}
+\note{}
+
+\frame{\titulos{Sintaxis}{}
+\begin{center}
+\begin{tikzpicture}
+\draw [blue] (2.3,0) circle [radius=2];
+\node[blue] at (2.4,1) {$x_{1}, x_{2}, ... , x_{n}$};
+\node[blue] at (2.4,0) {$c_{1}, c_{2}, ...,c_{n}$};
+\node[blue] at (2.4,-1) {$f(t_{1}, t_{2}, ... , t_{n})$};
+\node at (2.4,-2.5) {TÉRMINOS};
+\draw [purple] (6.7,0) circle [radius=2];
+\node[purple] at (6.6,1.1) {$\top, \bot$};
+\node[purple] at (6.6,0.6) {$P(t_{1}, ... , t_{n})$};
+\node[purple] at (6.6,-0.3) {$\neg \varphi \, , \, \varphi \land \psi \, , \, \varphi \lor \psi$};
+\node[purple] at (6.6,-0.8) {$ \, \varphi \imp \psi \, , \, \varphi \iff \psi$};
+\node[purple] at (6.6,-1.2) {$ \, \exists x \varphi  \, , \, \forall y \varphi $};
+\node at (6.4,-2.5) {FÓRMULAS};
+\draw [magenta] (5.4,0.3) rectangle (7.9,1.4);
+\end{tikzpicture}
+\end{center}
+}
+
+
+\frame{\titulos{Sintaxis}{}
+
+\begin{block}{{\bf Términos}}
+Los {\bf términos} del lenguaje son aquellas expresiones que representan objetos, elementos o individuos en el universo del discurso y se generan con la siguiente gramática:
+$$ t ::= x \mid c \mid f(t_1,\ldots,t_m) $$
+\espc
+Al conjunto de términos en lenguaje de la Lógica de Primer Oren lo denotaremos con $\term$. \\
+\espc
+\end{block}
+
+}
+
+
+
+\frame{\titulos{Sintaxis}{}
+\begin{block}{{\bf Fórmulas}}
+El conjunto de expresiones atómicas se denotará con $\mathsf{ATOM}$ y está formado por: \\
+\bi
+\item Las constantes lógicas $\bot,\top$.
+\item Las expresiones de la forma: $P_1(t_1,\ldots,t_n)$ donde
+  $t_1,\ldots,t_n$ son términos. 
+\item Las expresiones de la forma $t_1=t_2$, si el lenguaje cuenta con igualdad. \\
+\ei
+\pause
+Los términos se construyen bajo la siguiente gramática:
+\[
+\begin{array}{rcl}
+  ATOM & ::= & \bot \mid \top \mid P(t_1,\ldots,t_m) \mid t_1=t_2
+\end{array}
+\]
+\espc
+\end{block}
+}
+
+\frame{\titulos{Sintaxis}{}
+\begin{block}{{\bf Fórmulas}}
+El conjunto $\form$ de fórmulas compuestas, llamadas usualmente {\em fórmulas}, se define recursivamente como sigue: 
+\bi
+\item Si $\vp\in\mathsf{ATOM}$ entonces $\vp\in\form$. Es decir, 
+toda fórmula atómica es una fórmula.
+\item Si $\vp\in\form$ entonces $(\neg\vp)\in\form$.
+\item Si $\vp,\psi\in\form$ entonces 
+$(\vp\land\psi),(\vp\lor\psi),(\vp\imp\psi),(\vp\iff\psi)\in\form$.
+\item Si $\vp\in\form$ y $x\in\mathsf{Var}$ entonces 
+$(\fa x\vp),(\exists x\vp)\in\form$.
+\ei
+\espc
+\pause
+La gramática correspondiente es:
+\[
+\begin{array}{rcl}
+  F&::=&ATOM \mid (\neg F) \mid (F\, \star \, F)  \mid (\fa x \, F) \mid (\ex x \, F) \\
+\star & ::= & \land \mid \lor \mid \imp \mid \iff 
+\end{array}
+\]
+\espc
+\end{block}
+}
+
+
+\frame{\titulos{Sintaxis}{}
+{\bf Convención: }
+ Los cuantificadores se aplican a la \textit{mínima} expresión sintácticamente posible delante del cuantificador. \\
+\espc
+\pause
+De manera que
+\[
+\ba{rll}
+\fa x\vp\imp \psi  & \text{ es} &  (\fa x\vp)\imp \psi \\
+\pause
+\espc
+\ex y\vp \land \fa w\psi\imp\chi& \text{ es} & (\ex y\vp)\land(\fa 
+w\psi)\imp\chi\\
+\ea
+\]
+}
+
+\frame{\titulos{Inducción y recursión}{}
+\begin{block}{{\bf Definición recursiva  de funciones sobre términos}}
+Para definir una funci\'on $h:\term \imp A$, basta definir $h$ como sigue:
+\bi
+\item Definir $h(x)$ para $x\in\mathsf{Var}$.
+\espc
+\item Definir $h(c)$ para cada constante $c\in\C$.
+\espc
+\item Suponiendo que $h(t_1),\ldots,h(t_n)$ est\'an definidas, definir \\
+$h(f(t_1,\ldots,\allowbreak t_n))$ para cada s\'{\i}mbolo de funci\'on $f\in\F$ 
+de índice $n$.
+\ei
+\espc
+\end{block}
+
+
+}
+
+
+\frame{\titulos{Inducción y recursión}{}
+\begin{block}{{\bf Definición recursiva de funciones sobre fórmulas}}
+Para definir una funci\'on~$h:\form\imp A$, basta definir~$h$ como sigue:
+\bi
+\item Definir $h$ para cada f\'ormula at\'omica, es decir, definir $h(\bot), 
+h(\top)$, $h(P(t_1,\ldots,t_n))$ y $h(t_1=t_2)$ si el lenguaje tiene igualdad.
+\espc
+\item Suponiendo definidas $h(\vp)$ y $h(\psi)$, definir a partir de
+ellas a\\
+$h(\neg\vp),\;h(\vp\lor\psi),\;h(\vp\land\psi),\;h(\vp\imp\psi),
+\;h(\vp\iff\psi) 
+,\;h(\fa x\vp)$ y $h(\ex x\vp)$. 
+\ei
+\espc
+\end{block}
+
+\espc 
+}
+
+
+\frame{\titulos{Inducción y recursión}{}
+\begin{block}{{\bf Principio de inducción estructural para términos}}
+Sea $\mathcal{P}$ una propiedad acerca de t\'erminos. Para demostrar que $\mathcal{P}$ es
+v\'alida para todos los t\'erminos, basta seguir los siguientes pasos:
+\bi
+\item Caso base: mostrar que
+\bi
+\item $\mathcal{P}$ es v\'alida para $x$, con $x\in\mathsf{Var}$ .
+\item $\mathcal{P}$ es v\'alida para $c$, con $c\in\mathcal{C}$.
+\ei
+\espc
+\item Hipótesis de inducción: suponer $\mathcal{P}$ para cualesquiera 
+$t_1,\ldots,t_n\in\term$.
+\espc
+\item Paso inductivo: usando la Hipótesis de inducción mostrar que 
+\bi
+\item  $f(t_1,\ldots,t_n)$ cumple $\mathcal{P}$, donde $f\in\mathcal{F}$ es un símbolo de función de índice $n$.
+\ei
+\espc
+\ei
+
+\end{block}
+}
+
+
+\frame{\titulos{Inducción y recursión}{}
+\begin{block}{{\bf Principio de inducción estructural para fórmulas}}
+Sea $\mathcal{P}$ una propiedad acerca de fórmulas. Para probar que toda fórmula $
+\vp\in\form$ tiene la propiedad $\mathcal{P}$ basta seguir los siguientes pasos:
+\espc
+\bi
+\item Caso base: mostrar que toda fórmula atómica tiene la propiedad $\mathcal{P}$. \\
+
+
+\item Hipótesis de inducción: suponer que $\vp$ y $\psi$ cumplen $\mathcal{P}$.
+\espc
+\item Paso inductivo: mostrar usando la Hipótesis de inducci\'on que
+\be
+\item $(\neg\vp)$ también cumple $\mathcal{P}$.
+\item  $(\vp\star\psi)$ tiene la propiedad $\mathcal{P}$, donde 
+$\star\in\{\imp,\land,\lor,\iff\}$
+\item $\fa x\vp$ y $\ex x\vp$ cumplen $\mathcal{P}$.
+\espc
+\ee
+\ei
+
+\end{block}
+}
+
+
+
+\frame{\titulos{Ligado y alcance}{}
+\begin{block}{{\bf Ligado y alcance}}
+Dada una cuantificación $\fa x \varphi$ o $\ex x \varphi$, la presencia de $x$ en $\forall x$ o $\ex x$ es la variable que {\em liga} el cuantificador correspondiente; mientras que la fórmula $\varphi$ es el {\bf alcance}, ámbito o radio del cuantificador.  \\
+\pause
+\espc
+Una presencia de la variable $x$ en la fórmula $\varphi$ está {\bf ligada} si figura en el alcance de un cuantificador y éste es el más cercano a $x$. \\
+\espc
+Si una presencia de la variable $x$ no es ligada, decimos que es {\bf libre}.
+\end{block}
+}
+
+\frame{\titulos{Sustitución}{}
+\begin{block}{{\bf Sustitución sobre términos}}
+La aplicación de una sustitución $[\vec{x}:=\vec{t}]$ a un término $r$,
+denotada $r[\vec{x}:=t]$, se define como el término obtenido al reemplazar 
+\textbf{simult\'aneamente} todas las presencias de $x_i$ en $r$ por $t_i$. 
+Este proceso de define  recursivamente como sigue:
+\pause
+\[
+\ba{rll}
+x_i[\vec{x}:=\vec{t}\,] & = & t_i \qquad  1\leq i\leq n \\ \\ 
+\pause
+z[\vec{x}:=\vec{t}\,] & = & z \qquad  \text{ si } z\neq x_i\;1\leq i\leq n  \\ \\
+\pause
+c[\vec{x}:=\vec{t}\,] & = & c \qquad 
+  \text{ si } c\in\C\text{, es decir, }c\text{ constante } \\ \\
+\pause
+f(t_1,\ldots,t_m)[\vec{x}:=\vec{t}\,] & = & 
+f(t_1[\vec{x}:=\vec{t}\,],\ldots,t_m[\vec{x}:=\vec{t}\,]) \quad \text{ con }f^{(m)}\in\F.
+\ea
+\espc
+\]
+\end{block}
+}
+
+\frame{\titulos{Sustitución}{}
+Debido a la presencia de variables libres y ligadas, la aplicación de una {\em sustitución textual} a una fórmula puede llevar a situaciones problemáticas, por ejemplo: 
+\pause
+\espc
+\bi
+\item Generar expresiones que no son fórmulas:  \[
+  \big(\fa x P(y,fx)\big)[x,y:=gy,z] = \fa gy P\big(z,fgy)\big)
+  \]
+La expresión de la derecha no es una fórmula. 
+\ei
+}
+
+\frame{\titulos{Sustitución}{}
+\bi
+\item Captura de variables: 
+Consideremos la siguiente aplicación de sustitución
+\[ 
+\ba{rcl} 
+\fa x\big(\ex   y(\,x\neq y)\big) [x:=y]  & -> & \\ \pause
+&  -> &   \ex y\big(\,(x\neq y)\big) [x:=y]  \\ \pause
+& -> &  \,(x\neq y)[x:=y]  \\ \pause
+& -> &  y\neq y  \\ \pause 
+& & \\ 
+\textcolor{red}{ \fa x\big(\ex   y(\,x\neq y)\big) [x:=y] } & \textcolor{red}{=} & \textcolor{red}{\fa x\big(\ex   y(\,y\neq y)\big) }\\
+\ea\]
+\ei
+\pause
+Para solucionar lo anterior, vamos a preferir un método utilizado en  teoría de 
+  lenguajes de programación: \textit{la aplicación de una sustitución a una 
+  fórmula se  define renombrando variables ligadas de manera que siempre 
+  podremos obtener  una sustitución admisible.}
+}
+
+\frame{\titulos{Sustitución}{}
+\begin{block}{{\bf Sustitución sobre fórmulas}}
+La aplicación de una sustitución a una fórmula $\vp[\vec{x}:=\vec{t}\,]$ se define  
+\textbf{recursivamente} como sigue: \pause
+\[
+ \ba{rll}
+  \bot[\vec{x}:=\vec{t}\;] & = & \bot \\ 
+  \top[\vec{x}:=\vec{t}\;] & = & \top \\ \pause
+  P(t_1,\ldots,t_m)[\vec{x}:=\vec{t}\;] & = &
+    P\big(t_1[\vec{x}:=\vec{t}\;], \ldots, t_m[\vec{x}:=\vec{t}\;]\big) \\ \pause
+  (t_1 = t_2)[\vec{x}:=\vec{t}\;] & = & t_1[\vec{x}:=\vec{t}\;]=t_2[\vec{x}:=\vec{t}\;]\\ \\ \pause
+  (\neg \vp)[\vec{x}:=\vec{t}\;] & = & \neg \big(\vp[\vec{x}:=\vec{t}\;]\big)\\ \pause
+  (\vp\star \psi)[\vec{x}:=\vec{t}\;] & = &
+  \big(\vp[\vec{x}:=\vec{t}\;]\star\psi[\vec{x}:=\vec{t}\;]\big)\\ \\ \pause
+  (\fa y\vp)[\vec{x}:=\vec{t}\;] & = & \fa y\big(\vp[\vec{x}:=\vec{t}\;]\big)\; 
+\text{ \textbf{si} } y\notin
+  \vec{x}\cup Var(\vec{t}) \\
+(\ex y\vp)[\vec{x}:=\vec{t}\;] & = & \ex y\big(\vp[\vec{x}:=\vec{t}\;]\big)\; \text{ 
+\textbf{si} } y\notin  \vec{x}\cup Var(\vec{t}) \\ \\
+\ea
+\]
+
+
+\end{block}
+}
+
+
+\frame{\titulos{Sustitución}{}
+La definición de sustitución en fórmulas cuenta con una restricción aparente
+en el caso de los cuantificadores, por ejemplo, la sustitución
+\[
+\fa x (Q(x)\to R(z,x))[z:=f(x)]
+\] 
+\pause
+no está definida, puesto que~$x$ figura en~$f(x)$ es decir~$x\in Var(f(x))$, 
+con lo que no se cumple la condición necesaria para aplicar la sustitución. \\
+\pause
+\espc
+\espc
+Esta restricción desaparece al notar que los nombres de las 
+variables ligadas no importan: por ejemplo, las fórmulas $\fa x P(x)$ y 
+$\fa y P(y)$ significan exactamente lo mismo.
+}
+
+
+\frame{\titulos{Sustitución}{}
+Por lo tanto, convenimos en identificar fórmulas que sólo difieren en sus
+variables ligadas, esto se hace formalmente mediante la llamada relación de
+$\alpha$-equivalencia definida como sigue: \\
+\pause
+\espc
+\begin{block}{{\bf Alfa Equivalencia}}
+Decimos que dos fórmulas~$\vp_1,\;\vp_2$ son $\alpha$-equivalentes lo cual
+escribimos $\vp_1\sim_\alpha \vp_2$ si y sólo si $\vp_1$ y $\vp_2$ difieren unicamente en los nombres de sus variables ligadas.
+\end{block}
+}
+
+\frame{\titulos{Sustitución}{}
+Las siguientes expresiones son $\alpha$-equivalentes. \\
+\pause
+\espc
+$\fa x P(x,y)\to \ex y R(x,y,z)\;\; \sim_\alpha\;\; $  \pause 
+$ \fa w P(w,y)\to \ex v R(x,v,z) \;\;  \;\; $  \\ \pause \espc 
+$ \fa w P(w,y)\to \ex v R(x,v,z) \;\; \sim_\alpha \fa z P(z,y)\to \ex u R(x,u,z) $
+}
+
+
+
+
+\end{document}

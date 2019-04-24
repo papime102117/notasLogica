@@ -1,0 +1,404 @@
+%%% Presentaciones para Lenguajes de programacion y sus paradigmas 
+
+\documentclass[xcolor=dvipsnames,table,handout]{beamer}
+%\documentclass[xcolor=dvipsnames,table]{beamer}
+
+\newcommand{\espc}{\vspace{0.3cm}}
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{hyperref}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+
+%%%% paquetes matematicas
+\usepackage{amssymb,amsmath,amscd}
+\usepackage{extarrows}
+\usepackage{stmaryrd}
+\usepackage{mathabx}
+\usepackage{mathrsfs}
+% \usepackage{mathabx}
+\usepackage{amsthm}
+
+%%%%%
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{pifont}
+\usepackage{xcolor}
+\usepackage{etex}
+\usepackage{tikz}
+\usepackage{array}
+%\usepackage{pgfplots}
+
+%%%% cosmetics
+% D.Remy package for pretty display of rules
+\usepackage{mathpartir}
+
+% para insertar codigo con formato particular 
+\usepackage{listing} 
+
+% comillas 
+\usepackage[autostyle=true,spanish=mexican]{csquotes}
+
+% codigo 
+\usepackage{verbatim}
+\usepackage{alltt}
+
+% footnotes
+\usepackage[bottom]{footmisc}
+\usepackage{setspace}
+
+\usepackage{wrapfig}
+\usepackage{caption}
+
+
+\hfuzz=5.002pt %parameter to allow hbox overfulled by length before error!
+
+% Options for presentation
+% ------------------------
+% \definecolor{mycolor}{RGB}{255,192,3}
+\definecolor{mycolor}{RGB}{17,132,221}
+\mode<presentation>
+{
+% \usetheme[secheader]{Boadilla}
+% \usecolortheme{orchid}
+\useoutertheme{infolines}
+\useinnertheme{rectangles}
+\setbeamertemplate{itemize items}[square]
+\setbeamertemplate{enumerate items}[square]
+\setbeamersize{text margin left=6mm, text margin right=6mm}
+
+\setbeamercolor{alerted text}{fg=red,bg=red!70!white}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{frametitle}{bg=mycolor,fg=white}
+\setbeamercolor{normal text}{bg=white,fg=black}
+\setbeamercolor{structure}{bg=black,fg=mycolor}
+\setbeamercolor{title}{bg=mycolor,fg=white}
+\setbeamercolor{subtitle}{bg=mycolor,fg=white}
+\setbeamercolor{titlelike}{bg=white,fg=mycolor}
+
+\setbeamercovered{invisible}
+
+\setbeamercolor*{palette primary}{fg=mycolor,bg=white}
+\setbeamercolor*{palette secondary}{bg=white,fg=white}
+\setbeamercolor*{palette tertiary}{fg=mycolor,bg=white}
+\setbeamercolor*{palette quaternary}{fg=white,bg=white}
+
+\setbeamercolor{separation line}{bg=mycolor,fg=mycolor}
+\setbeamercolor{fine separation line}{bg=white,fg=red}
+\setbeamercolor{author in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{title in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{date in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{institute in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{section in head/foot}{bg=mycolor!60!white, fg=Red}
+\setbeamercolor{subsection in head/foot}
+{bg=mycolor!50!white,fg=mycolor!50!white}
+
+
+\setbeamertemplate{headline}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.65ex,dp=1.5ex,center]{section in 
+head/foot}%
+    \usebeamerfont{section in head/foot}\insertsectionhead\hspace*{2ex}
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.65ex,dp=1.5ex,center]{subsection 
+in head/foot}%
+    \usebeamerfont{subsection in head/foot}\hspace*{2ex}\insertsubsectionhead
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+% \beamerdefaultoverlayspecification{<+->}
+\beamertemplatenavigationsymbolsempty
+% \setbeamertemplate{footline}[frame number]
+}
+
+\input{macroslc}
+
+\title[]{Lógica computacional}
+\subtitle{Tema: Lógica Clausular Proposicional}
+\author[]{}
+\institute[UNAM-FC]{Facultad de Ciencias\\ 
+Universidad Nacional Aut\'onoma de M\'exico}
+\date[]{
+\newline{\tiny{Material desarrollado bajo el proyecto UNAM-PAPIME PE102117.}}}
+ 
+
+\beamerdefaultoverlayspecification{<+->}
+ 
+\titlegraphic{\includegraphics[width=16mm]{fc2.png}}
+ 
+
+\begin{document}
+
+\begin{frame}
+\titlepage 
+\end{frame}
+\note{}
+
+\frame{\titulos{Formas Normales}{}
+\begin{block}{{\bf Fnn}}
+Una fórmula $\varphi$ está en {\bf forma normal negativa} si y s\'olo si cumple las siguientes condiciones:
+\be
+\item $\vp$ no contiene equivalencias ni implicaciones
+\item Las negaciones que figuran en~$\vp$ afectan s\'olo a f\'ormulas 
+at\'omicas. 
+\ee
+\espc
+\pause
+\noindent La transformación a forma normal negativa se apoya en las siguientes 
+equivalencias:
+\bi
+\item Doble Negaci\'on: $\neg\neg\vp\equiv\vp$.
+\item De Morgan: $\neg(\vp\lor\psi)\equiv \neg\vp\land\neg\psi$.
+\item De Morgan: $\neg(\vp\land\psi)\equiv \neg\vp\lor\neg\psi$.
+\item $\neg(\vp\imp\psi)\equiv\vp\land\neg\psi$
+\item $\neg(\vp\imp\psi)\equiv\neg\vp\imp\psi\equiv\vp\imp\neg\psi$.
+\ei
+\espc
+\end{block}
+
+}
+
+
+\frame{\titulos{Formas Normales}{}
+
+\begin{block}{{\bf Literales.}}
+{\bf Una literal} $\ell$ es una fórmula atómica (variable proposicional $p$, $\bot$ o $\top$) o la negaci\'on de una fórmula atómica. \\
+\pause
+\espc
+Una literal es {\bf negativa} si es una negación, en otro caso decimos que es \textbf{positiva}. \\
+\pause
+\espc
+Dada una literal $\ell$ definimos su {\bf literal contraria}, denotada $\ell^c$, como sigue:   
+\[ 
+\ell^c =
+\left\{
+\ba{rl}
+ a & \text{ si } \;\;\;\ell=\neg a \\
+\neg a  & \text{ si } \;\;\;\ell=a
+\ea
+\right.
+\]
+\pause
+Donde $a$ es una fórmula atómica, es decir, $varp$, $\top$ o $\bot$. \\
+\espc
+\pause
+El par $\{\ell,\ell^c\}$ se llama un par de {\bf literales complementarias.} 
+\espc
+\end{block}
+
+}
+
+\frame{\titulos{Formas Normales}{}
+\begin{block}{{\bf FNC.}}
+{\bf Una cl\'ausula} $\C$ es una literal o una disyunci\'on de literales. \\
+\espc
+\pause
+Una f\'ormula $\vp$ est\'a en \textbf{forma normal conjuntiva} (\verb"fnc") si y s\'olo si es de la forma $\C_1\land \C_2\land\ldots\land\C_n$ , donde cada $\C_i$ es una cláusula.
+\end{block}
+
+}
+
+\frame{\titulos{Formas Normales}{}
+En particular, se sigue que cualquier literal y cualquier cláusula están en forma normal conjuntiva. \\
+\pause
+Los conceptos anteriores de literal, cláusula y forma normal conjuntiva se definen de manera breve mediante la siguiente gramática:
+\[
+ \ba{rcll}
+  S & ::= & F & \\
+  F & ::= & \C \mid  \C\land F & \;\;\;\;\text{- - forma normal conjuntiva} \\
+  \C & ::= & \ell \mid \ell\lor\C & \;\;\;\;\text{- - cláusulas}\\ 
+  \ell & ::= & a \mid \neg\,a & \;\;\;\;\text{- - literales}\\ 
+  a & ::= & \bot \mid \top \mid p & \;\;\;\;\text{- - atómicas}\\
+
+ \ea
+\]
+
+}
+
+\frame{\titulos{Formas Normales}{}
+El empleo de las formas normales conjuntivas simplifica el procedimiento para
+decidir si una fórmula dada es válida, es decir, es tautología. 
+\pause
+\espc
+\begin{exampleblock}{}
+Una cláusula $\C=\ell_1\lor\ell_2\lor\ldots\lor\ell_n$ es tautología $(\models\vp)$  si y s\'olo si existen $1\leq i,j\leq n$ tales que
+$\ell_i^c=\ell_j$. \\
+\espc
+Es decir, $\models\C$ si y s\'olo si $\C$ contiene un par de literales complementarias.
+\end{exampleblock}
+}
+
+\frame{\titulos{Formas Normales}{}
+La proposición anterior permite tener un algoritmo para verificar si $\models\vp$, cuando $\vp$ está en forma normal conjuntiva, 
+digamos $\vp=\C_1\land\ldots\land\C_n$:
+\espc
+\be
+\item Para cada $1\leq i\leq n$, buscar en $\C_i$ un par de literales
+  complementarias.
+\item Si tal par existe para cada cláusula $\C_i$ entonces $\models\vp$.
+\item En otro caso $\not\models\vp$, es decir $\vp$ no es tautología.
+\ee
+\espc
+\pause
+Ejercicio 1: Decidir si $p \land (p \imp r) \imp (q \imp r)$ es tautología. \\
+}
+
+\frame{\titulos{Formas Normales}{}
+\begin{exampleblock}{Proposición}
+\begin{itemize}
+\item $\vDash \varphi$ si y sólo si $\neg \varphi$ es no satisfacible.
+\espc
+\item $\varphi$ es satisfacible si y sólo si $\not  \models \neg \varphi$
+\end{itemize}
+\end{exampleblock}
+}
+
+\frame{\titulos{El Problema SAT}{}
+La forma más común de enunciar el problema de satisfacibilidad para la lógica proposicional (usualmented enotado como SAT) es el siguiente:
+\begin{center}
+\textit{Dado un conjunto $P=\{p_1,\ldots,p_n\}$ de variables proposicionales y\\ un conjunto $C$ de cláusulas con variables en $P$\\ ¿Existe una interpretación $\mathcal{I}$ que satisfaga a $C$? }
+\end{center}					
+}
+
+\frame{\titulos{El Problema SAT}{}
+\begin{itemize}
+\item SAT fue el primer problema NP-completo conocido (Cook 1971).
+\espc
+\item A partir de los años 90, se han desarrollado diversos algoritmos para resolver el problema.
+\espc
+\item Conjetura:  {\em Cualquier algoritmo que resuelve SAT es exponencial en el número de variables, en el peor de los casos.}
+\espc
+\item El razonamiento automatizado se encarga, entre otras cosas, del desarrollo de algoritmos para resolver el problema SAT. 
+\end{itemize}
+}
+
+\frame{\titulos{El Problema SAT}{Nota sobre complejidad}
+\begin{figure}[t]
+\includegraphics[width=5cm]{diagramaC}
+\centering
+\end{figure}
+}
+
+\frame{\titulos{El Problema SAT}{Nota sobre complejidad}
+\begin{figure}[t]
+\includegraphics[width=8cm]{diagarmaC2}
+\centering
+\end{figure}
+}
+
+\frame{\titulos{El Problema SAT}{}
+\begin{figure}[t]
+\includegraphics[width=12cm]{sat}
+\centering
+\end{figure}
+}
+
+
+\frame{\titulos{Resolución Binaria}{}
+\begin{block}{Resolución binaria}
+Sean $\C_1,\;\C_2$ cláusulas y $\ell$ una literal. La regla de
+  inferencia conocida como {\bf resolución binaria proposicional} se define como 
+  sigue:
+\beqs
+  \frac{\C_{1} \lor \, \ell\;\;\;\;\;\; \ell^c \lor\C_2}{\C_1\lor \C_2}\;(Res)
+  \eeqs
+ donde $\ell^c$ es la literal contraria de $\ell$. En tal situación decimos que 
+ se \textbf{resuelven} las dos premisas con respecto a la literal $\ell$ y a la 
+ cláusula resultante $\C_1\lor \C_2$ se le llama {\bf resolvente o resolvente 
+ binario}.
+\end{block}
+}
+
+\frame{\titulos{Resolución Binaria}{}
+Si bien en la definición de la regla las literales~$\ell$ y $\ell^c$ aparecen al final y principio de las cláusulas respectivamente, el orden no importa dado  que la disyunción es conmutativa. \\
+\espc
+\pause
+\noindent Por ejemplo:
+\beqs
+\frac{\neg p\lor q\lor \mathbf{r} \;\;\;\;\;s\lor \mathbf{\neg r} \lor \neg t}{\neg p\lor q\lor
+  s\lor \neg t}\;\;\;\;\;\;\;\;\frac{t\lor \mathbf{\neg s}\lor q\;\;\;\;\;\;\neg
+q\lor w\lor \mathbf{s}\lor u}{t\lor q\lor \neg q \lor w \lor u}
+\eeqs
+}
+
+
+\frame{\titulos{Resolución Binaria}{}
+Dado que las literales también son cláusulas la aplicación
+de resolución a $p$ y $\neg p$ devuelve como resultado la llamada {\bf clásula vacía}, denotada
+$\square$, es decir, la siguiente es una instancia válida de resolución: 
+\espc
+\pause
+\beqs
+\frac{p\;\;\;\neg p}{\square}
+\eeqs
+
+}
+
+
+\frame{\titulos{Resolución Binaria}{}
+La resolución binaria proporciona un método de decisión para la lógica que utiliza el
+principio de refutación para decidir la consecuencia lógica:  \\
+\pause
+\espc
+para decidir si $\G\models\vp$ basta demostrar que $\G\cup\{\neg\vp\}$ es
+insatisfacible, para lo cual basta con obtener la cláusula vacía usando la regla de resolución binaria, a partir del conjunto de cláusulas de la formas normales conjuntivas del conjunto  $\G\cup\{\neg\vp\}$.\\
+\pause
+\espc
+ Este proceso se conoce como una {\bf refutación} del conjunto de cláusulas.\\
+}
+
+
+\frame{\titulos{Algoritmo de Saturación}{}
+\begin{block}{n-ésima resolución}
+Si $\Sg$ es cualquier conjunto de cl\'ausulas, entonces la {re\-so\-lu\-ci\'on} de $\Sg$, denotada $\mathcal{R}(\Sg)$, es el conjunto que consiste de $\Sg$ junto con todos los resolventes de cl\'ausulas de $\Sg$, es decir:
+\pause
+\beqs
+\mathcal{R}(\Sg)=\Sg\cup \{E \, |\mbox{ existen } C,D\in\Sg\;\mbox{ tales que } E\mbox{ es
+un resolvente de } C\mbox{ y } D\}.
+\eeqs
+\espc
+\pause
+La $n$-\'esima resoluci\'on de $\Sg$ se define recursivamente como sigue:
+\beqs
+\ba{rl}
+Res_0(\Sg) &=\Sg \\
+Res_{n+1}(\Sg) &=\mathcal{R}(Res_n(\Sg))
+\ea
+\eeqs
+\espc
+\end{block}
+}
+
+\frame{\titulos{Algoritmo de Saturación}{}
+\begin{exampleblock}{n-ésima resolución}
+Sea $\Sg$ es un conjunto finito de cl\'ausulas: \\
+\espc
+ $\Sg$ es no satisfacible si y s\'olo si $\square \in Res_n(\Sg)$ para alguna $n\in\mathbb{N}$.
+\end{exampleblock}
+\pause
+\espc
+Un {\bf algoritmo de saturación} se encargan de generar todos los posibles resolventes a partir de un conjunto dado $\Sg$. \\
+\pause
+\espc
+Para verificar si un conjunto de cláusulas~$\Sg$ es {\bf insatisfacible}, basta construir con un algoritmo de saturación los conjuntos~$Res_n(\Sg)$ hasta hallar~$\square$.
+}
+
+\frame{\titulos{Algoritmo de Saturación}{}
+\noindent Analicemos los escenarios posibles durante la ejecución de un algoritmo de saturación : \\
+\be
+\item En algún momento $\square$ es generada, es decir $\square\in Res_{n}(\Sg)$
+  para algún $n\in\N$.\\ En este caso el conjunto $\Gamma$ de entrada es 
+  insatisfacible. \espc
+ \item El algoritmo termina sin generar~$\square$ jamás, es decir, en algún 
+  momento se tiene $Res_n(\Sg)=Res_{n+1}(\Sg)$ por lo que no hay más 
+  resolventes posibles, pero $\square\notin Res_n(\Sg)$.\\
+  En este caso $\Gamma$ es satisfacible. 
+\ee
+
+}
+
+\end{document}
