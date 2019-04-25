@@ -1,0 +1,668 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage{../packageslc}
+\usepackage{../optionslc}
+
+\input{../macroslc}
+
+\title{Lógica Computacional 2017-2, nota de clase 13 \\
+Lógica Ecuacional
+}
+\author{Favio Ezequiel Miranda Perea \and Araceli Liliana Reyes Cabello\and
+Lourdes Del Carmen Gonz\'alez Huesca \and Pilar Selene Linares Arévalo}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Introducción}
+Durante este curso hemos enfocado nuestra atención en el estudio de la validez 
+de enunciados lógicos y métodos para hacerlo. 
+Consideremos las siguientes proposiciones que involucran una noci\'on de 
+igualdad y analicemos su posible valor de verdad:
+\begin{proposition} $p \land q \equiv q \land p$\end{proposition}\vspace*{-7pt}
+¿Qué significa exactamete que esta proposición sea válida? ¿Es posible dar un 
+contraejemplo a esta proposición?
+Para mostrar que la sentencia es válida en lógica proposicional, podríamos 
+proceder realizando la tabla de verdad (tabla con cuatro renglones)y verificar 
+que no existe un contraejemplo, es decir, una asignación de valores para 
+las variables involucradas de tal forma que $p \land q \iff q \land p$ se 
+evalúe a falso.
+
+% Consideremos ahora  la siguiente proposición:
+\begin{proposition} $ x+y = y+x$  \end{proposition}\vspace*{-7pt}
+Suponiendo un significado aritm\'etico a esta proposici\'on, ¿podemos dar un 
+contrajemplo a la proposición? ¿Cómo demostramos que ésta válida? ¿Podríamos 
+realizar algo similar al caso de lógica proposicional? Desafortunadamente, los 
+valores que podemos asignarle a las variables es infinito, lo cual significa que 
+no podríamos terminar de completar la tabla de asignaciones. Por lo tanto, 
+necesitamos una forma diferente de demostrar que una proposición como la 
+anterior es válida sin recurrir a su tabla de asignaciones. 
+
+\bigskip
+
+Aunado a lo anterior, hay una pregunta importante que nos debemos hacer: 
+¿Cuándo una igualdad se puede inferir a partir de un conjunto dado de 
+ecuaciones? Por ejemplo, a partir de las ecuaciones:
+\[
+\ba{rcl}
+x + y& = & y + x\\ 
+x + (y + z)& = & (x + y) + z
+\ea
+\]
+
+\noindent podemos concluir que $w_{1} + (w_{2} + w_{3}) = (w_{3} + w_{2}) + w_{1}$ pero no podemos afirmar que $w_{1}+ w_{1} = w_{1}+ w_{2}$. \\
+
+% Consideremos la siguiente proposición:
+% \begin{proposition} $ p \land q \equiv q \land p$
+% \end{proposition}
+% 
+% ¿Qué significa exactamete que la proposición 1 es válida? ¿Es posible dar un contraejemplo a esa proposición?
+% Para mostrar que la sentencia es válida en lógica proposicional, podríamos proceder realizando la tabla de verdad (tabla con cuatro renglones)  y verificar que no existe un contraejemplo, es decir, una asignación de valores para las variables involucradas de tal  forma que $p \land q \iff q \land p$ se evalúe a falso.  \\
+% 
+% Consideremos ahora  la siguiente proposición:
+% \begin{proposition} $ x+y = y+x$
+% \end{proposition}
+% 
+% ¿Podemos dar un contrajemplo a la proposición? ¿Cómo demostramos que ésta es válida? ¿Podríamos realizar algo similar al caso de lógica proposicional? Desafortunadamente, los valores que podemos asignarle a las variables es infinito, lo cual significa que no podríamos terminar de completar la tabla de asignaciones. Por lo tanto, necesitamos una forma diferente de demostrar que una proposición como la anterior es válida sin recurrir a su tabla de asignaciones. 
+
+
+Hasta ahora hemos trabajado con l\'ogica de proposiciones y de predicados
+y en ellos hemos usado una noci\'on de equivalencia entre expresiones, 
+$e_1 \equiv e_2$, que est\'a fuertemente basada en la sem\'antica formal de 
+cada l\'ogica.
+
+
+ 
+En esta nota, estudiaremos la Lógica Ecuacional, 
+% un fragmento de la Lógica de Predicados 
+una teoría que trabaja sobre expresiones que involucran al operador de 
+igualdad, que reflejan la idea subyacente de objetos equiparables y no 
+necesariamente de forma sint\'actica. 
+La lógica ecuacional juega un papel importante en el razonamiento sobre 
+equivalencias lógicas, igualdades algebraicas, definiciones de programas, 
+propiedades de estructuras de datos, entre otros.  \\
+Veamos algunos ejemplos en donde se ocupa un razonamiento puramente 
+ecuacional para demostrar:
+>>>>>>> c16e90911ba0fb5690162de889527d2946d51cfb
+
+\paragraph{L\'ogica proposicional}
+% Hasta ahora hemos trabajado con l\'ogica de proposiciones y de predicados
+En esta lógica hemos usado una noci\'on de equivalencia entre 
+expresiones~$e_1 \equiv e_2$, que est\'a  basada en la sem\'antica formal. 
+Pero si se desean realizar diversas equivalencias resulta tedioso hacerlas 
+formalmente y para ello hemos recurrido a utilizar s\'olo equivalencias 
+demostradas previamente para justificar cada paso de alguna secuencia
+del estilo $e_1 \equiv e_2 \equiv \ldots \equiv e_n$.\\
+
+Las equivalencias de f\'ormulas proposicionales son usadas para simplificar o 
+referirse a f\'ormulas cuyo valor booleano es el mismo, por ejemplo:
+\[
+\ba{rlll}
+(p\lor q)\land\lnot(\lnot p\land q)&\equiv &
+(p\lor q)\land (\lnot\lnot p\lor\lnot q) & \text{distributividad negaci\'on}\\
+& \equiv & (p\lor q)\land (p\lor\lnot q) & \text{eliminaci\'on doble neg}\\
+& \equiv & p\lor (q\land\lnot q) & \text{asociatividad}\\
+& \equiv & p\lor \bot & \text{absorci\'on}\\ 
+& \equiv & p & \text{neutro}
+\ea
+\]
+Este razonamiento tambi\'en deber\'ia expresarse utilizando igualdad en lugar 
+de equivalencia. 
+
+
+\paragraph{Programa funcional}
+%cap 13 G. Hutton 
+% http://lya.fciencias.unam.mx/favio/pf/programming_in_Haskell.pdf
+% Considera la definci\'on de listas en {\hsk}, una propiedad interesante a 
+% demostrar es que la funci\'on \verb=reverse= no tiene ning\'un efecto sobre 
+% de la funci\'on \verb-member-, es decir:
+% \begin{center}
+%  Si se cumple que \verb=member x l= para alg\'un elemento y una lista, \\
+%  entonces tambi\'en se debe cumplir que \verb=member x (reverse l)=.
+% \end{center}
+% Veamos c\'omo demostrar esta propiedad:
+% \begin{lstlisting}
+%  reverse :: [a ] -> [a ]
+%  reverse [] = []
+%  reverse (x : xs) = reverse xs ++ [x]
+% \end{lstlisting}
+
+Consideremos la definici\'on de \'arboles binarios de n\'umeros naturales en 
+{\hsk}:
+\begin{lstlisting}
+data Tree = Leaf Nat | Node Tree Tree
+\end{lstlisting}
+El aplanado de \'arboles es una funci\'on que dado un \'arbol devuelve 
+una lista con todos sus elementos:
+\begin{lstlisting}
+flatten :: Tree -> [Nat]
+flatten (Leaf n) = [n]
+flatten (Node l r) = flatten l ++ flatten r
+\end{lstlisting}
+
+La funci\'on anterior es ineficiente, tiene complejidad cuadr\'atica: 
+si el n\'umero de nodos del sub\'arbol izquierdo es $m_1$ entonces append y 
+\verb-flatten- est\'an recorriendo esos $m_1$ elementos respectivamente,
+adem\'as de que se visita cada hoja del sub\'arbol derecho $m_2$ para obtener 
+la lista de elementos del árbol original. 
+
+\bigskip
+
+Si quisi\'eramos mejorar la definici\'on de \verb=flatten= debemos eliminar el 
+uso de append, para esto usaremos una especificaci\'on m\'as general de 
+aplanado de \'arboles utilizando una lista auxiliar:
+\begin{center} \verb!flatten' t ns = flatten t ++ ns! \end{center}
+Buscaremos una definici\'on que la cumpla tal especificaci\'on por medio de 
+inducci\'on:
+\bi
+\item Caso Base: 
+\begin{lstlisting}
+flatten' (Leaf n) ns
+        = { especificacion de flatten' }
+flatten (Leaf n) ++ ns
+        = { aplicando flatten }
+[n] ++ ns
+        = { aplicando ++ }
+n:ns
+\end{lstlisting}
+
+% \newpage
+
+\item Caso Inductivo:~\footnote{Donde la hip\'otesis de inducci\'on supone 
+verdadera la propiedad para los sub\'arboles \texttt{l} y \texttt{r}.}
+\begin{lstlisting}
+flatten' (Node l r) ns
+        = { especificacion de flatten' }
+(flatten l ++ flatten r ) ++ ns
+        = { asociatividad de ++ }
+flatten l ++ (flatten r ++ ns)
+        = { hipotesis induccion para l }
+flatten' l (flatten r ++ ns)
+        = { hipotesis induccion para r }
+flatten' l (flatten' r ns)
+\end{lstlisting}
+\ei
+
+Hemos obtenido una definici\'on mejorada que no utiliza la definici\'on de 
+append y que usa una lista auxiliar que hace las funciones de 
+\textbf{acumulador}:
+\begin{lstlisting}
+flatten' :: Tree -> [Nat] -> [Nat]
+flatten' (Leaf n) ns = n : ns
+flatten' (Node l r) ns = flatten' l (flatten' r ns)
+\end{lstlisting}
+De este ejemplo quisi\'eramos referirnos a la equivalencia en ambas 
+definiciones, esto se puede describir como la igualdad de resultados al aplicar 
+cualquiera de ellas al mismo árbol:
+\begin{center}
+\textit{para cualquier lista} \verb-l-, \textit{se cumple que} \; 
+\verb-flatten l = flatten' l []-
+\end{center}
+
+\medskip
+
+El ejemplo anterior es un razonamiento sobre la especificaci\'on de estructuras 
+de datos (\'arboles, listas, n\'umeros naturales) y funciones de ellas 
+(aplanado, concatenaci\'on, etc.). Una demostraci\'on utilizando el lenguaje de 
+l\'ogica de predicados resultar\'ia en un ejercicio m\'as extenso y con 
+notaci\'on l\'ogica que hemos usado hasta ahora: un lenguaje de predicados~$\L$ 
+para las estructuras, funciones y relaciones y un modelo para \'este $\M_{\L}$.
+As\'i la pregunta anterior se traduce en demostrar que:
+\[
+ \M_{\L} \models \forall x \big(Tree(x) \to flatten(x) = flatten'(x,nil) \big)
+\]
+
+% Veamos otro ejemplo de especificaci\'on formal:
+
+\paragraph{Estructura de datos}
+Utilizando la formalizaci\'on de listas polim\'orficas en l\'ogica de 
+predicados, queremos demostrar la siguiente propiedad:
+\begin{center}
+ \textit{Cualquier lista no vac\'ia puede descomponerse en dos listas y un 
+elemento\\ tal que ese elemento est\'a en una posici\'on intermedia en la lista 
+original.}
+\end{center}
+Las siguientes f\'ormulas de primer orden corresponden a la formalizaci\'on de 
+la propiedad, donde los elementos de la lista son de cierto tipo~$A$ 
+\be
+\item Funcionamente:
+\[
+\forall x \Big( L_{A}(x) \land x \neq nil \to 
+    \big(\exists y,z,w \big(L_{A}(y) \land L_{A}(z) \land A(w) \land 
+      x=app(y,cons(w,z))\big) \big) \Big)
+\]
+\item Relacionalmente:
+\[
+\forall x \Big( L_{A}(x) \land x \neq nil \to 
+    \big(\exists y,z,w \big(L_{A}(y) \land L_{A}(z) \land A(w) \land 
+      App(y,cons(w,z),x)\big) \big) \Big)
+\]
+\ee
+Nuevamente para este ejemplo se requiere de un modelo dado por la 
+formalizaci\'on vista en la nota de especificaci\'on formal.
+
+
+\bigskip
+
+
+Para aligerar estas demostraciones, se puede usar un razonamiento ecuacional 
+para decidir si una ecuaci\'on en particular se sigue de un conjunto de `
+ecuaciones dado como por ejemplo en programas funcionales.\\
+Por tanto requerimos de una noci\'on formal para el manejo de igualdades que 
+forme parte de cualquier lenguaje formal y que presentamos a continuación.
+%En esta nota estudiaremos a fondo este concepto que tambi\'en es \'util en 
+%otras \'areas de computaci\'on.
+
+\subsection{Reglas y sistemas de deducci\'on}
+
+Para describir las reglas que emplearemos en la Lógica ecuacional y que 
+permiten 
+\textit{encadenar} razonamientos respecto a ecuaciones, utilizaremos una 
+representaci\'on que relaciona dos enunciados mediante una l\'inea horizontal.
+
+Estos esquemas son usados en muchas \'areas matem\'aticas y computacionales ya 
+pueden leerse en dos sentidos: de arriba hacia abajo y viceversa, dependiendo 
+de 
+un prop\'osito en el desarrollo de una demostraci\'on: generar, derivar o 
+deducir informaci\'on.
+
+Un sistema de deducci\'on tiene reglas b\'asicas o axiomas que son reglas que 
+cuentan \'unicamente con la parte inferior para representar hechos o 
+conclusiones sin premisas:
+\begin{mathpar}
+ \inferrule*[]{
+ }{
+ \quad B\quad 
+ }
+\end{mathpar}
+Tambi\'en tienen reglas de deducci\'on que cuentan con ambas partes, premisas y 
+conclusiones, \'utiles en la generaci\'on de informaci\'on:
+\begin{mathpar}
+ \inferrule*[]{
+ \quad A_1\;A_2\; \ldots \;A_m \quad 
+ }{
+ \quad B  \quad 
+ }
+\end{mathpar}
+
+
+En sentido de arriba hacia abajo, la regla de deducción anterior se puede leer 
+como sigue: si sucede que se cumplen $A_{1}, A_{2}, ..., A_{m}$ entonces podemos 
+concluir $B$. En sentido contrario (de abajo hacia arriba), la regla se puede 
+interpretar como sigue: para demostrar $B$ basta con demostrar que se cumplen 
+$A_{1}, A_{2}, ... , A_{n}$.
+
+
+\defin{
+Un sistema de deducci\'on para una teor\'ia~$\T$, es un sistema que consta de 
+un n\'umero finito de reglas y axiomas que establecen la relaci\'on 
+entre enunciados de $\T$.}
+
+\defin{
+Una deducci\'on o derivaci\'on de un enunciado $\J$ usando un sistema de 
+deducci\'on, es una secuencia finita 
+$\Pi = \langle \J_1,\dots,\J_k \rangle$ tal que $\J_k = \J$ y cada 
+$\J_i$, $1\leq i \leq k$ es una instancia de una regla del sistema de 
+deducci\'on. Tambi\'en puede usarse una representaci\'on de \'arbol de 
+derivaci\'on donde la ra\'iz est\'a en la parte inferior y es el enunciado 
+$\J$ y cada hoja del \'arbol es una instancia de un axioma.}
+
+Los enunciados sobre ecuaciones que deseamos representar dependen de una serie 
+de ecuaciones o de informaci\'on preestablecida, para ello usaremos de manera 
+\textbf{impl\'icita} esta \enquote{base de datos} en cada derivaci\'on. 
+
+\section{L\'ogica ecuacional}
+% Del libro Logic: A foundation for computer science, Sperschnneider & 
+% Antoniou
+
+Un sistema de deducci\'on para razonar respecto a ecuaciones es el llamado 
+C\'alculo de Birkhoff, el cual contiene cinco reglas:
+\begin{mathpar}
+   \inferrule*[right=Hyp]{
+   }{
+   \quad  {H} \quad 
+   }
+   
+   \inferrule*[right=Refl]{
+   }{
+    \quad {t=t} \quad 
+   }
+  
+   \inferrule*[right=Sym]{
+    \quad {s=t} \quad 
+   }{
+    {t=s}
+   }
+  
+   \inferrule*[right=Trans]{
+    {t = r} \and {r = s}
+   }{
+    \quad {t=s}\quad 
+   }\\
+  
+   \inferrule*[right=Inst]{
+    {t=s}
+   }{
+    \quad {t\sigma=s\sigma} \quad 
+   }
+  
+   \inferrule*[right=Congr]{
+    {t_1=s_1} \quad \dots \quad {t_n=s_n}
+   }{
+    \quad  {f(t_1,\ldots,t_n) = f(s_1,\ldots,s_n)} \quad 
+   }
+ \end{mathpar}
+\noindent 
+El axioma b\'asico es el que permite obtener cierta informaci\'on conocida o 
+\enquote{informaci\'on de la base de datos}. \\
+El resto de las reglas hacen \'enfasis en ciertas ecuaciones y
+\be
+\item establecen las caracter\'isticas de una relaci\'on 
+sim\'etrica y transitiva (\textsc{Refl}, \textsc{Sym}, \textsc{Trans})
+\item abstraen patrones por medio de instanciaci\'on (\textsc{Inst})
+\item construyen nuevos t\'erminos por medio de congruencia entre subtérminos 
+(\textsc{Congr})
+\ee
+
+Estas reglas son suficientes para hacer demostraciones pero se pueden a\~nadir 
+algunas otras reglas que factoricen aplicaciones de varias reglas asegurando 
+una demostraci\'on o derivaci\'on con menos pasos, de hecho se pueden utilizar 
+las siguientes en lugar de las reglas de \textsc{Inst} y \textsc{Congr}:
+\begin{mathpar}
+ \inferrule*[right=Rewrite]{
+    {t=s} \and {E[x:=s\sigma]} 
+  }{
+    {t=s}{E[x:=t\sigma]}
+  }
+  
+ \inferrule*[right=Rewrite <-]{
+    {t=s} \and {E[x:=t\sigma]}   %\frac{s=t\;\;\;\;E[t]}{E[s]}
+   }{
+    {E[x:=s\sigma]}
+   }
+\end{mathpar}
+En las reglas de reescritura $E[t]$ denota a una ecuaci\'on haciendo 
+expl\'icita una presencia de algún término~$t$, por ejemplo si 
+$E=_{def} x+2=f\,y$ podemos hacer expl\'icitas cualquiera de las subexpresiones 
+involucradas en $E$, usando $E[x], E[x+2], E[f\,y]$. \\
+
+
+% Veamos otros ejemplos:
+% \beje[Ecuaciones de t\'erminos]
+% Recordemos la gram\'atica para t\'erminos de cualquier lenguaje de primer 
+% orden:
+% $$ t ::=  x \mid c \mid f(t_1,t_2,\ldots,t_n) $$
+% \eeje
+% 
+% \beje[otro ejemplo]
+% Aquí me falta el ejemplo de las ecuaciones con funciones pero quiero ver si es 
+% posible escribirlo de una manera menos fea que el que encontré.
+% \eeje
+% 
+
+\section{Formalizaci\'on de teor\'ias}
+%http://lya.fciencias.unam.mx/favio/pf/%5bRichard_Bird%5d_Thinking_Functionally_
+% with_Haskell(BookZZ.org).pdf
+El sistema de l\'ogica ecuacional presentado ayuda a realizar demostraciones 
+de ecuaciones de forma clara. 
+As\'i una derivaci\'on finita utilizar\'a unicamente estas reglas y si se desea 
+realizar un \'arbol de derivaci\'on, entonces las hojas ser\'an instancias de 
+los axiomas \textsc{Hyp} o \textsc{Refl}.
+Una aplicaci\'on de esto es la formalizaci\'on de teor\'ias que requieren de 
+ecuaciones para la demostraci\'on de propiedades o especificaciones de los 
+elementos en la teor\'ia. 
+Veamos dos ejemplos extendidos:
+
+\beje[Estructura algebraica]
+Considera el siguiente conjunto de ecuaciones~$\A$, que define la 
+estructura de anillo~\footnote{Un anillo es un conjunto $R$ junto 
+con dos operaciones $(R,+,\cdot)$, un elemento distinguido $0$ y una 
+operaci\'on unaria $^{-1}$.}:
+ \[
+  \begin{array}{rclrcrclr}
+  0 + x & = & x & A1 & \hspace{20pt} & x^{-1} + x & = & 0 & A2\\
+  x + y & = & y + x & A3 & & (x + y) + z & = & x + (y + z) & A4\\
+  x \cdot 1 & = & x & A5 & & (x\cdot y)\cdot z & = & x\cdot (y\cdot z) & A6\\ 
+  x\cdot (y+z) & = & x\cdot y + x\cdot z & A7&& 
+    (y+z) \cdot x & = & y\cdot x + z\cdot x & A8
+  \end{array}
+ \]
+Demuestra que $x + (y + z) = y + (x + z)$. \\
+% teniendo como hip\'otesis adicional que~$z\cdot z = z$ para cualquier 
+% elemento~$x$ en $R$.
+Recordemos que la base de datos es $\A$.
+\locallabelreset
+ \[
+  \begin{array}{lll}
+   \llabel{p1} & {(x + y) + z = x + (y + z)} 
+      & \textsc{Hyp\; A5} \\
+   \llabel{p2} & {x + (y + z) = (x + y) + z} 
+      & \textsc{Sym}~\lref{p1} \\
+   \llabel{p3} & {z = z} 
+      & \textsc{Refl} \\
+   \llabel{p4} & {x + y = y + x} 
+      & \textsc{Hyp\; A4} \\
+   \llabel{p5} & {(x + y) + z = (y + x) + z} 
+      & \textsc{Congr}\; + ~\lref{p4}~\lref{p3}\\
+   \llabel{p6} & {(y + x) + z = y + (x + z)} 
+      & \textsc{Inst}~\lref{p1} \\
+   \llabel{p7} & {x + (y + z) = (y + x) + z} 
+      & \textsc{Trans}~\lref{p2}\lref{p5} \\
+   \llabel{p8} & {x + (y + z) = y + (x + z)} 
+      & \textsc{Trans}~\lref{p7}\lref{p6} 
+  \end{array}
+ \]
+\eeje
+
+\newpage
+
+\beje[Estructura de datos]
+Del ejemplo presentado al inicio:
+\begin{center}
+ \textit{Cualquier lista no vac\'ia puede descomponerse en dos listas y un 
+elemento\\ tal que ese elemento est\'a en una posici\'on intermedia en la lista 
+original.}
+\end{center}
+consideremos aqu\'i las listas de n\'umeros naturales. 
+La base de datos correspondiente para la prueba tiene la definici\'on de 
+listas as\'i como las definiciones de funciones sobre listas.
+
+Esta demostraci\'on puede realizarse  considerando la hip\'otesis sobre la 
+forma 
+de la lista a saber $\ell\neq[\;]$ y donde el \'unico caso a analizar es $\ell= 
+n::\ell'$. Exhibiremos la partici\'on trivial donde $x = [\;]$:
+\bi
+\item Demostrar que los elementos \verb!x = []!, \verb!z = n! y \verb!y = l'! 
+tales que \verb!x++(z::y) = n::l'!, suponiendo que \verb!l = n:: l'!
+\locallabelreset
+ \[
+ \begin{array}{lll}
+  \llabel{p1} & x = [\;] & \textsc{Hyp} \\
+  \llabel{p2} & z = n & \textsc{Hyp} \\
+  \llabel{p3} & y = \ell' & \textsc{Hyp} \\
+  \llabel{p4} & z::y = n::\ell' & \textsc{Congr}\; :: \;\lref{p2}\lref{p3}\\
+  \llabel{p5} & z::y = z::y & \textsc{Refl} \\
+  \llabel{p6} & x++(z::y) = [\;]++(z::y) & 
+    \textsc{Congr}\;++\; \lref{p5} \lref{p1}\\
+  \llabel{p7} & [\;]++(z::y) = z::y & \textsc{Ins}\; (\verb-nil ++ x = x- )\\
+  \llabel{p8} & x++(z::y) = z::y & \textsc{Trans}\;\lref{p6}\lref{p7} \\
+  \llabel{p9} & x++(z::y) = n::\ell' & \textsc{Trans}\;\lref{p4}\lref{p8}
+ \end{array}
+ \]
+\ei
+\eeje
+
+
+\subsection{Guiar una demostraci\'on}
+Las demostraciones de los ejemplos \textbf{3.1} y \textbf{3.2} pueden resultar 
+elaboradas y con algunos pasos que resultan obvios, por ejemplo los pasos en 
+donde se presentan las hip\'otesis o el uso de reflexividad.
+
+Adem\'as buscamos explotar nuestra herramienta de trabajo, la computadora. Para 
+ello utilizaremos un asistente de pruebas que facilitar\'a la formalizaci\'on y 
+las demostraciones sobre alguna teor\'ia o sistema, por ejemplo en este caso 
+nuestro sistema de razonamiento ecuacional.
+
+Decimos que un asistente de pruebas es un sistema (software) que ayuda en el 
+desarrollo de demostraciones formales mediante la interacci\'on con el usuario. 
+El asistente o demostrador puede resolver algunos pasos de las demostraciones 
+pero el usuario siempre est\'a ah\'i para guiar el proceso inclusive dar 
+instrucciones para que se realice de manera casi autom\'atica.
+
+El sistema de deducci\'on~$\mathcal{B}$ y algunos refinamientos del mismo 
+resultan ser subconjuntos de t\'acticas del asistente de pruebas 
+{\coq}~\footnote{\url{http://coq.inria.fr/}}.
+Este asistente interact\'ua con el usuario mediante comandos y t\'acticas, 
+estas \'ultimas son funciones que ayudan a descomponer un enunciado a demostrar 
+en partes que resultan ser m\'as f\'aciles de demostrar y que una 
+composici\'on final de todas las subdemostraciones asegura la prueba del 
+enunuciado original.
+
+Las t\'acticas correspondientes a las reglas del sistema~$\mathcal{B}$ son:
+\begin{center}
+\begin{tabular}{c|c}
+ Regla & T\'actica \\\hline
+ \textsc{Hyp} & \verb=assumption= \\
+ \textsc{Refl} & \verb=reflexivity= \\
+ \textsc{Sym} & \verb=symmetry= \\
+ \textsc{Trans} & \verb=transitivity r= \\
+ \textsc{Inst} & \verb=apply= \\
+ \textsc{Congr} & \verb=rewrite=  ($n$ veces)\\
+ \textsc{Rewrite} & \verb=rewrite= \\
+ \textsc{Rewrite <-} & \verb=rewrite <-= \\
+\end{tabular}
+\end{center}
+
+El uso de estas t\'acticas sigue el sentido inverso (\textit{backward 
+reasoning}) en la construcci\'on de demostraciones de {\coq}, es decir que las 
+reglas del sistema $\mathcal{B}$ ser\'an leidas y aplicadas de abajo hacia 
+arriba.
+Por esta raz\'on la regla de transitividad debe incluir el t\'ermino \verb-r- 
+que permite pasar de \verb-s- a \verb-t-. 
+Tambi\'en debe considerarse que no siempre es posible tener todas las 
+ecuaciones de la base de datos en el contexto de prueba, as\'i la aplicaci\'on 
+de la t\'actica \verb=assumption= ser\'a sustituida por las t\'acticas 
+\verb=apply= o \verb=simpl=, la \'ultima realiza una simplificaci\'on de un 
+t\'ermino. 
+Veamos otros ejemplos:
+\beje[Propiedades de la concatenaci\'on de listas]
+Consideremos la implementaci\'on de listas en~{\coq} y algunas funciones:
+\begin{lstlisting}
+Require Import List.
+Import ListNotations.
+
+Section MyListSection.
+Variable A : Type.
+
+(* Recordatorio de las definiciones como aparecen en las bibliotecas de Coq
+Inductive list (A : Type) : Type :=
+ | nil : list A
+ | cons : A -> list A -> list A.
+ 
+Definition app (A : Type) : list A -> list A -> list A :=
+  fix app l m :=
+  match l with
+   | nil => m
+   | a :: l1 => a :: app l1 m
+  end.
+Infix "++" := app (right associativity, at level 60) : list_scope.
+*)
+\end{lstlisting}
+Para demostrar que la concatenaci\'on asociativa, agregaremos dos axiomas a la 
+base de datos que describen la conmutatividad de la concatenaci\'on respecto a 
+la lista vac\'ia:
+\begin{lstlisting}
+Axiom axapp_nil_l : forall l:list A, [] ++ l = l.
+Axiom axapp_nil_r : forall l:list A, l ++ [] = l.
+\end{lstlisting}
+Y un teorema auxiliar:
+\begin{lstlisting}
+Theorem aux_app_comm_cons : 
+   forall (x y:list A) (a:A), a :: (x ++ y) = (a :: x) ++ y.
+Proof.
+induction x.
+(* l = [] *)
++ intros. rewrite axapp_nil_l. simpl app. reflexivity.
+(* l = a :: l *)
++ intros. rewrite <- IHx. simpl app.
+reflexivity.
+Qed.
+\end{lstlisting}
+As\'i el teorema se enuncia y demuestra como sigue:
+\begin{lstlisting}
+Theorem app_assoc : 
+   forall l m n:list A, l ++ m ++ n = (l ++ m) ++ n.
+Proof.
+induction l.
+(* l = [] *)
++ intros. apply app_nil_l.
+(* l = a :: l *)
++ intros. rewrite <- aux_app_comm_cons. 
+rewrite IHl. 
+reflexivity.
+Qed.
+\end{lstlisting}
+Hay que observar que la t\'actica \verb=intro= o \verb=intros= hace que {\coq} 
+incluya todas las hip\'otesis de un enunciado. De esta forma se agrega m\'as 
+informaci\'on a la base de datos.
+\eeje
+
+\beje
+Una formalizaci\'on alternativa usando {\coq} del ejemplo \textbf{3.2} resulta 
+en el siguiente c\'odigo:
+\begin{lstlisting}
+Theorem list_partition : 
+   forall l:list nat, l <> nil -> exists (z:nat) (x y:list nat), l=x++(z::y).
+\end{lstlisting}
+
+La base de datos correspondiente para la prueba tiene la definici\'on de 
+listas que aparece en el archivo \verb=Coq.Init.Datatypes= y las 
+definiciones de funciones sobre listas dadas en \verb=Require Import List.=
+
+Por otro lado, tambi\'en se puede considerar una implementaci\'on de una 
+funci\'on que calcule \textit{todas} las particiones posibles para una lista 
+dada:
+\begin{lstlisting}
+Fixpoint aux_partition (n: nat) (l:list nat) : list (list nat*nat*list nat) :=
+   match n with 
+   | 0 => nil
+   | S n => ((firstn n l),(nth n l 0),(skipn (S n) l)) :: aux_partition n l
+   end.
+
+Definition partition (x:list nat) : list (list nat*nat*list nat) :=
+   let l := length x in aux_partition l x.
+\end{lstlisting}
+Y despu\'es demostrar que esta implementaci\'on cumple con la 
+especificaci\'on dada por la propiedad:
+\begin{lstlisting}
+Theorem func_partition : 
+   forall (l:list nat) (z:nat) (x y:list nat), 
+   In (x,z,y) (partition l) <-> l = x++(z::y).
+\end{lstlisting}
+
+Este \'ultimo ejemplo requiere de una regla con m\'as poder que las incluidas 
+en el sistema de deducci\'on $\mathcal{B}$, es necesario esclarecer casos en 
+los que la forma de un objeto es fundamental para la demostraci\'on es decir, 
+el uso de inducci\'on es inminente como el caso de la funci\'on \verb-flatten-. 
+Sin inducci\'on no es posible realizar dichas demostraciones.
+
+Pero este esquema de demostraci\'on es manejado de manera sofisticada por 
+{\coq} facilitando la construcci\'on interactiva de la prueba.
+As\'i tambi\'en hacemos \'enfasis en que el sistema ecuacional estudiado en 
+esta nota es un subsistema de t\'acticas que ofrece {\coq} y que el uso 
+del asistente rebasa en gran medida al sistema $\mathcal{B}$ como lo muestra la 
+demostraci\'on del teorema \verb=list_partition=:
+\begin{lstlisting}
+Proof.
+intros.
+case_eq l.
+(* l=[] *)
++ intro. elim H. assumption.
+(* l=n::l0 *)
++ intros. exists n. exists []. exists l0. simpl. reflexivity.
+Qed.
+\end{lstlisting}
+\eeje
+En los siguientes temas nos serviremos de este poder para realizar 
+demostraciones asistidas por computadora. 
+\end{document}

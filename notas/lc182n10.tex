@@ -1,0 +1,526 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage{../packageslc}
+\usepackage{../optionslc}
+
+\input{../macroslc}
+
+
+\title{Formas Normales en Lógica de Predicados \\
+L\'ogica Computacional 2018-2, Nota de clase 10}
+\author{Favio Ezequiel Miranda Perea\and Araceli Liliana Reyes Cabello\and
+Lourdes Del Carmen Gonz\'alez Huesca \and Pilar Selene Linares Ar\'evalo}
+\date{\today\\ Facultad de Ciencias UNAM}
+
+\begin{document}
+
+\maketitle
+
+%En esta nota presentamos las herramientas básicas de los sistemas de
+%programación lógica, a saber la transformación de cualquier fórmula al
+%lenguaje de cláusulas, la unificación de literales y la regla de resolución
+%binaria para la lógica de predicados.
+
+%\section{Formas Normales}
+
+En esta nota desarrollaremos diversas formas normales para la lógica de
+predicados, las cuales son transformaciones sintácticas de una f\'ormula que 
+conservan ciertas propiedades sem\'anticas. Las fórmulas en forma normal, si
+bien pueden ser sintácticamente más complejas, ayudan a semiautomatizar en
+ciertos casos el proceso para tratar de verificar si un argumento es
+correcto. Además son de gran importancia en programación lógica.
+
+\bigskip
+
+Antes de construir formas normales se aplica un proceso de
+simplificación a las f\'ormulas llamado \emph{rectificaci\'on}, el cual permite 
+simplificar la transformación a la forma normal de 
+interés.\index{rectificaci\'on}
+
+\defin{Una f\'ormula $\vp$ esta rectificada si y sólo si se cumplen las
+siguientes condiciones:\index{f\'orm11ula!rectificada}
+\bi
+\item $\vp$ no tiene presencias libres y ligadas de una misma
+  variable, es decir, $FV(\vp)\cap BV(\vp)=\varnothing$. 
+\item $\vp$ no tiene cuantificadores de la misma variable con alcances
+  ajenos.
+\item $\vp$ no tiene cuantificadores múltiples de la misma variable, es decir, 
+  subfórmulas de la forma \\
+  $ \fa x\fa x\psi,\;\ex x\ex x\psi,\;\ex x\fa x\psi,\;\fa x\ex x\psi $
+\item $\vp$ no tiene cuantificadores vácuos (tontos), es decir, cuantificadores
+de la forma $\fa x\psi$ o $\ex x\psi$ donde $x\notin FV(\psi)$.
+% tales que la variable del cuantificador no figure en el alcance del mismo.
+\ei
+}
+
+\noindent Nuestro primer objetivo es mostrar que cualquier fórmula es
+rectificable para lo cual nos serviremos del siguiente:
+\lema{\label{lemareva}
+Se cumplen las siguientes equivalencias l\'ogicas:
+\be
+\item Eliminaci\'on de cuantificadores m\'ultiples.\index{eliminaci\'on!del
+cuantificador m\'ultiple} 
+\bi
+\item $\fa x\fa x\vp\equiv\fa x\vp$
+\item $\ex x\ex x\vp\equiv\ex x\vp$
+\item $\ex x\fa x\vp\equiv\fa x\vp$
+\item $\fa x\ex x\vp\equiv\ex x\vp$
+\ei
+\item Renombre de variables. Si $y$ no figura libre en $\vp$, es
+  decir, $y\notin FV(\vp)$ %  y $\vp\{x/y\}$ es admisible
+  entonces:\index{renombre de variables}
+\bi
+\item $\fa x\vp\equiv\fa y(\vp[x:=y])$
+\item $\ex x\vp\equiv\ex y(\vp[x:=y])$
+\ei
+\item Eliminaci\'on de cuantificadores vácuos. Si $x\notin FV(\vp)$
+  entonces:\index{eliminaci\'on!del cuantificador vacuo}
+\bi
+\item $\fa x\vp\equiv\vp$
+\item $\ex x\vp\equiv\vp$
+\ei
+\ee
+}
+\proof
+Se deja como ejercicio.
+\qed
+\bigskip\\
+
+Una consecuencia inmediata de los lemas anteriores es la siguiente proposición.
+
+\prop{
+Siempre es posible transformar mediante un algoritmo una f\'ormula
+dada $\vp$ en una f\'ormula $\mathsf{rec}(\vp)$ de manera que 
+$\mathsf{rec}(\vp)$ est\'a
+rectificada y $\mathsf{rec}(\vp)\equiv\vp$.
+}
+\proof
+Sea $\vp$ una f\'ormula. Si $FV(\vp)\cap BV(\vp)\neq\varnothing$
+podemos aplicar el lema~\ref{lemareva} (parte 2) para renombrar las
+presencias ligadas de todas las variables que figuraban libres y
+ligadas en $\vp$, an\'alogamente si existían en $\vp$ cuantificadores
+con alcances ajenos de la misma variable. \\
+Los cuantificadores m\'ultiples se eliminan mediante el lema 
+\ref{lemareva} (parte 1) y los cuantificadores v\'acuos con el lema 
+\ref{lemareva} (parte 3). \\
+Cualquier f\'ormula obtenida al terminar estos procesos se denota 
+$\mathsf{rec}(\vp)$,
+obs\'ervese que no es \'unica.
+\qed
+
+\vspace{.5cm}
+
+Nuestro objetivo principal, dirigido a tener un método de prueba en lógica de 
+predicados usando resolución, es transformar una f\'ormula dada en la 
+lógica de predicados en una f\'ormula esencialmente proposicional que sea en 
+cierto sentido equivalente a la f\'ormula original. Con las siguientes 
+transformaciones esto se logra parcialmente.
+
+\section{Forma Normal Negativa}
+
+El objetivo de esta forma normal es obtener una f\'ormula equivalente a una
+f\'ormula dada de manera que las negaciones sólo afecten a fórmulas atómicas,
+es decir a predicados.  
+
+
+\defin{Una f\'ormula~$\vp$ est\'a en forma normal negativa si y sólo si se 
+cumplen las siguientes condiciones:
+\be
+\item $\vp$ no contiene símbolos de equivalencia ni implicaciones y
+\item las negaciones que figuran en~$\vp$ afectan sólo a f\'ormulas at\'omicas. 
+\ee
+\index{forma normal!negativa}
+}
+
+La transformación a forma normal negativa es prácticamente igual que en el
+caso de la lógica proposicional, basta considerar adicionalmente las leyes de
+negación para los cuantificadores.
+
+% \newpage
+
+\prop{[Leyes de la Negaci\'on]
+Se cumplen las siguientes equivalencias l\'ogicas.
+\bi
+\item Doble Negaci\'on: $\neg\neg\vp\equiv\vp$.
+\item De Morgan: $\neg(\vp\lor\psi)\equiv \neg\vp\land\neg\psi$.
+\item De Morgan: $\neg(\vp\land\psi)\equiv \neg\vp\lor\neg\psi$.
+\item $\neg(\vp\imp\psi)\equiv\vp\land\neg\psi$
+\item $\neg(\vp\iff\psi)\equiv\neg\vp\iff\psi\equiv\vp\iff\neg\psi$.
+\item $\neg\fa x \vp\equiv\ex x\neg \vp$
+\item $\neg\ex x \vp\equiv\fa x\neg \vp$
+\ei
+\index{leyes!de la negaci\'on}
+\index{leyes!de De Morgan}
+\label{leyneg}
+}
+\proof Ejercicio
+\qed
+
+\prop{Sea $\vp$ una f\'ormula. Podemos encontrar de manera algorítmica una
+f\'ormula~$\psi$ que es lógicamente equivalente a~$\vp$ y tal que $\psi$ est\'a 
+en forma normal negativa. En tal caso $\psi$ se denota con 
+$\mathsf{fnn}(\psi)$. 
+}
+\proof
+Dada la fórmula~$\vp$, aplicarle exhaustivamente las leyes de negaci\'on de
+manera adecuada. La f\'ormula $\psi$ obtenida es~$\mathsf{fnn}(\vp)$.  
+\qed
+
+\ejem{Sea 
+$\vp=\fa x(Px\lor\neg\ex y (Qy\land Rxy))\lor\neg (Py\land\neg\fa x Px)$.\\
+La forma normal negativa de $\neg\ex y (Qy\land Rxy)$ se obtiene as\'{\i}:
+\[
+\neg\ex y (Qy\land Rxy) \equiv \fa y\neg(Qy\land Rxy) \equiv
+\fa y(\neg Qy\lor\neg Rxy)
+\]
+La forma normal negativa de $\neg (Py\land\neg\fa x Px)$ se obtiene
+as\'{\i}:
+\[
+\neg (Py\land\neg\fa x Px) \equiv \neg Py\lor \neg\neg\fa x Px\equiv 
+\neg Py\lor\fa x Px
+\]
+Por lo tanto tenemos que
+$$ \mathsf{fnn}(\vp) = 
+\fa x (Px\lor\;\fa y(\neg Qy\lor\neg Rxy))\lor (\neg Py\lor\fa x Px)$$
+\label{ejfnn}
+}
+ 
+\section{Forma Normal Prenex}
+
+Al buscar una fórmula en lógica de predicados que se parezca a una 
+proposicional se deben eliminar los cuantificadores. 
+El primer paso para eliminarlos de una f\'ormula consiste en 
+\emph{factorizarlos} de manera que todos queden juntos al principio de la
+f\'ormula, esto se logra con la llamada forma normal prenex.\\
+El siguiente lema describe las propiedades básicas de factorización o
+prenexación de cuantificadores.
+
+\lema{Se cumplen las siguientes equivalencias l\'ogicas.\label{lemafacu}
+\be
+\item Si $x$ no figura libre en $\vp$ entonces:
+\bi
+\item $\vp\land \fa x\psi\equiv\fa x(\vp\land\psi)$.
+\item $\vp\land \ex x\psi\equiv\ex x(\vp\land\psi)$.
+\item $\vp\lor \fa x\psi\equiv\fa x(\vp\lor\psi)$.
+\item $\vp\lor \ex x\psi\equiv\ex x(\vp\lor\psi)$.
+\item $\vp\imp \fa x\psi\equiv\fa x(\vp\imp\psi)$.
+\item $\vp\imp \ex x\psi\equiv\ex x(\vp\imp\psi)$.
+\ei
+
+\item Si $x$ no figura libre en $\psi$ entonces:
+\bi
+\item $\fa x\vp\imp\psi\equiv\ex x(\vp\imp\psi)$.
+\item $\ex x\vp\imp\psi\equiv\fa x(\vp\imp\psi)$.
+\ei
+\ee
+}
+\proof
+Se deja como ejercicio.
+\qed
+
+\vspace{.5cm}
+
+Obsérvese que no se dieron equivalencias lógicas para factorizar un
+cuantificador en una equivalencia, como en la fórmula~$\vp\iff\fa x\psi$. 
+De manera que primero se deben eliminar las equivalencias mediante la 
+implicación y la conjunción, y luego prenexar. \\
+
+De mayor importancia es tener en cuenta que al prenexar un
+cuantificador en el antecedente de una implicación éste se intercambia
+por el cuantificador contrario o dual.
+
+\defin{Una fórmula~$\vp$ está en forma normal prenex si y sólo si $\vp$ es de la
+  forma $Q_1x_1\ldots Q_nx_n\psi$ donde $\psi$ es una
+  fórmula sin cuantificadores y $Q_i\in\{\fa,\ex\}$ para toda $1\leq i\leq n$.
+  En tal caso, la cadena de cuantificadores $Q_1x_1\ldots Q_nx_n$ se conoce 
+  como el {\em prefijo} de $\vp$ mientras que $\psi$ es la {\em matriz} de 
+  $\vp$.
+\index{forma normal!prenex!prefijo de la}
+\index{forma normal!prenex!matriz de la}
+}
+
+
+\prop{
+Sea $\vp$ una f\'ormula. Se puede construir mediante un algoritmo
+una f\'ormula $\psi$ en forma normal prenex tal que $\vp\equiv\psi$. A
+$\psi$ se le denota con $\mathsf{fnp}(\vp)$. 
+Obs\'ervese que $\mathsf{fnp}(\vp)$ no es \'unica.
+}
+\proof
+Dada $\vp$ eliminar las bicondicionales o equivalencias~\footnote{De la manera 
+más conveniente en cada caso particular, ya sea usando la 
+equivalencia~$\vp\iff\psi \equiv (\vp\to\psi)\land (\psi\to\vp)$ o bien 
+$\vp\iff\psi \equiv (\vp\land\psi) \lor (\neg\vp\land\neg\psi)$} obteniendo una 
+fórmula $\vp'$.
+Aplicarle el lema \ref{lemafacu} a la fórmula rectificada $\mathsf{rec}(\vp')$ 
+hasta factorizar todos sus cuantificadores. La f\'ormula obtenida es 
+$\mathsf{fnp}(\vp)$. 
+\qed
+
+\ejem{Sea $\vp$ la misma f\'ormula del ejemplo \ref{ejfnn}.\\
+Tenemos
+$\mathsf{rec}(\vp) =
+\fa x(Px\lor\neg\ex v (Qv\land Rxv))\lor\neg (Py\land\neg\fa z Pz)$.\\
+La forma normal prenex de $\neg\ex v (Qv\land Rxv)$ es 
+$\fa v\neg (Qv\land Rxv)$.\\
+La forma normal prenex de $\fa x(Px\lor\fa v\neg (Qv\land Rxv))$ es 
+$\fa x\fa v (Px\lor\neg(Qv\land Rxv))$.\\
+La forma normal prenex de $\neg\fa z Pz$ es $\ex z\neg Pz$.\\
+La forma normal prenex de $Py\land\ex z\neg Pz$ es $\ex z (Py\land\neg Pz)$.\\
+La forma normal prenex de $\neg \ex z (Py\land\neg Pz)$ es 
+$\fa z\neg(Py\land\neg Pz)$.\\
+Por lo tanto la forma normal prenex de $\vp$ es
+$$ \mathsf{fnp}(\vp) = 
+\fa x\fa v\fa z (Px\lor\neg (Qv\land Rxv)\lor\neg(Py\land\neg Pz))$$
+}
+
+\ejem{Sea $\vp=\fa x Px\imp\ex y\fa z Ryz$. Entonces
+$$
+\ba{ll}
+\fa x Px\imp\ex y\fa z Ryz & \equiv \\
+\ex y (\fa x Px\imp\fa z Ryz) & \equiv \\
+\ex y\fa z(\fa x Px\imp Ryz) & \equiv \\
+\ex y\fa z\ex x(Px\imp Ryz).
+\ea
+$$
+$\therefore\;\;\mathsf{fnp}(\vp)=\ex y\fa z\ex x(Px\imp Ryz).$
+}
+
+
+\section{Forma Normal de Skolem}
+
+Ahora nuestro inter\'es se centra en los cuantificadores existenciales.
+Buscamos un m\'etodo para eliminarlos de una f\'ormula, de manera
+que se preserve la satisfacibilidad. Para esto utilizaremos el proceso 
+de \emph{skolemizaci\'on}~\footnote{El nombre es debido a su creador,
+Thoralf Skolem (1887-1963).}, el cual consiste en substituir las f\'ormulas
+existenciales por \textbf{testigos} nuevos de las cuantificaciones 
+existenciales de la f\'ormula, de la siguiente manera:\index{skolemizaci\'on}
+\[
+\ba{rcl}
+\ex x\vp & \text{ se sustituye por } & \vp[x:=c] \\ \\
+\fa x_1\ldots\fa x_n\ex y\vp & \text{ se sustituye por } &
+\fa x_1\ldots\fa x_n\vp[y:=gx_1\ldots x_n]
+\ea
+\] 
+aqu\'{\i}, $c$ es un s\'{\i}mbolo de constante {\bf nuevo},
+llamado\index{constante de Skolem}
+\emph{constante de Skolem} y $g^{(n)}$ es un s\'{\i}mbolo de funci\'on 
+{\bf nuevo} llamado \emph{funci\'on de Skolem}\index{funci\'on! de Skolem}. 
+Con $\mathsf{Sko}(\vp)$ denotamos a la skolemizaci\'on de $\vp$ que se obtiene 
+al e\-li\-mi\-nar mediante este proceso, de izquierda a derecha, todos los
+cuantificadores existenciales de la f\'ormula~$\vp$. 
+\ejem{
+\[
+\ba{ll}
+\vp & \mathsf{Sko}(\vp) \\\hline
+\ex y Ry & Rc \\
+\fa x\ex y Pxy & \fa x Pxgx \\ 
+\fa x\fa z\ex y Rxgyfz & \fa x\fa z Rxghxzfz
+\ea
+\]
+}
+
+Hasta ahora hemos visto que una f\'ormula $\vp$ es l\'ogicamente
+equivalente a cualquiera de sus formas normales, situaci\'on muy
+conveniente pues si hallamos un modelo de una de las formas normales,
+\'este mismo nos servirá como modelo de $\vp$. Desafortunadamente no sucede
+lo mismo con la skolemizaci\'on, ya que tenemos una relaci\'on más debil
+entre $\vp$ y $\mathsf{Sko}(\vp)$, pero la cual resultará suficiente para 
+nuestros propósitos. 
+
+\defin{Sean $\vp,\psi$ dos f\'ormulas, decimos que $\vp,\psi$ son
+equisatisfacibles cuando se cumple que: \\ $\vp$ es satisfacible si y
+s\'olo si $\psi$ es satisfacible. \\ 
+Esta propiedad será denotada con 
+$\vp\sim_{sat}\psi$.\index{f\'ormulas!satisfaciblemente equivalentes}
+\label{defisat}
+} 
+Es claro que $\vp\equiv\psi$ implica que $\vp\sim_{sat}\psi$, mas no al
+revés, veamos unos ejemplos.
+
+\ejem{Claramente $\fa xPxa\sim_{sat}\fa xPax$ pero si
+interpretamos la constante~$a$ como $0$ y el predicado~$P$ como $\leq$ sobre 
+$\mathbb{N}$ observamos que $\fa xPxa\not\equiv\fa xPax$.
+}
+
+\ejem{Considere la fórmula~$\ex x Qx\sim_{sat} Qc$, este ejemplo muestra que 
+una f\'ormula equisatisfacible a la f\'ormula existencial dada, resulta
+mucho m\'as f\'acil de analizar.
+}
+
+
+%Con ayuda del siguiente teorema demostraremos que $\vp\sim_{sat}sko(\vp)$.
+
+%\prop{(AE). (Forma Normal de Skolem). Sean $\Sigma$ una signatura, $g$ un 
+% s\'{\i}mbolo de
+%funci\'on que no est\'a en $\Sigma$ y $\fa x_1\ldots\fa x_n\ex y\vp$ una
+%$\Sigma$-f\'ormula ce\-rra\-da tal que $x_1\ldots x_n$ no est\'an acotadas en
+%$\vp$ (de manera que la sustituci\'on $\{y/g(x_1\ldots x_n)\}$ es
+%admisible). Sea $\Sigma_g=\Sigma\cup\{g\}$. Entonces todo $\Sigma_g$-modelo
+%de $\fa x_1\ldots\fa x_n\vp\{y/g(x_1\ldots x_n)\}$ es un $\Sigma_g$-modelo de  
+%$\fa x_1\ldots\fa x_n\ex y\vp$. Inversamente, todo $\Sigma$-modelo de 
+%$\fa x_1\ldots\fa x_n\ex y\vp$ puede expanderse a un $\Sigma_g$-modelo de 
+%$\fa x_1\ldots\fa x_n\vp\{y/g(x_1\ldots x_n)\}$.
+%\label{teofns}
+%\index{teorema!de Skolem}
+%}
+%\proof
+%Se omite.
+%\qed
+
+%\cor{$\fa x_1\ldots\fa x_n\ex y\vp$ tiene un modelo syss  
+%$\fa x_1\ldots\fa x_n\vp\{y/g(x_1,\ldots,\allowbreak x_n)\}$ tiene un modelo.
+%}
+
+\prop{Si $\vp$ es una f\'ormula entonces $\vp\sim_{sat}\mathsf{Sko}(\vp)$
+}
+\proof 
+Ejercicio.
+\qed
+\\
+Finalmente podemos construir la forma normal de Skolem de cualquier fórmula.
+
+\defin{Una enunciado de la forma $\fa  x_1\ldots\fa x_n\vp$ donde $\vp$ no 
+  tiene cuantificadores y además $\vp$ est\'a en forma normal conjuntiva es 
+  una f\'ormula en forma normal de Skolem.\index{forma normal!de Skolem}
+}
+
+Obsérvese que en la definición anterior se pide que la fórmula sea un enunciado,
+es decir, que no tenga variables libres. Si de entrada existiera alguna 
+variable libre se deberá cuantificar universalmente, situación que no cambia en 
+absoluto los resultados pues el buscar modelos para fórmulas con variables 
+libres equivale a buscar modelos para sus cerraduras universales.
+
+\prop{Para cada f\'ormula $\vp$ podemos construir efectivamente una
+f\'ormula~$\psi$ en forma normal de Skolem de manera que $\vp\sim_{sat}\psi$. 
+En tal caso $\psi$ se denota con $\mathsf{fns}(\vp)$.
+\label{teosko}
+}
+\proof Es consecuencia inmediata de los resultados anteriores de esta
+nota.
+\qed
+
+\ejem{Sea $\vp=\fa x\ex y(\ex z\fa w Rxyzw\imp \ex v Pv)$, obtener la forma 
+normal de Skolem para $\vp$. \\
+Primero obtenemos la forma normal prenex de $\vp$:
+\[
+\vp \equiv \fa x\ex y\ex v(\ex z\fa w Rxyzw\imp Pv)\equiv 
+\fa x\ex y\ex v\fa z(\fa w Rxyzw\imp Pv)\equiv \\ \\
+\fa x\ex y\ex v\fa z\ex w(Rxyzw \imp Pv) = \mathsf{fnp}(\vp)
+\]
+
+Ahora aplicamos el proceso de skolemizaci\'on a 
+$\mathsf{fnp}(\vp)$:\label{ejfns}
+\be
+\item Eliminamos el primer existencial $\ex y$ mediante la funci\'on de
+skolem $f^{(1)}$, obteniendo 
+\[\fa x\ex v\fa z\ex w(Rxfxzw\imp Pv)\]
+\item Eliminamos el segundo existencial $\ex v$ mediante la funci\'on de
+skolem $g^{(1)}$, obteniendo 
+\[\fa x\fa z\ex w(Rxfxzw\imp Pgx)\]
+\item Eliminamos el tercer existencial $\ex w$ mediante la funci\'on de
+skolem $h^{(2)}$, obteniendo 
+\[\fa x\fa z(Rxfxzhxz\imp Pgx)\]
+\ee
+Por lo tanto, $\mathsf{Sko}(\vp)=\fa x\fa z(Rxfxzhxz\imp Pgx)$. \\
+Finalmente para obtener $\mathsf{fns}(\vp)$ basta poner la matriz de $sko(\vp)$ 
+en forma normal conjuntiva~\footnote{La transformación a forma normal conjuntiva
+es exactamente igual que en el caso de la lógica de proposiciones sólo que
+en lugar de variables proposicionales ahora se manejan predicados.}.
+\[
+\mathsf{fnc}(Rxfxzhxz\imp Pgx)\equiv\neg Rxfxzhxz\lor Pgx.
+\]
+Por lo tanto la forma normal de Skolem buscada es
+\[
+\mathsf{fns}(\vp)=\fa x\fa z(\neg Rxfxzhxz\lor Pgx)
+\]
+}
+
+\section{Forma Clausular}
+
+Finalmente llegamos a la forma normal necesaria para el método de resolución 
+binaria y para la programación lógica, la llamada forma clausular.
+
+%\defin{Una cl\'ausula es una disyunci\'on de literales.
+%}
+%Con esta definici\'on podemos redefinir una forma normal conjuntiva
+%como una conjunci\'on de cl\'ausulas.
+
+\defin{Sean $\vp$ una fórmula y $\mathsf{fns}(\vp)=\fa x_1\ldots\fa x_n\psi$ la 
+forma normal de Skolem de~$\vp$. Si $\psi$ es $\C_1\land\ldots\land\C_n$ 
+entonces la forma clausular de $\vp$, denotada $Cl(\vp)$ es la secuencia de 
+cláusulas
+$$ Cl(\vp)=\C_1,\ldots,\C_n $$
+donde {\em sin perder generalidad} las variables en cualesquiera dos cláusulas 
+son distintas. Es decir, cualesquiera dos cláusulas tienen variables ajenas.
+% tales que $\mathsf{fnc}(\vp)=\C_1\land\ldots\land C_n$
+% forma clausular de $\vp$ y se denota 
+% con $Cl(\vp)$.\index{forma clausular}
+}
+
+\noindent De manera que la forma clausular de una fórmula $\vp$ se obtiene de 
+la matriz de su forma normal de Skolem.\\
+Observemos que $Cl(\vp)$ es una secuencia (conjunción) de cl\'ausulas, libre de
+cuantificadores; adem\'as es inmediato que existe un proceso efectivo para
+construir $Cl(\vp)$ y que $Cl(\vp)\sim_{sat}\vp$. Con esto hemos logrado el
+objetivo planteado, cada f\'ormula $\vp$ puede transformarse en una
+f\'ormula esencialmente proposicional $Cl(\vp)$, satisfaciblemente
+equivalente a $\vp$.
+ 
+%M\'as adelante trabajaremos con las formas clausulares que nos ofrecen
+%diversas ventajas y veremos su importancia en la programaci\'on l\'ogica. 
+%\index{programaci\'on!l\'ogica}
+
+\ejem{Sea $\vp$ la f\'ormula del ejemplo \ref{ejfns}. 
+La forma cl\'ausular de $\vp$ es 
+$$ Cl(\vp)=\neg Rxfxzhxz\lor Pgx $$
+}
+
+% Obsérvese que en este caso $Cl(\vp)$ consta de una única claúsula,
+% pero en el caso general es de la forma
+% $Cl(\vp)=\C_1\land\C_2\land\ldots\land\C_n$ y es costumbre referirse
+% también con $Cl(\vp)$ a la lista de cláusulas $\C_1,\ldots,\C_n$.
+
+Esto concluye nuestra exposición de formas normales, por medio de la cual
+ahora podemos transformar cualquier fórmula en su forma clausular, la cual es
+una fórmula en forma normal conjuntiva sin cuantificadores y equisatisfacible
+a la fórmula original.
+
+
+\section{Algoritmo de conversión a la Forma Clausular}
+
+La conversión a forma clausular de cualquier fórmula~$\vp$ se obtiene al 
+aplicar todas las formas normales anteriores. 
+Damos aquí un algoritmo que se sirve además de ciertas heurísticas para 
+facilitar el proceso.
+
+\be
+\item Rectificar $\vp$.
+% \item Eliminar los conectivos $\imp,\iff$ mediante
+% \beqs
+% A\to B\equiv \neg A\lor B\;\;\;\;\;\;
+% A\iff B\equiv (A\to B)\land (B\to A)
+% \eeqs
+\item Transformar a la forma normal negativa.
+\item Prenexar obteniendo una fórmula de la forma $Q z_1\ldots Q z_m\chi$.
+\item Skolemizar obteniendo una fórmula de la forma $\fa x_1\ldots\fa x_n\psi$.
+\item Transformar $\psi$ (la matriz de la skolemización anterior) a la forma 
+normal conjuntiva obteniendo $\mathsf{fnc}(\psi)=\C_1\land\ldots\land\C_k$.
+\item Renombrar las variables de cada cláusula $\C_i$ obteniendo una clásula 
+$\C_i'$ de manera que las variables en cada una de éstas sean distintas.
+% digamos $\C_1',\ldots,\C_k'$
+\item La forma clausular de $\vp$ es
+$$ Cl(\vp)=\C_1',\ldots,\C_k' $$
+\ee
+
+
+De esta manera concluimos que cualquier fórmula de la lógica de predicados puede 
+transformarse en un conjunto de fórmulas de la llama lógica clausular.\\
+
+Ahora ya estamos preparados para nuestro siguiente tema, que versa sobre otro 
+método sintáctico para verificar la correctud de un argumento dentro de la 
+lógica clausular, la {\em resolución binaria}, método que es también el 
+fundamento principal del paradigma de programación lógica.
+
+
+\end{document}

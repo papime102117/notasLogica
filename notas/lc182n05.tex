@@ -1,0 +1,572 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage{../packageslc}
+\usepackage{../optionslc}
+
+\input{../macroslc}
+
+
+\title{Lógica de Primer Orden: Conceptos Sintácticos Importantes \\ 
+L\'ogica Computacional 2018-2, Nota de clase 5}
+\author{Favio Ezequiel Miranda Perea\and Araceli Liliana Reyes Cabello\and
+Lourdes Del Carmen Gonz\'alez Huesca \and Pilar Selene Linares Ar\'evalo}
+\date{\today\\ Facultad de Ciencias UNAM}
+
+
+\begin{document}
+
+\maketitle
+
+Al tener cuantificadores en la l\'ogica de primer orden se deben revisar con 
+detenimiento algunos conceptos sint\'acticos como la importancia de un 
+cuantificador en una f\'ormula as\'i como los diferentes casos a estudiar al 
+tratar de realizar una sustituci\'on. 
+
+\section{Ligado y alcance}
+
+En lógica de predicados los cuantificadores~$\fa x$ y~$\ex x$ son ejemplos del
+fenómeno de \textit{ligado} que también surge en la mayoría de lenguajes de
+programación.
+La idea general es que ciertas presencias de variables son presencias
+\textit{ligadas} o simplemente \textit{ligas}, cada una de las cuales se asocia 
+con una expresión llamada su \textit{alcance}.
+
+% A continuación damos las definiciones para el caso de los cuantificadores.
+
+\defin{Dada una cuantificaci\'on $\fa x\vp$ o $\ex x\vp$, la presencia de~$x$
+  en~$\fa x$ o~$\ex x$ es la variable (artificial) que liga el cuantificador
+  correspondiente, mientras que la f\'ormula $\vp$ se llama el alcance, ámbito 
+  o radio de acción de este cuantificador.
+}
+
+\defin{Una presencia de la variable~$x$ en la f\'ormula~$\vp$ est\'a
+ligada o acotada si es la variable que liga a un cuantificador de~$\vp$ o si
+figura en el alcance de un cuantificador $\fa x$ o $\ex x$ de~$\vp$.\\ Si una 
+presencia de la variable~$x$ en la f\'ormula~$\vp$ no est\'a ligada, decimos 
+que est\'a libre en~$\vp$. 
+}
+
+\ejem{Sea $\vp=\fa x\ex z\big(Q(y,z)\lor R(z,x,y)\big)\land P(z,x)$. 
+\bi
+ \item El alcance del cuantificador $\fa$ es la f\'ormula 
+  $\ex z (Q(y,z)\lor R(z,x,y))$.
+ \item El alcance del cuantificador $\ex$ es la f\'ormula 
+  $Q(y,z)\lor R(z,x,y)$. 
+ \item En $\vp$ hay tres presencias de~$x$, las dos primeras ligadas y la 
+  \'ultima libre.
+ \item Las presencias de $z$ son cuatro, ligadas las tres primeras
+  y libre la última.
+ \item Finalmente las dos presencias de $y$ son libres.  
+\ei
+}
+
+
+\defin{Sea $\vp$ una f\'ormula. El conjunto de variables libres de~$\vp$, se
+denota~$FV(\vp)$.\\
+Es decir, $FV(\vp)=\{x\in\Var \mid x \text{ figura libre en }\vp\}$. \\
+La notaci\'on~$\vp(x_1,\ldots,x_n)$ quiere decir 
+que~$\{x_1,\ldots,x_n\}\inc FV(\vp)$.
+}
+Obsérvese que una misma variable~$x$ puede figurar tanto libre como ligada en
+una fórmula.
+
+\defin{Una f\'ormula~$\vp$ es \emph{cerrada} si no tiene variables
+libres, es decir, si $FV(\vp)=\vacio$. Una f\'ormula cerrada tambi\'en se
+conoce como enunciado o sentencia. 
+% El conjunto de~$\Si$-f\'ormulas cerradas se denota con $FORM_0(\Si)$.
+}
+
+\defin{Sea $\vp(x_1,\ldots,x_n)$ una f\'ormula 
+con~$FV(\vp)=\{x_1,\ldots,x_n\}$. 
+La cerradura universal de~$\vp$, denotada $\fa\vp$, es la 
+f\'ormula~$\fa x_1\ldots\fa x_n\;\vp$. 
+La cerradura existencial de $\vp$, denotada $\ex\vp$ es la 
+f\'ormula~$\ex x_1\ldots\ex x_n\;\vp$.
+}
+Obs\'ervese que una cerradura se obtiene cuantificando todas las variables
+libres de una f\'ormula. 
+
+
+\subsection{Implementación}
+\noindent Se deja como ejercicio implementar todos los conceptos de esta 
+sección mediante las siguientes funciones:
+\bi
+%\item Alcance: \verb-Alcance :: Form -> Form}
+\item Lista de variables libres: \verb=fv :: Form -> [Nombre]=
+\item Lista de variables ligadas: \verb=bv :: Form -> [Nombre]=
+\item Cerradura universal: \verb=aCl :: Form -> Form=
+\item Cerradura existencial: \verb=eCl :: Form -> Form=
+\item Alcances en una fórmula : \verb=alcF :: Form -> [(Form,Form)]=, al tomar 
+como entrada $P$ esta función devuelve una lista de pares de la forma $(A,B)$ 
+donde $A$ es una cuantificación que es subfórmula de $P$ y $B$ es el alcance de 
+$A$.
+\ei
+
+
+\section{Sustitución}
+La noción de sustitución en la lógica de predicados es más complicada que en
+la lógica proposicional debido a la existencia de términos y de variables
+ligadas. A diferencia de lo que sucede en lógica proposicional, donde una 
+sustitución es sólo una operación textual sobre las fórmulas, en la lógica de 
+predicados las sustituciones son operaciones sobre los términos y sobre las 
+fórmulas y en este último caso deben respetar el ligado de variables, por lo 
+tanto \textbf{no} son operaciones textuales.
+% tienen interés por sí solas, como lo veremos al tratar el tema
+% de unificación en programación lógica, de manera que empezamos por definir
+% que es una sustitución.
+
+\defin{Una sustitución en un lenguaje de predicados $\L$ es una tupla
+  de variables y términos denotada como
+  $[x_1,x_2,\ldots,x_n:=t_1,\ldots,x_n]$
+  donde 
+  \bi
+  \item $x_1,\ldots,x_n$ son variables distintas.
+  \item $t_1,\ldots,t_n$ son términos de $\L$.
+  \item $x_i\neq t_i$ para cada $1\leq i\leq n$
+  \ei
+  Por lo general denotaremos a una sustitución con $[\vx:=\vt\,]$.
+}
+% \defin{Una sustitución en un lenguaje de predicados $\L$ es una función 
+% $\sigma:\Var\imp\term_\L$ con la propiedad de que $\sigma(x_i)=x_i$ para casi
+% toda $i\in\N$. Es decir $\sigma(x_i)\neq x_i$ únicamente para un número
+% finito de variables. Esto se conoce en matemáticas en general como la
+% propiedad de que una función dada tenga soporte finito, siendo el soporte de 
+% $\sigma$ el conjunto de variables $x_i$ con $\sigma(x_i)\neq x_i$.
+% }
+% Obsérvese que una sustitución $\sigma$ queda completamente determinada 
+% mediante su soporte (finito), si éste es $x_1,\ldots,x_n$ con 
+% $\sigma(x_i)=t_i$ entonces la sustitución se denotará con
+% $\sigma = [x_1,x_2,\ldots,x_n:=t_1,t_2,\ldots,t_n] $
+% o de manera más breve $\sigma=[\vx:=\vt\,]$
+% La aplicación de una sustitución $\sigma$ a un término $t$ puede verse
+% formalmente como una extensión $\sigma^\star:\term_\L\imp\term_\L$ de
+% $\sigma$, que se denota igual que $\sigma$ sobrecargando la operación.
+
+
+\subsection{Implementación}
+Representaremos la sustitución $[\vx:=\vt\,]$ mediante listas de pares
+$ [(x_1,t_1),\ldots,(x_n,t_n)] $
+Para esto definimos el tipo de sustituciones:
+\begin{verbatim}
+type Subst = [(Nombre,Term)]
+\end{verbatim}
+Obsérvese que esto no garantiza que si \verb=s:Subst= entonces \verb-s- sea una 
+sustitución legal. Por lo tanto debe escribirse una función 
+\verb=verifSus:: Subst -> Bool= que verifique si una lista dada es una 
+sustitución.
+
+
+\subsection{Aplicación de una sustitución a un término}
+
+La aplicación de una sustitución~$[\vx:=\vt]$ a un término~$r$,
+denotada~$r[\vx:=\vt]$, se define como el término obtenido al reemplazar 
+\textbf{simult\'aneamente} todas las presencias de~$x_i$ en~$r$ por~$t_i$. 
+Este proceso de define  recursivamente como sigue:
+\[
+\ba{rll}
+x_i[\vx:=\vt\,] & = & t_i \qquad  1\leq i\leq n \\ \\ 
+z[\vx:=\vt\,] & = & z \qquad  \text{ si } z\neq x_i\;1\leq i\leq n  \\ \\
+c[\vx:=\vt\,] & = & c \qquad 
+  \text{ si } c\in\C\text{, es decir, }c\text{ constante } \\ \\
+f(t_1,\ldots,t_m)[\vx:=\vt\,] & = & 
+f(t_1[\vx:=\vt\,],\ldots,t_m[\vx:=\vt\,]) \qquad \text{ con }f^{(m)}\in\F.
+\ea
+\]
+
+Obsérvese entonces que la aplicación de una sustitución a término es
+simplemente una sustitución textual tal y como sucede en lógica de 
+proposiciones.
+
+\subsection{Implementación}
+La aplicación de una sustitución~$[\vec{x}:=\vec{t}]$ a un término~$t$ se 
+implementa mediante una función
+\begin{verbatim}
+apsubT :: Term -> Subst -> Term
+\end{verbatim}
+tal que si \verb-s- implementa a la sustitución~$[\vx:=\vt\,]$ entonces 
+\verb-apsubT r s- debe devolver el término~$r[\vx:=\vt\,]$.
+% Las siguientes propiedades de las sustituciones serán de
+% utilidad más adelante.
+% \prop{Sean $\sigma=[x_1,\ldots,x_n:=t_1,\ldots,t_n]$, 
+% $\tau=[y_1,\ldots,y_m:=s_1,\ldots,s_m]$ sustituciones.
+% La composición $\sigma\tau$ es una sustitución definida por:
+% \[
+% \sigma\tau =
+% %[z_1:=t_1\tau,\ldots,z_k:=t_k\tau,\,w_1:=w_1\tau,\ldots,w_l:=w_l\tau]
+% [z_1,\ldots,z_k,w_1,\ldots,w_l  :=  
+% t_1\tau,\ldots,t_k\tau,\,r_1,\ldots,r_l]
+% \]
+% donde $k\leq n,l\leq m$, las $z_i$ son exactamente aquellas $x_p$ tales que
+% $x_p\neq t_p\tau$ y las $w_j$ son aquellas $y_q$ no incluidas en 
+% $x_1,\ldots,x_n$. }
+
+% \prop{La composición de sustituciones es asociativa, es decir si
+% $\sigma,\rho,\tau$ son sustituciones entonces 
+% $(\sigma\rho)\tau=\sigma(\rho\tau)$.
+% }
+
+% \ejem{Sean  $\sigma=[x,y:=f(y),w],\;\rho=[x,z:=g(w),b],
+% \;\tau=[y,w,v:=b,f(c),w]$. Entonces
+% \[
+% \ba{rll}
+% \sigma\rho & = & [x,y,z:=f(y),w,b]. \\ \\
+% (\sigma\rho)\tau & = & [x,y,z,w,v:=f(b),f(c),b,f(c),w].
+% \ea
+% \]
+% }
+
+\subsection{Sustitución en Fórmulas}
+
+La aplicación de sustituciones a fórmulas, necesita de ciertos cuidados debido 
+a la presencia de variables ligadas mediante cuantificadores. La aplicación de 
+una sustitución textual a una fórmula puede llevar a situaciones problemáticas
+con respecto a la sintaxis y a la semántica de la lógica. En particular deben 
+evitarse los siguientes problemas:
+
+\paragraph{Sustitución de variables ligadas}
+  La definición de sustitución textual 
+  \[
+  (\fa y\vp)[\vx:=\vt\,] =_{def} \fa (y[\vx:=\vt\,])(\vp[\vx:=\vt\,])
+  \]
+  obliga a sustituir todas las variables de una fórmula, pero tal definición 
+  genera expresiones que ni siquiera son fórmulas, por ejemplo tendríamos que
+  \[
+  \big(\fa x P(y,f(x))\big)[x,y:=g(y),z] = \fa g(y) P\big(z,f(g(y))\big)
+  \]
+  La expresión de la derecha no es una fórmula puesto que la cuantificación 
+  sobre términos que no sean variables no está permitida. 
+  Lo mismo sucederá al definir la sustitución de esta manera para una fórmula
+  existencial. 
+  En conclusión, la sustitución en fórmulas \textbf{NO} debe ser una 
+  sustitución textual puesto que las presencias ligadas de variables no pueden 
+  sustituirse.\\ \\
+  Una solución inmediata al problema anterior consiste en definir la sustitución
+  sólamente sobre variables libres, como sigue 
+% dada una sustitución $[\vx:=\vt]$ definir~$x$ como la sustitución que 
+% coincide con $\sigma$ en todo su soporte, excepto en $x$, y donde 
+% $\sigma_x(x)=x$. De esta manera definiríamos 
+  \[
+  (\fa x\vp)[\vx:=\vt\,] =_{def} \fa x(\vp[\vx:=\vt\;]_x)
+  \]
+  donde $[\vx:=\vt\,]_x$ denota a la sustitución que elimina al par $x:=t$
+  de $[\vx:=\vt\,]$.  \\\\  
+  Por ejemplo $[z,y,x:=y,f(x),c]_x=[z,y:=y,f(x)]$. \\
+  Y así la aplicación de sustitución para la fórmula del primer ejemplo se 
+  ejecuta como sigue:
+  \[
+  \ba{rll}
+  \big(\fa x P(y,f(x))\big)[x,y:=g(y),z] & = &  
+  \fa x \big(P(y,f(x)[x,y:=g(y),z]_x\big) \\ & = & 
+  \fa x \big(P(y,f(x))[y:=z]\big) \\ & = &
+  \fa x P\big(z,f(x)\big)
+  \ea
+  \]
+  De esta manera se garantiza que el resultado de aplicar una sustitución a una
+  cuantificación siempre será una fórmula. Análogamente podemos definir la
+  sustitución para una fórmula existencial. Pasemos ahora a ver el segundo
+  problema a evitar.
+
+ \paragraph{Captura de variables libres}
+  Si bien la solución dada al problema anterior es suficiente desde el punto 
+  de vista sintáctico, no lo es al entrar en juego la semántica o el 
+  significado de las fórmulas.\\ \\
+  Consid\'erese la f\'ormula~$\fa x\vp$, la semántica intuitiva nos dice que 
+  esta fórmula será cierta siempre y cuando~$\vp(x)$ sea cierta para cualquier 
+  valor posible de~$x$, de manera que nos gustar\'ia poder obtener, a partir de 
+  la de verdad~$\fa x\vp$, la verdad de cualquier aplicación de 
+  sustitución~$\vp[x:=t]$. \\
+  Veamos ahora que que sucede si consideramos la f\'ormula 
+  \[\fa x\big(\ex   y(\,x\neq y)\big)\]  
+  Est\'a f\'ormula expresa el hecho de que para cualquier individuo existe otro 
+  distinto de \'el y es cierta si el universo tiene al menos dos elementos. \\
+  Ahora bien, al momento de calcular el caso particular 
+  $\big(\ex y(x\neq y)\big)[x:=y]$ con la definición anterior de aplicación de 
+  sustituciones obtenemos:
+  \[ 
+  \big(\ex y\,(x\neq y)\big)[x:=y] \;= \;
+  \ex y\big(\,(x\neq y)[x:=y]_y\big) \; =  \;
+  \ex y\big(\,(x\neq y)[x:=y]\big) \; =\;
+  \ex y\,(y\neq y)
+  \]  
+  Pero en esta última fórmula se ha cambiado el sentido: se está diciendo que 
+  hay un objeto~$y$ que es distinto de si mismo lo cual es absurdo. \\
+  De manera que con la definición dada no podemos garantizar la verdad de un 
+  caso particular de~$\vp$ aun suponiendo la verdad de la cuantificación 
+  universal~$\fa x\vp$.\\\\
+  ?` Qu\'e es lo que anda mal? obs\'ervese que la presencia libre de~$x$ en la 
+  f\'ormula~$\ex y(x\neq y)$ se ligó al aplicar la sustituci\'on~$[x:=y]$. 
+  Así que una variable libre que representa a un objeto particular se sustituyó 
+  por una variable que representa al objeto cuya existencia se está asegurando. 
+  Esta clase de sustituciones son inadmisibles, las posiciones que corresponden 
+  a una presencia libre de una variable representan a objetos particulares y el
+  permitir que se liguen después de una sustitución modificará el significado 
+  intensional de la fórmula. \\\\
+  Existen dos maneras de solucionar el problema, la primera es aceptando la 
+  definición dada arriba mediante el uso de sustituciones de la forma
+  $[\vx:=\vt\,]_x$ pero prohibiendo la aplicación de
+  sustituciones que liguen posiciones libres de variables. Para esto
+  debe darse una una definición sustitución admisible para una fórmula, este 
+  método es el más usado en textos de lógica matemática.\\
+  Nosotros preferimos el segundo método, utilizado generalmente en la teoría de 
+  lenguajes de programación: \textit{la aplicación de una sustitución a una 
+  fórmula se  define renombrando variables ligadas de manera que siempre 
+  podremos obtener  una sustitución admisible.}
+  
+\newpage
+
+Despu\'es de analizar los problemas anteriores, podemos dar una definición 
+correcta para la sustitución:
+\defin{La aplicación de una sustitución~$[\vx:=\vt]$ a una fórmula~$\vp$,
+denotada~$\vp[\vx:=\vt]$ se define como la fórmula obtenida al reemplazar 
+\textit{simultáneamente} todas las presencias libres de~$x_i$ en~$\vp$ 
+por~$t_i$, verificando que este proceso no capture posiciones de variables 
+libres.
+}
+
+La aplicación de una sustitución a una fórmula $\vp[\vx:=\vt\,]$ se define  
+\textbf{recursivamente} como sigue
+% Sean $\vp$ una fórmula y $[\vx:=\vt\;]$ una sustitución. Definimos 
+% recursivamente la aplicación de $[\vx:=\vt\,]$ a $\vp$, 
+% denotada $\vp[\vx:=\vt\;]$ como sigue:
+\[
+ \ba{rll}
+  \bot[\vx:=\vt\;] & = & \bot \\
+  \top[\vx:=\vt\;] & = & \top \\
+  P(t_1,\ldots,t_m)[\vx:=\vt\;] & = &
+    P\big(t_1[\vx:=\vt\;], \ldots, t_m[\vx:=\vt\;]\big) \\ 
+  (t_1 = t_2)[\vx:=\vt\;] & = & t_1[\vx:=\vt\;]=t_2[\vx:=\vt\;]\\ \\
+  (\neg \vp)[\vx:=\vt\;] & = & \neg \big(\vp[\vx:=\vt\;]\big)\\
+  (\vp\land\psi)[\vx:=\vt\;] & = &
+  \big(\vp[\vx:=\vt\;]\land\psi[\vx:=\vt\;]\big)\\
+  (\vp\lor\psi)[\vx:=\vt\;] & = &
+  \big(\vp[\vx:=\vt\;]\lor\psi[\vx:=\vt\;]\big)\\
+  (\vp\imp\psi)[\vx:=\vt\;] & = &
+  \big(\vp[\vx:=\vt\;]\imp\psi[\vx:=\vt\;]\big)\\
+  (\vp\iff\psi)[\vx:=\vt\;] & = &
+  \big(\vp[\vx:=\vt\;]\iff\psi[\vx:=\vt\;]\big)\\ \\
+  (\fa y\vp)[\vx:=\vt\;] & = & \fa y\big(\vp[\vx:=\vt\;]\big)\; 
+\text{ \textbf{si} } y\notin
+  \vx\cup Var(\vt) \\
+(\ex y\vp)[\vx:=\vt\;] & = & \ex y\big(\vp[\vx:=\vt\;]\big)\; \text{ 
+\textbf{si} } y\notin  \vx\cup Var(\vt) \\
+\ea
+\]
+
+% Análogamente a la sustitución en términos, la aplicación de una
+% sustitución $\sigma$ a una fórmula  $\vp$ puede verse
+% formalmente como una extensión $\sigma^\#:\form_\L\imp\form_\L$ de
+% $\sigma$, denotada igual que $\sigma$, sobrecargando nuevamente la
+% operación $\sigma$.\\
+
+Mencionamos ahora algunas propiedades de la sustitución que pueden
+verificarse mediante inducción sobre las fórmulas.
+
+\prop{La operación de sustitución tiene las siguientes propiedades, 
+  considerando~$x\notin \vx$.
+  \bi
+   \item Si $x\notin FV(\vp)$ entonces 
+    $\vp[\vec{x},x:=\vec{t},r\,] = \vp[\vec{x}:=\vec{t}\,]$.
+   \item Si $\vec{x}\cap FV(\vp)=\vacio$ entonces $\vp[\vx:=\vt\,]=\vp$.
+   \item $FV(\vp[\vx:=\vt\,])\inc (FV(\vp)-\vx)\cup Var(\vt)$.
+   \item Si $x\notin \vx\cup Var(\vt\,)$ entonces $x\in FV(\vp)$
+    si y sólo si $x\in FV(\vp[\vx:=\vt\,])$.
+   \item Si $x\notin \vx\cup Var(\vt\,)$ entonces            
+    $\vp[x:=t][\vx:=\vt\,]=\vp\big[\vx:=\vt\,\big]\big[x:=t[\vx:=\vt\,]\big]$.
+   \item Si $x\notin \vx\cup Var(\vt\,)$ entonces 
+    $\vp[\vx,x := \vt,t]=\vp[\vx:=\vt\,][x:=t]$.
+  \ei
+}
+
+\subsection{Implementación}
+La aplicación de una sustitución $[\vec{x}:=\vec{t}]$ a una fórmula $A$ se 
+implementa mediante una función
+\begin{verbatim}
+apsubF :: Form -> Subst -> Form
+\end{verbatim}
+donde si \verb-s- implementa a la sustitución~$[\vx:=\vt\,]$ entonces 
+\verb-apsubF A s- debe devolver la fórmula~$A[\vx:=\vt\,]$. 
+
+\vspace*{10pt}
+
+\noindent Hasta este momento debemos hacer la siguiente simplificación en la 
+implementación: \\
+en el caso de una sustitución donde la fórmula tiene como conectivo 
+principal una cuantificación, primero se debe verificar la condición de las 
+variables en la sustitución: \textit{las variables ligadas \textbf{no} 
+aparacen en ninguno de los términos de la sustitución.}\\
+De no cumplirse convenimos en devolver la fórmula de entrada tal cual, por 
+ejemplo el resultado de $(\fa x P(x,y))[y:=f(x)]$ debe ser~$\fa x P(x,y)$.
+
+% \begin{verbatim}
+% apsubF fu@(All x p) s = if not (elem x (dom s)++(map VarT (ran s))) 
+%                           then  All x (apsubF p s) 
+%                            else fu
+% \end{verbatim}
+
+
+\subsection{La relación de $\al$-equivalencia}
+
+La definición de sustitución en fórmulas cuenta con una restricción aparente
+en el caso de los cuantificadores, por ejemplo, la sustitución
+\[
+\fa x (Q(x)\to R(z,x))[z:=f(x)]
+\] 
+no está definida, puesto que~$x$ figura en~$f(x)$ es decir~$x\in Var(f(x))$, 
+con lo que no se cumple la condición necesaria para aplicar la sustitución, a 
+saber que las variables en la sustitución son ajenas a las de la fórmula.
+Por lo tanto, la aplicación de cualquier sustitución a una fórmula hasta 
+ahora es una función parcial.
+
+\vspace*{10pt}
+
+Esta aparente restricción desaparece al notar que los nombres de las 
+variables ligadas no importan: por ejemplo, las fórmulas $\fa x P(x)$ y 
+$\fa y P(y)$ significan exactamente lo mismo, a saber que todos los 
+elementos del universo dado cumplen la propiedad~$P$.\\
+% Por ahora podemos argumentar intuitivamente que el
+% nombre de las variables ligadas no importa, pues no denotan objetos en
+% particular sino que hacen una gene\-ralización existencia o universal. La
+% fórmula $\fa xP(x)$ representa el hecho de que la propiedad $P$ se cumple
+% para todos los objetos, propiedad representada igualmente por $\fa yP(y)$.\\
+
+Por lo tanto convenimos en identificar fórmulas que sólo difieren en sus
+variables ligadas, esto se hace formalmente mediante la llamada relación de
+$\al$-equivalencia definida como sigue:
+\defin{Decimos que dos fórmulas~$\vp_1,\;\vp_2$ son $\al$-equivalentes lo cual
+escribimos $\vp_1\sim_\al \vp_2$ si y sólo si $\vp_1$ y $\vp_2$ difieren a lo 
+más en los nombres de sus variables ligadas.
+}
+
+\ejem{Las siguientes expresiones son $\al$-equivalentes.
+\[
+\fa x P(x,y)\to \ex y R(x,y,z)\;\;\sim_\al\;\; 
+\fa w P(w,y)\to \ex v R(x,v,z) \;\; \sim_\al \;\; 
+\fa z P(z,y)\to \ex u R(x,u,z)
+\]
+}
+
+
+Más tarde demostraremos que las fórmulas $\al$-equivalentes también son 
+lógicamente equivalentes y por lo tanto son intercambiables en cualquier 
+contexto o bajo cualquier operación.
+
+\vspace*{10pt}
+
+Usando la $\al$-equivalencia, la operación de sustitución en fórmulas se
+vuelve una función \textit{total} por lo que siempre está definida. 
+\ejem{Por ejemplo se tiene que
+\[
+\fa x (Q(x)\to R(z,x))[z:=f(x)] \;=\; \fa y(Q(y)\to R(z,y))[z:=f(x)]
+\;=\; \fa y(Q(y)\to R(f(x),y))
+\]
+}
+Veamos otros ejemplos de sustituciones:
+
+\ejem{Las siguientes sustituciones se sirven, en caso necesario, de la 
+$\al$-equivalencia
+\[
+\ba{rll}
+\fa x R(x,y,f(z))[y,z:=d,g(w)] & = & \fa x R(x,d,f(g(w))) \\ \\
+\fa x P(x,y)[y,z:=f(c),w] & = & \fa x P(x,f(c)) \\ \\
+Q(y,z,y)[y,z:=g(d),f(y)] & = & Q(g(d),f(y),g(d)) \\\\
+\ex w Q(y,z,y)[y,z:=g(d),f(y)] & = & \ex w Q(g(d),f(y),g(d)) \\ \\
+\ex y Q(y,z,y)[y,z:=g(d),f(y)] & = & \ex w Q(w,f(y),w) \\ \\
+\ex z Q(y,z,y)[y,z:=g(d),f(y)] & = & \ex w Q(g(d),w,g(d)) \\\\
+\fa x\big( Q(z,y,x)\land \ex z T(f(z),w,y)\big)[x,y,z:=a,z,g(w)] & = &
+\fa u\big( Q(g(w),z,u)\land \ex v T(f(v),w,z)\big) \\ \\
+\fa x\big( Q(z,y,x)\land \ex z T(f(z),w,y)\big)[z,w,y:=g(x),h(z),w] & = &
+\fa u\big( Q(g(x),w,u)\land \ex v T(f(v),h(z),w)\big) 
+\ea
+\]
+}
+%Veamos porque es necesario el concepto de instancia admisible. En el
+%siguiente cap\'{\i}tulo daremos un significado formal a todas las
+%nociones sint\'acticas que hemos introducido hasta ahora, sin embargo, ya
+%les hemos dado un significado intuitivo que usaremos ahora. Considerese la
+%f\'ormula $\fa x\vp$, con la cual representamos que la f\'ormula se cumple
+%para todo valor posible de la variable $x$, de manera que nos gustar\'{\i}a
+%poder concluir, a partir de la f\'ormula $\fa x\vp$, la instancia
+%$\vp\{x/t\}$ para cualquier t\'ermino $t$. Veamos que pasa si consideramos
+%la f\'ormula $\fa x\ex y\neg(x=y)$, est\'a f\'ormula expresa el hecho de
+%que para cualquier individuo existe otro distinto de \'el y es cierta si
+%nuestro universo de discurso tiene al menos dos elementos, 
+%pero al momento de obtener el caso particular para $y$  obtenemos la
+%f\'ormula $\ex y\neg (y=y)$ que claramente es falsa. `? Qu\'e es lo est\'a
+%mal?, obs\'ervese que la presencia libre de $x$ en la f\'ormula $\ex y\neg
+%(x=y)$ se acot\'o al aplicar la sustituci\'on $\{x/y\}$, es decir la
+%instancia $(\ex y\neg(x=y))\{x/y\}$ no es admisible. 
+%La condici\'on de admisibilidad prohibe que sucedan situaciones erroneas
+%como la anterior.
+
+%\ejem{Considerense las siguientes sustituciones, 
+% $\si=\{x/f(x),y/c\},\;\allowbreak
+%\tau=\{x/f(y),y/z\},\;\rho=\{x/c, z/g(x,y)\}$, entonces:
+%\bi
+%\item[] $(\fa x P(x,y))\si=\fa x P(x,c)$ es admisible.
+%\item[] $(\ex y R(x,z,y))\tau=\ex y R(f(y),z,y)$ no es admisible pues la
+%presencia de $y$ en el t\'ermino $f(y)$ se vuelve ligada.
+%\item[] $(\fa x\ex y Q(z,x,y)\lor P(c,x))\rho=\fa x\ex y Q(g(x,y),x,y)\lor
+%P(c,c)$ no es admisible pues las presencias de $x,y$ en $g(x,y)$ se vuelven 
+% ligadas.
+%\ei
+%}
+
+
+
+%Definimos la sustitución de la letra proposicional $p$ por la fórmula
+%$\psi$ en una fórmula dada $\vp$, denotada $\vp[p:=\psi]$
+%recursivamente como sigue:
+
+%\[
+%\ba{rll}
+%p[p:=\psi] & = & \psi \\
+%q[p:=\psi] & = & q \\
+%\top[p:=\psi] & = & \top \\
+%\bot[p:=\psi] & = & \bot \\
+%(\neg \vp)[p:=\psi] & = & \neg (\vp[p:=\psi])\\
+%(\vp\land\chi)[p:=\psi] & = &
+%(\vp[p:=\psi]\land\chi[p:=\psi])\\
+%(\vp\lor\chi)[p:=\psi] & = &
+%(\vp[p:=\psi]\lor\chi[p:=\psi])\\
+%(\vp\imp\chi)[p:=\psi] & = &
+%(\vp[p:=\psi]\imp\chi[p:=\psi])\\
+%(\vp\iff\chi)[p:=\psi] & = &
+%(\vp[p:=\psi]\iff\chi[p:=\psi])\\
+%\ea
+%\]
+
+% Analogamente se define la sustitución simultanea 
+% $\vp[p_1,\ldots,p_n:=\psi_1,\ldots,\psi_n]$
+%La operación sustitución tiene las siguientes propiedades:
+%\bi
+%\item Si $p$ no figura en $\vp$ entonces
+%  $\vp[p:=\psi]=\vp$
+%  \item Si $p\neq q$ y $p$ no figura en $\chi$ entonces
+%$$\vp[p:=\psi][q:=\chi]=\vp[q:=\chi][p:=\psi[q:=\chi]]$$
+%\item Si $p\neq q_1,\ldots, q_n$ y $p$ no figura en $\psi_1,\ldots.\psi_n$
+%  entonces 
+% $$\vp[\vec{q},p:=\vec{\psi},\chi]=\vp[\vec{q}:=\vec{\psi}\;][p:=\chi]$$
+% 
+%\ei
+
+
+\subsection{Implementación}
+
+Se deja como ejercicio implementar un test para la $\al$-equivalencia así como 
+redefinir la función de sustitución usando el renombre de variables ligadas. 
+Estos ejercicios son más complicados que los anteriores.
+
+\bi
+\item \verb=vAlfaEq:: Form -> Form -> Bool= verifica si dos fórmulas son 
+$\al$-equivalentes.
+\item \verb=renVL:: Form -> Form= renombra las variables ligadas de una fórmula 
+de manera que las listas de variables libres y ligadas sean ajenas. Esto es un 
+caso particular de la siguiente función.
+\item \verb=renVLconj :: Form -> [Nombre] -> Form= renombra las variables 
+ligadas 
+de una fórmula de forma que sus nombres sean ajenos a los de una lista dada. 
+\item \verb=apSubF2 :: Form -> Subst -> Form= que implemente la sustitución en 
+fórmulas usando la $\al$-equivalencia.
+\ei
+
+
+\end{document}

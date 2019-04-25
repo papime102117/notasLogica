@@ -1,0 +1,789 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage{../packageslc}
+\usepackage{../optionslc}
+
+\input{../macroslc}
+
+
+\title{Tableaux Sem\'anticos \\ 
+L\'ogica Computacional 2018-2, Nota de clase 8}
+\author{Favio Ezequiel Miranda Perea\and Araceli Liliana Reyes Cabello\and
+Lourdes Del Carmen Gonz\'alez Huesca \and Pilar Selene Linares Ar\'evalo}
+\date{\today\\ Facultad de Ciencias UNAM}
+
+\begin{document}
+
+\maketitle
+
+\section{Introducción}
+Los \emph{tableaux} o \emph{tablas semánticas} son un método de
+demostración por refutación, el cual fue introducido en los años 1950 
+de manera independiente por Hintikka y Beth. 
+Este método se basa en la semántica más que en la sintáxis de las fórmulas. Sin
+embargo, se requiere de una clasificación de las fórmulas basada en sintaxis.
+
+Esta teor\'ia de prueba utiliza el principio de refutación: dado un 
+conjunto de premisas~$\Gamma$ y una conclusión~$\varphi$, se debe mostrar que el
+conjunto $\Gamma\cup \{ \lnot \varphi \}$ no tiene un 
+modelo~\footnote{Recordemos que un modelo de un conjunto de fórmulas $\Gamma$, 
+es una interpretación $\I$ tal que para cualquier estado de las 
+variables~$\sigma$ se cumple $\I_\sigma(\Gamma)=1$.},
+lo cual es equivalente a que $\G\models\vp$ es decir, a que
+$\varphi$ sea consecuencia lógica de $\Gamma$.
+
+Es Smullyan quien estandariza la notación y realiza la clasificación de las
+fórmulas en cuatro tipos identificando su esquema:
+\bi
+\item \emph{tipo $\alpha$}: las fórmulas conjuntivas.
+\item \emph{tipo $\beta$}: las fórmulas disyuntivas.
+\item \emph{tipo $\gamma$}: las fórmulas universales.
+\item \emph{tipo $\delta$}: las f\'ormulas existenciales.
+\ei
+De acuerdo a su tipo, una fórmula genera una extensión en el tableau. 
+Veamos ahora los preliminares para despu\'es detallar el método de prueba.
+
+% Las siguientes equivalencias lógicas nos servirán para clasificar las
+% fórmulas:
+% \beqs
+% \lnot(\varphi \lor \psi)\equiv\lnot \varphi \land \lnot \psi\;\;\;\;\;
+% \lnot(\varphi \imp \psi)\equiv\varphi \land \lnot \psi
+% \eeqs
+% \beqs
+% \lnot(\varphi \land\psi)\equiv\lnot \varphi \lor \lnot \psi\;\;\;\;\;
+% \varphi \imp \psi\equiv\lnot \varphi \lor  \psi
+% \eeqs
+% \beqs
+% \lnot(\varphi \syss \psi)\equiv\lnot \varphi \syss \psi\equiv
+% (\lnot \varphi \land  \psi) \lor \lnot ( \varphi \land \lnot \psi)
+% \;\;\;\;\;\;\varphi \syss \psi\equiv
+%        (\varphi \land \psi) \lor (\lnot \varphi \land\lnot \psi)
+% \eeqs
+% \beqs
+% \neg \fa x\vp\equiv\ex x\vp\;\;\;\;\;\neg\ex x \vp\equiv\fa x\lnot\vp
+% \eeqs
+
+
+\begin{definicion}
+  Una literal es una fórmula atómica o la negación de una fórmula atómica.
+\end{definicion}
+
+\begin{definicion} El conjunto de fórmulas que no son literales se clasifica en
+ cuatro tipos, en cada tipo de fórmula se distinguen ciertas
+ subfórmulas necesarias posteriormente:
+ \begin{enumerate}
+  \item[] \textbf{Tipo $\alpha$}: si la fórmula es conjuntiva o es equivalente
+   a una fórmula conjuntiva. \\
+   Una fórmula $\chi \in \form$ es tipo $\alpha$, si tiene alguna de las
+   siguientes formas:
+   \begin{enumerate} 
+   \item  $\chi = \vp \land \psi$, con subfórmulas $\alpha_{1} = \vp$ y
+     $\alpha_{2} = \psi$.
+
+   \item  $\chi = \lnot(\vp \lor \psi)$, con subfórmulas 
+   $\alpha_{1} = \lnot \vp$ y  $\alpha_{2} = \lnot \psi$.
+
+   \item   $\chi = \lnot(\varphi \imp \psi)$, con subfórmulas  
+   $\alpha_{1} = \vp$ y  $\alpha_{2} = \lnot \psi$.
+   \end{enumerate}
+% Las fórmulas $\alpha_{1}$ y $\alpha_{2}$ son llamadas 
+% \emph{$\alpha$-subfórmulas} de $\varphi$.
+
+  \item[] \textbf{Tipo $\beta$}: si la fórmula es disyuntiva o es equivalente
+   a una fórmula disyuntiva. \\
+   Una fórmula $\chi \in \form$ es tipo $\beta$, si tiene alguna de las
+   siguientes formas:
+   \begin{enumerate}
+   \item  $\chi = \vp \lor \psi$, con subfórmulas $\beta_{1} = \varphi$ y
+    $\beta_{2} = \psi$.
+
+   \item $\chi = \lnot(\vp \land \psi)$, con subfórmulas  
+    $\beta_{1} = \lnot \varphi$ y $\beta_{2} = \lnot \psi$.
+
+   \item $\chi = \vp \imp \psi$, con subfórmulas $\beta_{1} = \lnot \vp$
+    y $\beta_{2} = \psi$.
+
+   \item $\chi = \varphi \syss \psi$, con subfórmulas 
+   $\beta_{1} = \varphi \land \psi$ y $\beta_{2} = \lnot \vp \land \lnot \psi$.
+
+   \item $\chi = \lnot ( \varphi \syss \psi)$, con subfórmulas  
+   $\beta_{1} = \lnot \varphi \land  \psi$ y $\beta_{2} = \vp\land \lnot \psi$.
+   \end{enumerate}
+% Las fórmulas $\beta_{1}$ y $\beta_{2}$ se llaman \emph{$\beta$-subfórmulas} 
+% de $\chi$.
+
+  \item[] \textbf{Tipo $\gamma$}: si la fórmula está cuantificada universalmente 
+  o es equivalente a una fórmula cuantificada universalmente. \\
+  Una fórmula $\varphi$ es de tipo $\gamma$, si tiene alguna de las 
+  siguientes formas:
+  \begin{enumerate}
+   \item  $\chi = \forall x \varphi$.
+   \item  $\chi = \lnot \exists x \varphi$.
+    \end{enumerate}
+% Cualquier fórmula $\varphi[x:=t]$ con $t$ un término cerrado se llama 
+% \emph{$\gamma$-subfórmula} de $\chi$.     
+
+ \item[] \textbf{Tipo $\delta$}: si la fórmula está cuantificada 
+  existencialmente o es equivalente a una fórmula cuantificada 
+  existencialmente. \\
+  Una fórmula $\varphi$ es tipo $\gamma$, si tiene alguna de las  siguientes 
+  formas:
+  \begin{enumerate}
+   \item  $\chi = \exists x \varphi$.
+   \item  $\chi = \lnot \forall x \varphi$.
+  \end{enumerate}
+% Cualquier fórmula $\varphi[x:=t]$ con $t$ un término cerrado se
+% llama \emph{$\delta$-subfórmula} de $\chi$.     
+\end{enumerate}
+\end{definicion}
+De esta manera cualquier fórmula pertenece a una de cinco categor\'ias:
+literales, $\al,\;\beta,\;\gamma$ ó $\delta$.\\
+Obsérvese que algunas equivalencias en fórmulas tipo~$\beta$ o sus negaciones
+pueden clasificarse como fórmulas~$\al$, pero la clasificación elegida aquí es 
+óptima para construir los tableaux, en particular, la negación de una fórmula 
+$\beta$ no es necesariamente una fórmula $\alpha$.
+
+% Notemos que de la clasificación presentada se sigue el siguiente resultado.
+
+% \lema{\label{correctezReglas}
+%   Sea $\varphi$ una fórmula, $\mathcal{M} = \langle M , \mathcal{I} \rangle$ y
+%   $\nu$ una asignación de variables,  se cumple que:
+%   \begin{enumerate}
+%   \item $\mathcal{I}_{\nu}(\varphi) = 1$  con $\varphi$ una fórmula de tipo
+%     $\alpha$  syss $\mathcal{I}_{\nu}(\alpha_{1}) = 1$ y 
+% $\mathcal{I}_{\nu}(\alpha_{2}) = 1$ 
+%     con $\alpha_{1}$ y $\alpha_{2}$ $\alpha$-subfórmulas de $\varphi$.
+
+%   \item $\mathcal{I}_{\nu}(\varphi) = 1$  con $\varphi$ una fórmula de tipo
+%     $\beta$  syss $\mathcal{I}_{\nu}(\beta_{1}) = 1$ o 
+% $\mathcal{I}_{\nu}(\beta_{2}) = 1$ 
+%     con $\beta_{1}$ y $\beta_{2}$ $\beta$-subfórmulas de $\varphi$.
+
+%  \item $\mathcal{I}_{\nu}(\varphi) = 1$  con $\varphi=\forall x\psi$ una 
+% fórmula de tipo
+%     $\gamma$  syss $\mathcal{I}_{\nu}(\psi([x:=t])) = 1$ para todo término
+%     cerrado\footnote{Recordemos que un término cerrado es un término
+%       que no contiene variables.} $t$.
+
+%  \item $\mathcal{I}_{\nu}(\varphi) = 1$  con $\varphi = \exists \psi$ una 
+% fórmula de tipo
+%     $\beta$  syss $\mathcal{I}_{\nu}(\psi([x:=t])) = 1$ con $t$ un término 
+% cerrado
+%     nuevo que no aparecía en la ramma a la cual pertenece $\varphi$.
+%   \end{enumerate}
+% }
+
+% \emph{Demostración}: La demostración es directa de la definición de
+% satisfacción de fórmulas. Y se deja como ejercicio al lector.\qed
+
+%\begin{proposicion}
+% Sean $\varphi$ una fórmula y  $\mathcal{I}$ una interpretación, se cumple:
+% \begin{enumerate}
+% \item Si $\varphi$ es una fórmula de tipo
+%   $\alpha$, entonces $\mathcal{I}$ satisface $\varphi$ syss
+%   $\mathcal{I}$ satisface la $\alpha_{1}$-subfórmula y la 
+% $\alpha_{2}$-subfórmula de $\varphi$.
+
+% \item Si $\varphi$ es una fórmula de tipo $\beta$, entonces $\mathcal{I}$ 
+% satisface $\varphi$  syss $\mathcal{I}$ satisface a alguna de las dos
+%   $\beta$-subfórmulas  de $\varphi$,
+%   $\beta_{1}$ o $\beta_{2}$.
+% \end{enumerate}
+%\end{proposicion}
+
+\section{Tableaux Semánticos}
+
+Un tableau es un árbol donde cada nodo está etiquetado con una
+fórmula y tiene a lo más dos hijos. La construcción del árbol la dictan las reglas de
+extensión que introducimos enseguida. Inicialmente el árbol únicamente
+contiene una rama en donde cada uno de los nodos que la conforman
+están etiquetados con una de las fórmulas del conjunto $\Gamma \cup
+\{\lnot \varphi \}$, si lo que queremos probar es que 
+$\Gamma \models\varphi$; o bien, $\Gamma$ si lo que queremos probar es que este 
+conjunto es insatisfacible.  
+% A cada uno de estos conjuntos le llamaremos \emph{conjunto inicial}.
+
+\begin{definicion}
+ Las reglas de extensión de tableaux se definen de acuerdo a la
+ clasificación antes mencionada, y son:
+ \begin{enumerate}
+ \item Regla de extensión $\al$: 
+% Para las fórmulas del tipo $\alpha$ (conjuntivas), la \emph{$\alpha$-regla}
+% se define de la siguiente forma, dependiendo de la sintáxis de $\varphi$:
+ \begin{center}
+%   \boldmath
+\tikzstyle{level 1}=[level distance=10mm]
+   \tikz{\node{$\vp\land \psi$}
+       child{node{$\vp$}
+             child{node{$\psi$}}
+            }
+     ;
+     }
+\end{center}
+%   \begin{center}
+%      \begin{displaymath}
+%        \begin{array}{ccccc}
+%          \underline{\varphi \land \psi} & \hspace{30pt} &
+%          \underline{\lnot ( \varphi \lor
+%            \psi)}  & \hspace{30pt} & \underline{\lnot(\varphi \imp
+%            \psi )} \\
+%          \varphi  & \hspace{30pt} & \lnot \varphi & \hspace{30pt} &
+%          \varphi \\
+%          \psi & \hspace{30pt}& \lnot \psi & \hspace{30pt}&\lnot
+%          \psi \\
+%        \end{array}
+%      \end{displaymath}
+%  \end{center}
+%  Se agregan dos nuevos nodos a la rama $\Gamma$, es decir a la rama que 
+%  contiene a todas las fórmulas de $\Gamma$.  que contiene a
+%  $\varphi$, etiquetados con las $\alpha$-subfórmulas $\alpha_{1}$ y
+%  $\alpha_{2}$. % En símbolos, $\Gamma + \alpha_{1} + \alpha_{2}$, donde 
+%  $\Gamma$ corresponde a la rama que contiene a $\varphi$.
+% \newpage
+ \item Regla de extensión $\beta$:% -regla correspondiente a las fórmulas del 
+% tipo $\beta$ (disyuntivas),
+%    opera de la siguiente manera, dependiendo de la forma que tenga $\varphi$:
+ \begin{center}
+%   \boldmath
+\tikzstyle{level 1}=[level distance=15mm]
+   \tikz{\node{$\vp\lor \psi$}
+     child{node{$\vp$}}
+     child{node{$\psi$}}
+     ;
+     }
+\end{center}
+% \begin{center}
+% %\;\;\;\;\;\;\;\;\;
+%  %  \boldmath
+%    \tikz{\node{$\vp\iff \psi$}
+%      child{node{$\vp\land\psi$}}
+%      child{node{$\neg\vp\land\neg\psi$}}
+%      ;
+%      }
+% \;\;\;\;\;\;\;\;\;
+%  %  \boldmath
+%    \tikz{\node{$\neg(\vp\iff \psi)$}
+%      child{node{$\neg\vp\land\psi$}}
+%      child{node{$\vp\land\neg\psi$}}
+%      ;
+%      }
+%  \end{center}
+
+%    \begin{center}
+%      \begin{displaymath}
+%        \begin{array}{ccccccccc}
+%          \underline{\varphi \lor \psi} & \hspace{10pt} &
+%          \underline{\lnot(\varphi \land \psi)} & \hspace{5pt} &
+%          \underline{\varphi \imp \psi} & \hspace{5pt} &
+%          \underline{\hspace{25pt}  \varphi \syss \psi
+%            \hspace{27pt}} &
+%          \underline{\hspace{20pt}  \lnot (\varphi \syss \psi)
+%            \hspace{20pt}} \\
+
+%          \varphi \textrm{ } | \textrm{ } \psi & \hspace{5pt} & \lnot
+%          \varphi \textrm{ } | \textrm{ } \lnot \psi &  &
+%          \lnot \varphi \textrm{ } | \textrm{ } \psi  &  &
+%          \varphi \land \psi \textrm{ } | \textrm{ } \lnot \varphi \land  \lnot 
+% \psi    &
+%          \lnot \varphi \land \psi \textrm{ } | \textrm{ }
+%          \varphi \land           \lnot \psi
+%        \end{array}
+%      \end{displaymath}
+%    \end{center}
+
+%        La regla $\beta$ agrega un nodo izquierdo etiquetado con la 
+% $\beta_{1}$-subfórmula y 
+%    un nodo derecho etiquetado con la $\beta_{2}$-subfórmula. % en símbolos,
+% %    $\Gamma  + \beta_{1}$ y $\Gamma + \beta_{2}$, donde $\Gamma$ es la rama
+% %   que contiene a la formula $\varphi$.
+
+
+%  \begin{itemize}
+  \item Regla de extensión $\ga$:
+% Si $\varphi$ es de tipo $\gamma$, la regla que se aplicará es la
+% \emph{$\gamma$-regla}:
+  \begin{center}
+  \tikzstyle{level 1}=[level distance=12mm]
+    \tikz{\node{$\fa x\vp$}
+       child{node{$\vp[x:=t]$}
+            }
+     ;
+     }
+\end{center}
+%     \begin{displaymath}
+%         \begin{array}{c}
+%           \forall x \; \varphi\\ \hline
+%           \varphi[x:= t] \\
+%         \end{array}
+%        \end{displaymath}
+% La regla $\ga$ agrega un nuevo nodo etiquetado con la $\ga$-subfórmula 
+% $\varphi[x:=t]$, 
+donde $t$ es cualquier término cerrado.  Decimos que las fórmulas
+tipo $\gamma$ siempre están activas.
+% Cualquier nodo etiquetado 
+% % con una fórmula tipo $\gamma$ puede ser reutilizado para realizar una
+% % extensión.
+% En otras palabras, si $\Gamma$ es la rama que contiene a  $\varphi$ y 
+% $\Gamma$ no es cerrada siempre es posible extender a $\Gamma$
+% utilizando la  $\gamma$-regla, obteniendo, $\Gamma + \varphi[x:=t]$, con
+% $t$ cualquier término cerrado.\footnote{Podemos decir que las fórmulas
+% tipo $\gamma$ siempre están activas.}
+          
+  \item Regla de extensión $\delta$: 
+% Si $\varphi$ es de tipo $\delta$, la regla que debe aplicarse es la
+% \emph{$\delta$-regla}:
+  \begin{center}
+  \tikzstyle{level 1}=[level distance=12mm]
+    \tikz{\node{$\ex x\vp$}
+       child{node{$\vp[x:=c]$}
+            }
+     ;
+     }
+\end{center}
+donde $c$ es una constante nueva, es decir una constante que no figura
+antes en la rama.
+%       \begin{displaymath}
+%         \begin{array}{c}
+%           \exists x \; \varphi \\ \hline
+%           \varphi[x:=c] 
+%         \end{array}
+%       \end{displaymath}
+% La regla $\delta$ agrega un nuevo nodo etiquetado con la 
+% $\delta$-subfórmula $\varphi[x:=c]$, donde  $c$
+% es una {\bf constante nueva}, es decir, una constante que no figura
+% antes en la rama. % La extensión es la siguiente: $\Gamma + \psi[x:=c]$. 
+%  % \end{itemize}
+ \end{enumerate}
+\end{definicion}
+Como se puede apreciar, cada extensi\'on de la regla agreaga a lo m\'as dos 
+nodos con las subf\'ormulas correspondientes.\\
+
+
+A pesar de que se consideran algunas f\'ormulas equivalentes en la 
+clasificaci\'on, se debe enfatizar que su uso respeta las reglas de extensi\'on 
+y no debe procederse a una transformaci\'on de una f\'ormula en un principio.
+Veamos los casos de las reglas aplicadas a las f\'ormulas equivalentes:
+\begin{enumerate}
+ \item Extensión de f\'ormulas equivalentes tipo~$\al$: 
+ \begin{center}
+\tikzstyle{level 1}=[level distance=10mm]
+  \tikz{\node{$\neg(\vp\lor \psi)$}
+       child{node{$\neg\vp$}
+             child{node{$\neg\psi$}}
+            }
+     ;
+     }
+\qquad \qquad 
+  \tikz{\node{$\neg(\vp\to\psi)$}
+       child{node{$\vp$}
+             child{node{$\neg\psi$}}
+            }
+     ;
+     }
+  
+\end{center}
+\item Extensión de f\'ormulas equivalentes tipo~$\beta$:
+\begin{center}
+\tikzstyle{level 1}=[level distance=15mm]
+\tikzstyle{level 1}=[sibling distance= 20mm]
+   \tikz{\node{$\neg(\vp\land \psi)$}
+     child{node{$\neg \vp$}}
+     child{node{$\neg \psi$}}
+     ;
+     }
+ \quad \quad
+   \tikz{\node{$\vp\to \psi$}
+     child{node{$\neg \vp$}}
+     child{node{$\psi$}}
+     ;
+     }
+\quad \qquad
+   \tikz{\node{$\vp\iff \psi$}
+     child{node{$\vp\land \psi$}}
+     child{node{$\lnot\vp\land\lnot\psi$}}
+     ;
+     }
+\quad \qquad
+   \tikz{\node{$\lnot(\vp\iff \psi)$}
+     child{node{$\neg \vp \land \psi$}}
+     child{node{$\vp \land \lnot \psi$}}
+     ;
+     }
+
+     
+\end{center}
+
+\item Extensión de f\'ormulas equivalentes tipo~$\gamma$:
+\begin{center}
+  \tikzstyle{level 1}=[level distance=12mm]
+    \tikz{\node{$\lnot\exists x\vp$}
+       child{node{$\lnot \vp[x:=t]$}
+            }
+     ;
+     }
+\end{center}
+
+\item Extensión de f\'ormulas equivalentes tipo~$\delta$:
+\begin{center}
+  \tikzstyle{level 1}=[level distance=12mm]
+    \tikz{\node{$\lnot \fa x\vp$}
+       child{node{$\lnot \vp[x:=a]$}
+            }
+     ;
+     }
+\end{center}
+
+
+\end{enumerate}
+
+A continuación definimos formalmente un tableau semántico:
+
+ \begin{definicion}[\emph{Tableaux semánticos}]
+ Sea $\Gamma = \{\varphi_{1},\varphi_{2},\ldots , \varphi_{n}\}$ un conjunto de
+ fórmulas, un tableau para $\Gamma$ denotado $\mathcal{T}(\Gamma)$ es una 
+ extensión obtenida recursivamente como sigue:
+ \begin{enumerate}
+ \item El árbol formado por la rama cuyos nodos son $\varphi_{1}, \varphi_{2},
+   \ldots , \varphi_{n}$ es un tableau para $\Gamma$.
+
+ \item Si $\mathcal{T}_{1}$ es un  tableau para $\Gamma$, entonces la extensión
+   que se obtiene después de aplicarle alguna de las reglas $\alpha,\;
+   \beta,\;\gamma,\;\delta$ es un tableau para $\Gamma$.
+
+   \item Son todos 
+   % Únicamente son tableaux de $\Gamma$ aquellos que se obtienen
+   %  utilizando las reglas mencionadas en 1 y 2.
+ \end{enumerate}
+\end{definicion}
+
+Dado un conjunto inicial $\Gamma$ denotamos con $\mathcal{T}(\Gamma)$ a
+cualquier extensión de $\Gamma$, obtenida mediante las reglas arriba 
+definidas, la cual por supuesto no es única. \\
+Las siguientes observaciones acerca del uso de las reglas de extensión son de 
+gran importancia:
+
+\bi
+ \item Las reglas de extensión $\al,\beta,\delta$ se utilizan una 
+  \textbf{única} vez para cada fórmula. Es decir, si $\vp$ es una fórmula a la 
+  que se puede aplicar alguna extensión $\al,\beta,\delta$ entonces una vez 
+  hecha la extensión la fórmula $\vp$ no puede usarse nuevamente para una 
+  extensión. 
+ \item En contraste la regla $\ga$ puede utilizarse para realizar una extensión 
+  cualquier número de veces, por supuesto utilizando distintos términos 
+  cerrados $t$ en cada ocasión. Por esto decimos que la regla $\ga$ permanece 
+  siempre activa.
+ \item Cualquier extensión de una fórmula $\vp$ debe realizarse sobre 
+  \textbf{todas} las ramas del tableau a las que pertenece la fórmula $\vp$ y 
+  únicamente sobre éstas.
+ \item Para extender un tableau es conveniente preferir el uso de fórmulas 
+  tipo~$\al$ sobre fórmulas tipo~$\beta$ para buscando ramificar el tableau lo menos posible.
+ \item Similarmente el uso de la regla $\ga$ se debe posponer hasta que sea 
+  estrictamente necesario.
+ \item La regla $\ga$ debe utilizar en su extensión términos cerrados ya 
+  presentes en el tableau, excepto cuando estos aún no existan. Únicamente en 
+  este caso se permite aplicar la regla $\ga$ usando una nueva constante $a$.
+\ei
+
+\begin{definicion}[Tableau cerrado]
+ Una rama $\rho$ % $\Gamma$ 
+ de un tableau es \emph{cerrada } si tanto una literal (fórmula 
+ atómica) $\varphi$ como su negación figuran en $\rho$. Un tableau es 
+ \emph{cerrado} si todas sus ramas están cerradas.
+\end{definicion}
+
+\begin{definicion}[Tableau abierto]
+ Una rama $\rho$ de una tableau es \emph{abierta} si  no es cerrada. Un
+ tableau se considera \emph{abierto} si contiene al menos una rama abierta.
+\end{definicion}
+
+
+\subsection{Los teoremas de correctud y completud refutacional}
+
+El método de tableaux se relaciona con la semántica de la lógica mediante los 
+siguientes teoremas de correctud y completud refutacional.
+
+\begin{teorema}[Correctud]
+Si hay un tableau cerrado para $\Gamma$ entonces $\Gamma$ no tiene un modelo.
+% $\Gamma$ es un conjunto de fórmulas de $\propo$ insatisfacible   syss
+% existe un tablero $\mathcal{T}(\Gamma)$ cerrado.
+\end{teorema}
+\noindent
+Es decir, si un tableaux con conjunto inicial $\G$ se cierra entonces
+dicho conjunto es insatisfacible.
+
+\begin{teorema}[Completud refutacional]
+Si $\Gamma$ no tiene un modelo entonces existe un tableau $\mathcal{T}(\Gamma)$
+cerrado. 
+\end{teorema}
+\noindent
+Es decir si un conjunto inicial $\G$ es insatisfacible entonces 
+existe una extensión $\Te(\G)$ cerrada.\\
+
+\noindent
+Con respecto a la consecuencia lógica se tienen los siguientes corolarios:
+
+\begin{corolario}
+ $\Gamma \models \varphi$ si y s\'olo si existe una extensión
+ $\mathcal{T}(\Gamma \cup \{ \lnot\varphi \})$ cerrada.
+\end{corolario}
+
+\begin{corolario}
+ $\models\varphi$  si y s\'olo si existe una extensión $\mathcal{T}(\lnot
+ \varphi)$ cerrada.
+\end{corolario}
+
+
+% \section{Decidibilidad de la lógica de proposiciones}
+
+% En esta sección mostraremos la decidibilidad de la lógica de
+% proposiciones $\propo$ usando el método de tableaux. De manera que
+% cualquier resultado se referirá exclusivamente a proposiciones.
+
+
+% \begin{definicion}[Tableau proposicional completo]
+%  Una rama $\Gamma$ es \emph{completa} si cumple lo siguiente:
+%  \begin{itemize}
+%  \item Para cada una de las fórmulas de $\Gamma$ de tipo $\alpha$, 
+% sus $\alpha$-subfórmulas, $\alpha_{1}$ y $\alpha_{2}$, también están
+% en $\Gamma$.
+%  \item Para cada una de las fórmulas de $\Gamma$ de tipo $\beta$,
+%    $\Gamma$ contiene alguna de las dos $\beta$-subfórmulas, $\beta_{1}$ o 
+% $\beta_{2}$.
+%  \end{itemize}
+%  Un tableau es \emph{completo} si todas sus ramas son completas o cerradas.
+% \end{definicion}
+
+% %\begin{definicion}[Tableau abierto]
+% % Una rama $\Gamma$ de una tableau es \emph{abierta} si  no es cerrada. Un
+% % tableau se considera \emph{abierto} si contiene al menos una rama abierta.
+% %\end{definicion}
+
+% \subsection{Construcción de modelos}
+% \renewcommand{\R}{\mathcal{R}}
+% Los tableaux semánticos nos permiten construir modelos para los conjuntos de
+% fórmulas satisfacibles y contraejemplos para argumentos no válidos.
+% Si $\Gamma$ es un conjunto satisfacible, entonces  existe un  tableau de
+% $\Gamma$ abierto y completo, de ahí que $\mathcal{T}(\Gamma)$ contenga una 
+% rama
+% $\R$  completa y abierta. Luego entonces, para construir un modelo que
+% satisfaga $\Gamma$ basta con dar una asignación de
+% variables $\mathcal{I}$ que satisfaga a la rama $\R$.
+
+% \begin{definicion}
+%  Una rama $\R$ de un $\mathcal{T}(\Gamma)$ es satisfacible si existe una
+%  interpretación $\mathcal{I}$ que satisfaga cada una de las fórmulas que
+%  ocurren en $\R$. Un tableaux $\mathcal{T}(\Gamma)$ es satisfacible si tiene
+%  una rama satisfacible.
+% \end{definicion}
+
+% Si una rama $\R$ es completa y abierta entonces es satisfacible, siendo
+% una interpretación $\mathcal{I}$ posible la siguiente:
+% %\begin{center}
+%  \begin{displaymath}
+%     \mathcal{I}(p) = \left \{
+%       \begin{array}{ll}
+%         1 & \textrm{ si la variable } p \textrm{ es uno de los nodos
+%           de la rama } \R \textrm{ o } p \textrm{ no figura en }
+%         \R \\
+%         0 & \textrm{ si la fórmula } \lnot p \textrm{ es uno de los nodos de
+%           la rama } \R
+%       \end{array} \right.
+%  \end{displaymath}
+% %\end{center}
+
+
+% Obsérvese que podrían existir otros modelos, en realidad, si una
+% variable $q$ no figura en la rama $\R$ entonces el valor de verdad de
+% $q$ es irrelevante para el modelo de $\R$ de manera que $q$ puede ser
+% verdadera o falsa generandose así dos modelos distintos para $\R$.\\
+ 
+% El siguiente resultado es consecuencia inmediata de los teoremas anteriores y
+% de la definición anterior.
+
+% \begin{corolario}
+% Un conjunto $\Gamma$ es satisfacible syss existe un tableaux completo
+% $\mathcal{T}(\Gamma)$ satisfacible. 
+% \end{corolario}
+
+% %Los tableaux sirven para implementar algoritmos de decisión para diversos
+% %problemas de la lógica de proposiciones, a continuación mencionamos algunos
+% %de ellos.
+
+% De lo anterior podemos concluir la decidibilidad de la lógica de 
+% proposiciones.
+
+% \begin{teorema}[Decidibilidad de $\propo$]
+% La lógica proposicional $\propo$ es decidible. Es decir, existe un algoritmo
+% que decide, dada una fórmula $\vp$, si esta es o no una tautología.
+% \end{teorema}
+
+% Podemos dar el siguiente algoritmo:
+% \bi
+% \item Entrada: $\vp$.
+% \item Construir $\mathcal{T}(\neg\vp)$
+% \bi
+% \item Si $\mathcal{T}(\neg\vp)$ se cierra entonces $\vp$ es tautología.
+% \item En otro caso existe una rama abierta y completa en
+%   $\mathcal{T}(\neg\vp)$ la cual genera un modelo de $\neg\vp$, por lo que
+%   $\vp$ no es tautología.
+% \ei
+% \ei
+
+% Finalmente mencionamos como  resolver algoritmicamente otros problemas de la
+% lógica proposicional:
+
+% \subsection{Satisfacibilidad de un conjunto de fórmulas $\Gamma$}
+% \bi
+% \item Entrada: un conjunto de fórmulas $\Gamma$.
+% \item Construir $\mathcal{T}(\Gamma)$.
+% \bi
+% \item Si $\mathcal{T}(\Gamma)$ se cierra entonces $\Gamma$ es insatisfacible
+% \item En otro caso existe una rama abierta y completa en
+%   $\mathcal{T}(\Gamma)$ la cual genera un modelo, por lo que
+%   $\Gamma$ es satisfacible.
+% \ei
+% \ei
+
+
+% \subsection{Correctud de un argumento lógico $\Gamma\models\vp$}
+% \bi
+% \item Entrada:  Un conjunto de fórmulas $\Gamma$ y una fórmula $\vp$.
+% \item Construir $\mathcal{T}(\Gamma\cup\{\neg\vp\})$.
+% \bi
+% \item Si $\mathcal{T}(\Gamma\cup\{\neg\vp\})$ se cierra entonces la
+%   consecuencia lógica $\Gamma\models\vp$ se da y el argumento es correcto.
+% \item En otro caso existe una rama abierta y completa en
+%   $\mathcal{T}(\Gamma\cup\{\neg\vp\})$ por lo que la consecuencia es inválida 
+%  y se genera un modelo de las premisas $\Gamma$ donde la conclusión $\vp$ es
+%   falsa.  
+% \ei
+% \ei
+
+
+% \subsection{Clasificación de una fórmula $\vp$}
+% \bi
+% \item Entrada:  Una fórmula $\vp$ que deseamos clasificar como tautología,
+%   contradicción o contingencia.
+% \item Construir $\mathcal{T}(\vp)$.
+% \bi
+% \item Si $\mathcal{T}(\vp)$ se cierra entonces $\vp$ es contradicción
+% \item En otro caso existe una rama abierta y completa en
+%   $\mathcal{T}(\vp)$. 
+% \bi
+% \item Construir $\mathcal{T}(\neg \vp)$.
+% \item Si $\mathcal{T}(\neg \vp)$ se cierra entonces $\vp$ es tautología.
+% \item En otro caso $\mathcal{T}(\neg \vp)$ tiene una rama abierta y completa
+%   y $\vp$ es contingente.
+% \ei
+% \ei
+% \ei
+
+
+\section{Tableaux en lógica de predicados: indecidibilidad}
+
+Es bien sabido que la lógica de predicados es indecidible, es decir 
+\textit{no existe un algoritmo que reciba una fórmula~$\vp$ y decida si ésta
+es o no una fórmula universalmente válida}. En particular:
+\bi
+\item No existe un algoritmo que reciba un conjunto de premisas $\G$ y
+una fórmula $\vp$ y decida si se cumple o no $\G\models\vp$.
+\item Podemos preguntarnos entonces por qu\'e los algoritmos de decisión para
+  la lógica de proposiciones fallan al usarlos o trasladarlos a la l\'ogica de 
+  predicados, en particular por qu\'e el método de tableaux no nos permitirá 
+  decidir la consecuencia lógica en la lógica de predicados. 
+  ?`Donde está la falla?
+\ei
+
+Considérese el siguiente tableau:
+\begin{center}
+%   \boldmath
+ \tikz{
+  \tikzstyle{level 1}=[level distance=10mm]
+  \tikzstyle{level 2}=[level distance=10mm]
+  \tikzstyle{level 3}=[level distance=10mm]
+  \tikzstyle{level 4}=[level distance=10mm]
+  \node{$\fa x\ex y P(x,y)$}
+       child{node{$\ex y P(c_1,y)$}
+             child{node{$P(c_1,c_2)$}
+                    child{node{$\ex y P(c_2,y)$}
+                           child{node{$P(c_2,c_3)$}
+                                   child{node{$\ex y P(c_3,y)$}
+                                          child{node{$P(c_3,c_4)$}
+                                                 child{node{$\vdots$}
+                                                      }
+                                               } 
+                                        }
+                                 }
+                         }  
+                  }
+            }
+     ;
+     }
+\end{center}
+%  \begin{center}
+%    \pstree[nodesep=2pt,levelsep=20pt]
+%    {\TR{$\forall x \exists y P(x,y)$}}
+%    {
+%      \pstree{\TR{$\exists y P(a_1,y)$}}{
+%        \pstree{\TR{$P(a_1,a_2)$}}{
+%          \pstree{\TR{$\exists y P(a_2,y)$}}{
+%            \pstree{\TR{$P(a_2,a_3)$}}{
+%              \pstree{\TR{$\exists y P(a_3,y)$}}{
+%                \pstree{\TR{$P(a_3,a_4)$}}{
+%                  \TR{$\vdots$}
+%                }
+%              }
+
+%            }
+%          }
+         
+%        }
+%      }
+%    }
+%  \end{center}
+\bi
+ \item Al aplicar la regla $\ga$ a la primera fórmula hacemos la extensión con 
+  una nueva constante $c_1$ obteniendo una fórmula existencial $\ex y P(c_1,y)$.
+ \item Al aplicar la regla $\delta$ a $\ex y P(c_1,y)$ debemos elegir una 
+  constante $c_2$ distinta de $c_1$ obteniendo $ P(c_1,c_2)$.
+ \item Como las fórmulas universales están siempre activas entonces podemos 
+  aplicar la regla $\gamma$ nuevamente a la primera fórmula pero ahora con la 
+  constante $c_2$ obteniendo $\ex y P(c_2,y)$, etc.
+ \item Se observa que este proceso se puede continuar indefinidamente
+  por lo que podemos obtener una rama infinita.
+ \item Al existir ramas infinitas no tiene sentido hablar de 
+  ramas completas como en la lógica de proposiciones. Pueden existir ramas, como 
+  la de arriba que sigan extendi\'endose indefinidamente, por lo que nunca 
+  sabremos si la rama se podrá cerrar o no.
+\ei
+
+De este ejemplo debe quedar claro el porque los tableaux en lógica de 
+predicados únicamente pueden ser utilizados  para trata de establecer  
+\emph{insatisfacibilidad, validez} ó \emph{consecuencia lógica} y  por lo 
+general \textbf{no} son un método apto para construir modelos como en   el caso 
+de la lógica de proposiciones. 
+
+Existen formas de construir modelos a partir de un tableaux en lógica de   
+predicados pero son m\'as bien casos particulares basados en ciertas   
+\textit{heurísticas}.
+
+En lógica de proposiciones la construcción de un modelo se sirve del concepto 
+de rama completa y abierta, pero en lógica de predicados no existe un concepto 
+de rama completa.
+Esto debe convencernos de la indecidibilidad de la lógica de predicados. \\
+
+
+\noindent Veamos otro ejemplo, consid\'erese lo siguiente:
+$$ \fa x\ex y P(x,y),\; R(a,b)\;/\;\therefore \ex x R(x,b) $$
+este argumento es claramente correcto pues la conclusión es consecuencia de la 
+segunda premisa, la primera no aporta nada pues habla de otra relación. \\
+Aunque existe un tableau cerrado generado por el argumento (utilizando la 
+segunda premisa y la negaci\'on de la conclusión) también existe un tableau 
+infinito muy semejante al que analizamos en el ejemplo anterior (utilizando la 
+primer premisa). \\
+Por lo tanto si en el análisis de un argumento nos encontramos ante 
+un tableau que no se ha cerrado no podemos asegurar nada.
+
+
+
+\end{document}
+

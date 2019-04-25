@@ -1,0 +1,429 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage{../packageslc}
+\usepackage{../optionslc}
+
+\input{../macroslc}
+
+\title{Introducci\'on y Sintaxis de la L\'ogica de Proposiciones \\
+Lógica Computacional 2018-2, Nota de clase 1}
+\author{Favio Ezequiel Miranda Perea\and Araceli Liliana Reyes Cabello\and
+Lourdes Del Carmen Gonz\'alez Huesca \and Pilar Selene Linares Ar\'evalo}
+\date{ Facultad de Ciencias UNAM}
+
+\begin{document}
+\maketitle
+
+\section{Introducci\'on}
+En muchos aspectos cotidianos hacemos referencia a la l\'ogica, ya sea de forma 
+expl\'icita o impl\'icita pero estricta y formalmente 
+\begin{center}
+ \textbf{?`Qué es la l\'ogica?}
+\end{center}
+\bi
+\item La habilidad para determinar respuestas correctas mediante un proceso
+  estandarizado.
+\item El estudio de la inferencia formal.
+\item Una secuencia de afirmaciones verificadas
+\item Razonamiento, lo opuesto a la intuici\'on.
+\item La deducción o derivación de afirmaciones a partir de afirmaciones 
+previas.
+\item Rama de la filosof\'ia que trata de las formas de razonamiento y 
+pensamiento, especialmente la inferencia y el método científico.
+\item Estudio de los principios de inferencia v\'alida.
+\ei
+ 
+\begin{center}
+ \textbf{?`Por qué estudiar l\'ogica?}
+\end{center}
+\bi
+ \item La l\'ogica computacional, que es la que veremos en este curso, 
+  refleja el uso de la l\'ogica en computación, en cierto sentido es el 
+ \emph{cálculo de la computación}, un fundamento matemático para tratar la 
+  información y razonar acerca del comportamiento de programas.
+ \item Además proporciona un entrenamiento que lleva a formas correctas y 
+  precisas de razonamiento, en particular permite generar descripciones libres 
+  de ambigüedades.
+ \item Es relevante para cursos posteriores como inteligencia artificial, bases 
+  de datos o ingeniería de software.
+ \item Muchos problemas computacionales involucran l\'ogica en su representación
+  o solución.
+ \item Si bien la l\'ogica es una ciencia muy antigua y la computación de 
+  reciente estudio, ambas se han fundido durante el siglo pasado, de manera 
+  que hoy en d\'ia es difícil marcar una frontera entre ambas ciencias. 
+\ei
+
+\subsection{Motivación para la formalización del razonamiento correcto}
+\noindent La l\'ogica ha sido pieza clave para estructurar el pensamiento y el 
+razonamiento:
+\bi
+\item Dar un fundamento a las matemáticas.
+\item Eliminar errores del razonamiento.
+\item Encontrar una forma eficiente para llegar a una justificación de una 
+conclusión, dada cierta información en forma de premisas.
+\ei
+
+\section{Argumentos lógicos}
+Un \emph{argumento lógico} es una colección finita de afirmaciones 
+(proposiciones) dividida en premisas y conclusión. Las premisas y conclusión 
+deben ser susceptibles de recibir un valor de verdad. El argumento lógico 
+puede ser correcto o incorrecto.
+
+Un problema central de la l\'ogica es verificar la correctud de un argumento 
+lógico.
+Y una aplicación principal en computación es: \\
+?`Cómo sabemos que el código que nos proporcione un programador es correcto, 
+es decir, realmente el programa siempre hará lo que queremos?
+
+Veamos algunos ejemplos:
+\bi
+ \item \emph{Todos los hombres son mortales, Socrates es
+  hombre. Por lo tanto Socrates es Mortal.} ?`Es correcto?
+ \item \emph{Nada es mejor que Superman, Un taco es mejor que nada. Por lo 
+  tanto un taco es mejor que Superman.} ?`Es correcto?
+ \item \emph{Los borogrovos se ponen fefos durante el brilgo. Pac es un 
+  borogrovo y hay brilgo. Por lo tanto Pac está fefo.}?`Es correcto?
+\ei      
+
+Pero, ?`cómo decidir si un argumento es correcto? 
+?` Por sentido común, por votación, por autoridad ? 
+
+Nosotros usaremos la l\'ogica como un medio para decidir la validez de un
+argumento.
+Un argumento es correcto o válido si {\bf suponiendo} que sus premisas son 
+ciertas, entonces necesariamente la conclusión también lo es.   
+Obsérvese que las premisas se suponen siempre ciertas. En el análisis de un   
+argumento lógico no importa el contenido sino la forma de las premisas.
+
+
+\paragraph{La isla de los caballeros y los bribones}
+
+En la isla de los caballeros y bribones sólo hay dos clases de habitantes, 
+los caballeros que siempre dicen la verdad y los bribones que siempre mienten. 
+Un n\'aufrago llega a la isla y encuentra dos habitantes: A y B. 
+El habitante A afirma : Yo soy un bribón o B es un caballero. \\
+El acertijo consiste en averiguar c\'omo son A y B.\\
+
+\noindent Representación l\'ogica: 
+\bi
+ \item[] $p$ := ``A es un bribón'', $q$ := ``B es un caballero''.\\
+  Entonces A dijo $s$ := p $\lor$ q.
+\ei
+Para resolver el acertijo suponemos que A es bribón.
+ \bi
+  \item En tal caso $s$ es mentira por lo que ambas $p$ y $q$ son falsas.
+  \item Si $p$ es falsa entonces A no es bribón.
+  \item Contradicción: A no puede ser bribón y no bribón a la vez.
+ \ei
+ De manera que A no es bribón y entonces es caballero y $s$ es cierta. 
+ Pero como $p$ es falsa, dado que A es caballero entonces $q$ debe ser cierta 
+ de manera que también B es caballero.
+
+
+\paragraph{Especificación de un sistema de cómputo}
+?`Puede existir un sistema de cómputo y un estado particular del mismo con las 
+siguientes características?
+\begin{enumerate}
+ \item El sistema está en modo multiusuario si y sólo si se comporta 
+  normalmente.
+ \item Si el sistema se comporta normalmente, su núcleo funciona.
+ \item El núcleo no funciona o el sistema está en modo de interrupción.
+ \item Si el sistema no está en modo multiusuario entonces está en modo de 
+  interrupción.
+ \item El sistema no está en modo de interrupción.
+\end{enumerate}
+
+?`Cómo resolvemos este problema? 
+
+
+\subsection{Características de un argumento lógico}
+
+\bi
+ \item Los argumentos involucran individuos (personas, objetos, cosas en
+  general): \emph{los hombres, Socrates, un taco, Superman, etc..}
+ \item Los individuos tienen propiedades: \emph{ser mortal, ser mejor, etc}
+ \item Los argumentos se forman mediante proposiciones, clasificadas como
+  premisas y conclusión del argumento. 
+ \item Una proposición es una oración que puede calificarse como verdadera o 
+  falsa.
+ \item Las proposiciones pueden ser compuestas.
+ \item Un argumento puede ser correcto (válido) o incorrecto (inválido)
+ \item Un argumento nunca es verdadero ni falso.
+\ei
+
+
+
+\section{Sistema l\'ogico}
+
+\subsection{Componentes de un sistema lógico}
+
+Cualquier sistema lógico consta al menos de las siguientes tres componentes:
+\bi
+ \item Sintaxis: lenguaje formal que se utilizará como medio de expresión.
+ \item Semántica: mecanismo que proporciona significado al lenguaje formal dado 
+  por la sintaxis.
+ \item Teoría de la prueba: colección de mecanismos puramente sintácticos cuyo 
+  propósito fundamental es obtener o identificar las expresiones válidas, 
+  respecto a la semántica, de un lenguaje, en particular se encarga de decidir 
+  la correctud de un argumento lógico por medios puramtente sintácticos.
+\ei
+
+\subsection{Propiedades de un sistema l\'ogico}
+\bi
+\item \textbf{Consistencia}: se refiere a que en el sistema l\'ogico no hay
+contradicciones.
+\item \textbf{Correctud}: las reglas del sistema no pueden obtener una 
+inferencia falsa a partir de una verdadera.
+\item \textbf{Completud}: no hay sentencias verdaderas que no se puedan 
+demostrar en el sistema. Es decir, todo lo verdadero es demostrable.
+\ei
+
+
+\section{Lógica proposicional}
+La l\'ogica proposicional es el sistema lógico más simple. Se encarga del 
+manejo de proposiciones mediante conectivos lógicos.
+ 
+Una \textbf{proposición} es un enunciado que puede calificarse de verdadero o 
+falso, por ejemplo:
+\bi
+ \item El es bribón
+ \item Tu eres caballero
+ \item Hoy es jueves.
+ \item Hay vida en Marte.
+\ei
+ 
+\textbf{NO} son proposiciones: ?`Llueve?, el perro azul, !`Viva Pancho Villa!, 
+el cerro de la silla, juan perez, etc.
+
+
+\subsection{El lenguaje \propo}
+\noindent
+Definimos ahora un lenguaje formal para la l\'ogica de proposiciones.
+El alfabeto de este lenguaje consta de:
+\bi
+ \item Símbolos o variables proposicionales (un número infinito): 
+  $p_1,\ldots,p_n,\ldots$
+ \item Constantes l\'ogicas: $\bot,\top$
+ \item Conectivos u operadores lógicos: $\neg,\land,\lor,\imp,\iff$
+ \item Símbolos auxiliares: $(,\;)$
+\ei
+
+\noindent El conjunto de expresiones o fórmulas atómicas, denotado $\atom\;$ 
+consta de:
+\bi
+\item Las variables proposicionales: $p_1,\ldots,p_n,\ldots$.
+\item Las constantes $\bot,\top$.
+\ei
+
+Las expresiones que formarán nuestro lenguaje $\propo$, llamadas usualmente 
+fórmulas, se definen recursivamente como sigue: 
+\begin{enumerate}
+ \item Si $\varphi\in\atom$ entonces $\varphi\in\propo$. 
+ Es decir, toda fórmula atómica es una fórmula.
+ \item Si $\varphi\in\propo$ entonces $(\neg\varphi)\in\propo$
+ \item Si $\varphi,\psi\in\propo$ entonces
+  
+$(\varphi\land\psi),(\varphi\lor\psi),(\varphi\imp\psi),
+(\varphi\iff\psi)\in\propo$.
+ \item Son todas.
+\end{enumerate}
+La última cláusula de la definición garantiza que el conjunto $\propo$ es el
+mínimo conjunto cerrado bajo las tres primeras reglas.
+
+\espc
+
+
+La definición anterior puede darse en la llamada forma de Backus-Naur para
+definir gramáticas como sigue:
+\[
+ \begin{array}{rcl}
+  \varphi,\psi & ::= & VarP \mid \bot \mid \top \mid 
+(\neg\varphi) \mid (\varphi\land\psi) \mid (\varphi\lor\psi) \mid 
+(\varphi\imp\psi) \mid (\varphi\iff\psi) \\
+VarP & ::= & p_1 \mid p_2 \mid \ldots \mid p_n \mid \ldots
+ \end{array}
+\]
+
+\subsection{Precedencia y Asociatividad de los Operadores Lógicos}
+
+Para evitar el uso de paréntesis al máximo definimos la siguiente precedencia
+de operadores de mayor a menor:
+\bi
+\item $\neg$
+\item $\land,\lor$
+\item $\imp$
+\item $\iff$
+\ei
+
+De manera que la operación a realizar primero es la dada por el conectivo de
+mayor precedencia. Veamos algunos ejemplos:
+\[
+\begin{array}{rll}
+\neg p\imp r  & \text{ es } &  (\neg p)\imp r \\
+p\imp q\land r& \text{ es } & p\imp (q\land r)\\ 
+\neg p\imp q \iff r & \text{ es } & \big((\neg p)\imp q\big) \iff r\\
+p\imp q \land r\iff s\lor \neg t & \text{ es } & 
+\big(p\imp q \land r\big)\iff \big(s\lor (\neg t)\big)\\
+p\land q \imp \neg q\lor s  & \text{ es } & (p\land q)\imp ((\neg q)\lor s) \\
+\end{array}
+\]
+
+
+Obsérvese que los operadores $\land,\lor$ tienen la misma precedencia de
+manera que expresiones como $p\land q\lor r$ son ambiguas y no pueden ni
+deben ser utilizadas.\\
+
+Acerca de la asociatividad, los operadores $\land,\lor,\iff$ son asociativos
+de manera que expresiones como $p\lor q\lor r$ o $\neg p\iff p\lor s\iff t$
+están libres de ambigüedades.\\
+Por otra parte el operador $\imp$ no es asociativo pero adoptaremos la
+convención usual de asociarlo a la derecha, es decir expresiones del estilo
+$\vphi_1\imp\vphi_2\imp\vphi_3$ se entenderán como 
+$\vphi_1\imp(\vphi_2\imp\vphi_3)$
+
+
+\section{Definiciones Recursivas y el Principio de Inducción}
+
+Las definiciones recursivas son omnipresentes en ciencias de la computación, 
+la definición del lenguaje {\propo} es un ejemplo de esta clase de definiciones
+que consisten en definir propiedades o funciones en una estructura de datos
+mediante un análisis de casos de las distintas formas sintácticas que definen a 
+la estructura de datos correspondiente.\\
+
+Veamos un ejemplo de definición recursiva, la función $np:\propo\imp\N$ que 
+devuelve el número de paréntesis de una fórmula dada. Se define como sigue:
+\[
+\begin{array}{rll}
+np(\varphi) & = & 0\quad \text{ si }\varphi \text{ es atómica }\\
+np((\neg\varphi)) & = & np(\varphi)+2\\
+np((\varphi\star\psi)) & = & np(\varphi)+np(\psi)+2
+\end{array}
+\]
+
+Si se desean probar propiedades acerca de estructuras o funciones definidas
+recursivamente como nuestro lenguaje {\propo}, como por ejemplo que 
+$np(\varphi)$ siempre es un n\'umero par, lo adecuado es usar el llamado
+principio de inducción estructural que enunciamos a continuación.
+
+\defin{[Principio de Inducción Estructural para {\propo}]
+Sea $\Pe$ una propiedad acerca de fórmulas del lenguaje {\propo}. 
+Para probar que toda fórmula $\varphi\in\propo$ tiene la propiedad $\Pe$ basta 
+demostrar lo siguiente:
+\bi
+\item Caso base: toda variable proposicional tiene la propiedad $\Pe$.
+\item Hipótesis de inducción: suponer que se cumple la propiedad $\Pe$ para
+  $\varphi$ y $\psi$.
+\item Paso inductivo: mostrar, usando la hipótesis de inducción, que 
+\begin{enumerate}
+\item $(\neg\varphi)$ cumple $\Pe$.
+\item $(\varphi\star\psi)$ cumple
+con $\Pe$, donde $\star\in\{\imp,\land,\lor,\iff\}$.
+\end{enumerate}
+\ei
+}
+
+\subsection{Algunas funciones de importancia}
+
+Las siguientes funciones serán de utilidad más adelante. 
+Su definición recursiva se deja como ejercicio:
+\bi
+ \item Profundidad de una fórmula: 
+  $depth(\vp)$ devuelve la profundidad o altura del árbol de análisis 
+  sintáctico de $\vp$.
+ \item Número de conectivos de una fórmula: 
+  $con(\vp)$ devuelve el número de conectivos de $\vp$.
+ \item Variables de una fórmula: 
+  $vars(\vp)$ devuelve el conjunto o lista de variables que figuran en $\vp$ 
+  (sin repeticiones).
+ \item Atómicas en una fórmula: 
+  $atom(\vp)$ devuelve el número de presencias de fórmulas atómicas en $\vp$.
+\ei
+
+Las siguientes relaciones entre algunas de las funciones recién especificadas 
+deben verificarse mediante inducción estructural:
+\bi
+\item $con(\vp) < 2^{depth(\vp)}$
+\item $depth(\vp) \leq con(\vp)$.
+\item $atom(\vp) \leq 2 con(\vp)+1$.
+\ei
+
+\section{Sustitución}
+Una operación sintáctica fundamental de las f\'ormulas proposicionales es
+la sustitución: en una fórmula dada $\varphi$, una variable proposicional 
+$p$ cambia por una fórmula $\psi$.
+Así se genera una nueva fórmula denotada $\varphi[p:=\psi]$ obtenida
+al sustituir todas las presencias de $p$ en $\varphi$  por $\psi$. 
+Esta operación se conoce como sustitución textual y se define recursivamente 
+como sigue:
+\[
+\begin{array}{rll}
+p[p:=\psi] & = & \psi \\
+q[p:=\psi] & = & q, \text{ si } p\neq q \\
+\top[p:=\psi] & = & \top \\
+\bot[p:=\psi] & = & \bot \\
+(\neg \varphi)[p:=\psi] & = & \neg (\varphi[p:=\psi])\\
+(\varphi\land\chi)[p:=\psi] & = &
+(\varphi[p:=\psi]\land\chi[p:=\psi])\\
+(\varphi\lor\chi)[p:=\psi] & = &
+(\varphi[p:=\psi]\lor\chi[p:=\psi])\\
+(\varphi\imp\chi)[p:=\psi] & = &
+(\varphi[p:=\psi]\imp\chi[p:=\psi])\\
+(\varphi\iff\chi)[p:=\psi] & = &
+(\varphi[p:=\psi]\iff\chi[p:=\psi])\\
+\end{array}
+\]
+An\'alogamente se define la sustitución simultánea de $n$ variables
+proposicionales por $n$ fórmulas 
+$\varphi[p_1,\ldots,p_n:=\psi_1,\ldots,\psi_n]$, también
+denotada como $\vp[\vec{p}:= \vec{\psi}\,]$.
+
+La operación de sustitución tiene las siguientes propiedades que deben 
+mostrarse usando inducción estructural:
+\bi
+ \item Si $p$ no figura en $\varphi$ entonces $\varphi[p:=\psi]=\varphi$.
+
+ \item Si $p\neq q$ y $p$ no figura en $\chi$ entonces
+  $$ \varphi[p:=\psi][q:=\chi]=\varphi[q:=\chi][p:=\psi[q:=\chi]] $$
+
+ \item Si $p\neq q_1,\ldots, q_n$ y $p$ no figura en $\psi_1,\ldots.\psi_n$
+  entonces  
+$$\varphi[\vec{q},p:=\vec{\psi},\chi]=\varphi[\vec{q}:=\vec{\psi}\;][p:=\chi]$$
+\ei
+
+\noindent Algunos ejemplos correspondientes a las propiedades anteriores son:
+\bi
+\item $(p\imp q\land r)[s:=t\lor p]=p\imp q\land r$, pues $s$ no figura en
+  $p\imp q\land r$.
+\item Ejemplificamos ahora la segunda propiedad 
+\[
+\begin{array}{rll}
+(q\lor r\imp t\iff s)[r:=p\land t][t:= p\land q] & = & \\
+(q\lor (p\land t)\imp t\iff s)[t:= p\land q] & = & \\ 
+q\lor (p\land (p\land q))\imp (p\land q)\iff s
+\end{array}
+\]
+
+Claramente $r \neq t$ y $r\notin Vars(p\land q)$ donde $Vars$ es la 
+función que obtiene el conjunto de variables proposicionales de una fórmula, 
+en particular $Vars(p\land q)=\{p,q\}$, y tenemos
+\[
+\begin{array}{rll}
+(q\lor r\imp t\iff s)[t:= p\land q][r:=(p\land t)[t:=p\land q]] & = & \\
+(q\lor r\imp t\iff s)[t:= p\land q][r:=p\land (p\land q)] & = & \\
+(q\lor r\imp (p\land q)\iff s)[r:=p\land (p\land q)] & = & \\
+q\lor (p\land (p\land q))\imp (p\land q)\iff s 
+\end{array}
+\]
+
+\item Un ejemplo de la tercera propiedad es:
+\[
+\begin{array}{rll}
+(r\land t \iff (q\land p\imp s))[r,p,s:=p\land s, t, r][q:= p\lor r] & = & \\
+((p\land s)\land t \iff (q\land t\imp r))[q:= p\lor r] & = & \\
+((p\land s)\land t \iff ((p\lor r)\land t\imp r)) & = & \\
+(r\land t \iff (q\land p\imp s))[r,p,s,q:=p\land s, t, r, p\lor r]
+\end{array}
+\]
+\ei
+
+
+\end{document}

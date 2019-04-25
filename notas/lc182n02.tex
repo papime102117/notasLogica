@@ -1,0 +1,864 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage{../packageslc}
+\usepackage{../optionslc}
+
+\input{../macroslc}
+
+
+\title{Sem\'antica de la L\'ogica de Proposiciones \\ 
+L\'ogica Computacional 2018-2, Nota de clase 2}
+\author{Favio Ezequiel Miranda Perea\and Araceli Liliana Reyes Cabello\and
+Lourdes Del Carmen Gonz\'alez Huesca \and Pilar Selene Linares Ar\'evalo}
+\date{Facultad de Ciencias UNAM}
+
+
+\begin{document}
+
+\maketitle
+
+En esta nota revisaremos brevemente los conceptos sem\'anticos m\'as relevantes 
+de la l\'ogica proposicional. Todos los conceptos involucrados en esta nota 
+fueron estudiados a detalle en el curso de Estructuras Discretas.
+
+\section{Significado de los conectivos l\'ogicos}
+
+\noindent Veamos el significado de cada conectivo l\'ogico:
+
+\paragraph{La Negaci\'on}
+La \emph{negaci\'on} de la f\'ormula $\vp$ es la f\'ormula $\lnot \vp$.
+
+\begin{itemize}
+ \item S\'imbolo utilizado:  $\lnot$ 
+ \item Correspondencia con el espa\~nol: No, no es cierto que, es falso que, 
+  etc.
+ \item Otros s\'imbolos: $\sim\!\vp,\; \overline{\vp}$. 
+ \item Sem\'antica (tabla de verdad):
+  \[ 
+   \begin{array}{c|c}
+    \vp & \lnot \vp \\ \hline 
+    1 & 0\\ 
+    0 & 1 
+   \end{array}
+  \]
+\end{itemize}
+
+
+\paragraph{La Disyunci\'on}
+La \emph{disyunci\'on} de las f\'ormulas $\vp,\psi$ es la f\'ormula
+$\vp\lor \psi$. 
+Las f\'ormulas $\vp,\psi$ se llaman \emph{disyuntos}. \index{disyuntos}
+
+\begin{itemize}
+ \item S\'imbolo utilizado: $\lor$
+ \item Correspondencia con el espa\~nol: o. 
+ \item Otros s\'imbolos: $\vp+\psi,\;\vp\,|\,\psi$. \index{disyunci\'on}
+ \item Sem\'antica (tabla de verdad):  
+  \[
+   \begin{array}{c|c|c}
+    \vp & \psi & \vp\lor \psi\\ \hline 
+    1 & 1 & 1\\
+    1 & 0 & 1\\
+    0 & 1 & 1\\
+    0 & 0 & 0\\
+   \end{array}
+  \]
+\end{itemize}
+
+\paragraph{La Conjunci\'on}\index{conjunci\'on}
+La \emph{conjunci\'on} de las f\'ormulas $\vp,\psi$ es la f\'ormula
+$\vp\land \psi$. Las f\'ormulas $\vp,\psi$ se llaman 
+\emph{conyuntos}\index{conyuntos}. 
+
+\begin{itemize}
+ \item S\'imbolo utilizado: $\land$
+ \item Correspondencia con el espa\~nol: y, pero. 
+ \item Otros s\'imbolos: $\vp\,\&\, \psi,\;\vp\cdot \psi$ o tambi\'en $\vp\psi$ 
+  sin usar un operador expl\'icito.
+ \item Sem\'antica (tabla de verdad): 
+  \[
+   \begin{array}{c|c|c}
+    \vp & \psi & \vp\land \psi\\ \hline 
+    1 & 1 & 1\\
+    1 & 0 & 0\\
+    0 & 1 & 0\\
+    0 & 0 & 0\\
+   \end{array}
+  \]
+\end{itemize}
+
+
+\paragraph{La Implicaci\'on}\index{implicaci\'on}\index{condicional}
+La \emph{implicaci\'on} o \emph{condicional} de las f\'ormulas $\vp,\psi$ es la 
+f\'ormula $\vp\imp \psi$. 
+La f\'ormula $\vp$ es el \emph{antecedente}\index{antecedente} y la
+f\'ormula $\psi$ es el \emph{consecuente} de la implicaci\'on. 
+
+\begin{itemize}
+ \item S\'imbolo utilizado: $\imp$
+ \item Correspondencia con el espa\~nol: $\vp\imp \psi$ significa: si $\vp$
+  entonces $\psi$; $\psi$, si $\vp$; $\vp$ s\'olo si $\psi$; $\vp$ es 
+  condici\'on suficiente para $\psi$; $\psi$ es condici\'on necesaria para 
+  $\vp$.
+ \item Otros s\'imbolos: $\vp\Imp \psi,\;\vp\supset \psi$.
+ \item Sem\'antica (tabla de verdad): 
+  \[
+   \begin{array}{c|c|c}
+    \vp & \psi & \vp\imp \psi\\\hline 
+    1 & 1 & 1\\
+    1 & 0 & 0\\
+    0 & 1 & 1\\
+    0 & 0 & 1\\
+   \end{array}
+  \]
+\end{itemize}
+
+\paragraph{La Equivalencia}
+La equivalencia o bicondicional de las f\'ormulas $\vp,\psi$ es la f\'ormula
+$\vp\iff \psi$. 
+
+\begin{itemize}
+ \item S\'imbolo utilizado: $\iff$
+ \item Correspondencia con el espa\~nol: $\vp$ es equivalente a $\psi$; 
+  $\vp$ si y s\'olo si $\psi$; $\vp$ es condici\'on necesaria y suficiente 
+  para $\psi$.
+ \item Otros s\'imbolos: $\vp\Iff \psi,\;\vp\equiv \psi$.
+ \item Sem\'antica (tabla de verdad): 
+  \[
+   \begin{array}{c|c|c}
+    \vp & \psi & \vp\iff \psi\\ \hline 
+    1 & 1 & 1\\
+    1 & 0 & 0\\
+    0 & 1 & 0\\
+    0 & 0 & 1\\
+   \end{array}
+  \]
+\end{itemize}
+
+\section{Sem\'antica formal de los conectivos l\'ogicos}
+
+\defin{El tipo de valores booleanos denotado $\bool$ se define como 
+$\bool=\{0,1\}$ }
+
+\defin{Un estado o asignaci\'on de las variables (proposicionales) es
+  una funci\'on $$\I:VarP\imp\bool$$
+  }
+
+\noindent Dadas $n$ variables proposicionales existen $2^n$ estados distintos
+para estas variables.
+
+\defin{Dado un estado de las variables $\I:VarP\imp\bool$, definimos la
+ interpretaci\'on de las f\'ormulas con respecto a $\I$ como la funci\'on
+ $\I^\star:\propo\imp\bool$ tal que:
+ \bi
+  \item $\I^\star(p)=\I(p)$ para $p\in VarP$, es decir
+    $\restr{\I^\star}{_{VarP}}=\I$.
+  \item $\I^\star(\top)=1$
+  \item $\I^\star(\bot)=0$
+  \item $\I^\star(\lnot\vphi)=1$ syss $\I^\star(\vphi)=0$.
+  \item $\I^\star(\vphi\land\psi)=1$ syss $\I^\star(\vphi)=\I^\star(\psi)=1$.
+  \item $\I^\star(\vphi\lor\psi)=0$ syss $\I^\star(\vphi)=\I^\star(\psi)=0$.
+  \item $\I^\star(\vphi\imp\psi)=0$ syss $\I^\star(\vphi)=1$ \textbf{e}
+    $\I^\star(\psi)=0$.
+  \item $\I^\star(\vphi\iff\psi)=1$ syss $\I^\star(\vphi)=\I^\star(\psi)$. 
+ \ei
+}
+
+
+Obs\'ervese que dado un estado de las variables~$\I$ (o tambi\'en~$\I_v$), la 
+interpretaci\'on~$\I^\star$ generada por~$\I$ est\'a determinada de manera 
+\'unica por lo que de ahora en adelante escribiremos simplemente $\I$ en lugar 
+de~$\I^\star$. Este abuso notacional es pr\'actica com\'un en ciencias de la
+computaci\'on y se conoce como \textit{sobrecarga} de operadores. \\
+
+\noindent El siguiente lema es de importancia para restringir las 
+interpretaciones de inter\'es al analizar una f\'ormula.
+
+\lema{[Coincidencia]
+Sean $\I_1,\I_2:\propo\imp\bool$ dos estados que coinciden en las variables 
+proposicionales de la f\'ormula $\vphi$, es decir $\I_1(p)=\I_2(p)$ para toda 
+$p\in vars(\vp)$.\\
+Entonces $\I_1(\vphi)=\I_2(\vphi)$.}
+\proof
+Inducci\'on estructural sobre $\vp$
+\qed
+
+\espc
+
+El lema anterior implica que a\'un cuando existen una infinidad de estados, dada 
+una f\'ormula $\vphi$ basta considerar \'unicamente aquellos que difieren en 
+las variables proposicionales de $\vphi$, a saber $2^n$ estados distintos si 
+$\vphi$ tiene $n$ variables proposicionales.
+
+
+\defin{[Estado modificado o actualizado] 
+Sean $\I:\vars \imp \bool$ un estado de las variables, $p$ una variable 
+proposicional y $v\in\bool$. Definimos la actualizaci\'on de $\I$ en $p$ por 
+$v$, denotado $\I[p/v]$ como sigue:
+\[
+\I[p/v\;](q) =\left\{\ba{rl}
+v & \text{ si } q=p \\ \\
+\I(q) & \text{ si } q \neq p
+\ea
+\right.
+\]
+%Es decir, $\sigma[\vx/\vec{m}\;]$ coincide con $\sigma$ en todas las variables
+%excepto en $x_1,\ldots,x_n$ siendo $m_i$ su valor en $x_i$.\\
+El estado $\I[p/v]$ se conoce como un estado modificado o una actualizaci\'on 
+de $\I$.
+}
+
+El concepto de estado modificado se relaciona con el concepto de sustituci\'on 
+textual de una manera importante que permite eficientar el proceso de 
+interpretaci\'on de una f\'ormula. Dicho proceso corresponde al siguiente
+
+\lema{[Sustituci\'on]
+Sean $\I$ una interpretaci\'on, $p$ una variable 
+proposicional y $\psi$ una f\'ormula tal que $\I^\star(\psi)=v$. Entonces
+% $r\in\term$, $\sigma$ un estado de
+%   las variables, $[\vx:=\vt\;]$ una sustituci\'on y $m_1,\ldots,m_n\in
+%   M$ tales que $\I(t_i)=m_i\;\;1\leq i\leq n$. Entonces
+$$\I\big(\vp[p:=\psi\;]\big) = \I[p/v\;](\vp)$$
+}
+\proof Inducci\'on sobre $\vp$. %Se vio en clase. 
+\qed
+
+
+\subsection{Observaciones sobre la implementaci\'on funcional}
+
+\bi
+\item Estados: un estado $\I$ puede implementarse directamente como una 
+funci\'on 
+\begin{verbatim}
+ i :: VarP -> Bool 
+\end{verbatim}
+o bien, dado que las listas son una estructura de datos muy conveniente en {\sc 
+Haskell} podemos definir el  tipo de Estados como
+\begin{verbatim}
+type Estado = [VarP] 
+\end{verbatim}
+con lo cual representamos a un estado mediante la lista de variables 
+proposicionales que est\'an definidas como verdaderas. \\
+Por ejemplo si definimos $\I_1(p)=\I_1(q)=1$ e $\I_1(r)=0$ entonces 
+implementamos a dicho estado como \verb~i1=[p,q]~. 
+Similarmente el estado \verb~i2=[r,s,t]~ representa al estado 
+$\I_2(r)=\I_2(s)=\I_2(t)=1$. 
+
+\item Funci\'on de interpretaci\'on: la funci\'on de interpretaci\'on 
+$\I^\star$ se implementa mediante una funci\'on 
+\begin{verbatim}
+interp :: Estado -> Prop -> Bool 
+\end{verbatim}
+especificada por: $$ {\tt interp}\;i\;\vp = \I^\star(\vp) $$ 
+donde el estado $i$ representa al estado $\I$ de la teor\'ia.
+
+\item Estados posibles: dada una f\'ormula $\vp$ con $n$-variables 
+proposicionales, la funci\'on 
+
+\verb~estados :: Prop -> [Estado]~
+devuelve la lista con los $2^n$ estados distintos para $\vp$. 
+Su definici\'on es  %dada {\tt phi::\propo}
+\begin{verbatim}
+estados phi = subconj (vars phi)
+\end{verbatim}
+donde \verb~vars:: Prop -> [VarP]~ es la funci\'on que 
+devuelve la lista de variables proposicionales que figuran en $\vp$ (sin 
+repetici\'on) y \verb= subconj :: [a] -> [[a]]= es una funci\'on que dada una 
+lista $\ell$, devuelve la lista con las sublistas de $\ell$. Por ejemplo:
+\begin{verbatim}
+subconj [1,2] = [[1,2],[1],[2],[]] 
+\end{verbatim}
+\ei
+
+\section{Conceptos Sem\'anticos B\'asicos}
+
+Dada una f\'ormula $\vp$ podemos preguntarnos ?`Cu\'antas interpretaciones hacen
+verdadera a $\vp$? las posibles respuestas llevan a las siguientes
+definiciones:
+
+\defin{\label{def3}Sea $\vp$ una f\'ormula. Entonces
+\bi
+\item Si $\I(\vp)=1$ para toda interpretaci\'on $\I$ decimos que $\vp$ es una
+  tautolog\'ia o f\'ormula v\'alida y escribimos $\models\vp$.
+\item Si $\I(\vp)=1$ para alguna interpretaci\'on $\I$ decimos que $\vp$ es
+  satisfacible, que $\vp$ es verdadera en $\I$ o que $\I$ es modelo de
+  $\vp$ y escribimos $\I\models\vp$
+\item Si $\I(\vp)=0$ para alguna interpretaci\'on $\I$ decimos que $\vp$ es
+  falsa o insatisfacible en $\I$ o que $\I$ no es modelo de $\vp$ y
+  escribimos $\I\not\models\vp$
+\item Si $\I(\vp)=0$ para toda interpretaci\'on $\I$ decimos que $\vp$ es una
+  contradicci\'on o f\'ormula no satisfacible.   
+\ei
+
+Similarmente si $\Gamma$ es un conjunto de f\'ormulas decimos que:
+\bi
+\item $\Gamma$ es satisfacible si tiene un modelo, es decir, si existe una 
+interpretaci\'on $\I$ tal que
+$\I(\vp)=1$ para toda $\vp\in\Gamma$. Lo cual denotamos a veces,
+abusando de la notaci\'on, con $\I(\Gamma)=1$.
+\item $\Gamma$ es insatisfacible o no satisfacible si no tiene un
+  modelo, es decir, si no existe una
+  interpretaci\'on $\I$ tal que $\I(\vp)=1$ para toda $\vp\in\Gamma$.
+\ei
+}
+Con respecto a las tablas de verdad tenemos las siguientes observaciones:
+\bi
+\item Una f\'ormula $\vp$ es satisfacible si en alguna linea de la tabla de
+  verdad $\vp$ toma el valor $1$. En caso contrario, es decir si en {\bf
+    todas} las
+  lineas toma el valor $0$ es insatisfacible (contradicci\'on).
+\item Un conjunto de f\'ormulas $\Gamma$ es satisfacible si existe alguna linea
+  de la tabla de verdad en la que {\bf todas} las f\'ormulas de $\Gamma$ toman 
+el valor $1$.
+\ei
+
+
+
+\prop{Sea $\Gamma$ un conjunto de f\'ormulas, $\vp\in\Gamma$, $\tau$ una 
+tautolog\'ia y $\chi$ una contradicci\'on. 
+\bi
+\item[] Si $\Gamma$ es satisfacible entonces
+\bi
+\item $\Gamma\setminus\{\vp\}$ es satisfacible.
+\item $\Gamma\cup\{\tau\}$ es satisfacible.
+\item $\Gamma\cup\{\chi\}$ es insatisfacible.
+\ei
+\item[] Si $\Gamma$ es insatisfacible entonces
+\bi
+\item $\Gamma\cup\{\psi\}$ es insatisfacible, para cualquier $\psi\in\propo$.
+\item $\Gamma\setminus\{\tau\}$ es insatisfacible.
+\ei
+\ei
+}
+\proof
+Ejercicio
+\qed
+
+\espc
+
+Si $\Gamma$ es satisfacible y $\psi$ tambi\'en nada se puede decir acerca de
+$\Gamma\cup\{\psi\}$. Analogamente si $\Gamma$ es insatisfacible y $\psi$ no es
+tautolog\'ia nada se puede decir de $\Gamma\setminus\{\psi\}$.
+
+\espc
+
+\prop{Sea $\Gamma=\{\vp_1,\ldots,\vp_n\}$ un conjunto de f\'ormulas. 
+\bi
+\item $\Gamma$ es satisfacible syss $\vp_1\land\ldots\land\vp_n$ es
+  satisfacible.
+\item $\Gamma$ es insatisfacible syss $\vp_1\land\ldots\land\vp_n$ es
+  una contradicci\'on.
+\ei
+}
+\proof
+Ejercicio
+\qed
+
+\espc
+\subsection{Observaciones sobre la implementaci\'on funcional}
+
+\noindent Para implementar los conceptos de la definici\'on~\ref{def3} nos 
+serviremos de la funci\'on 
+\begin{verbatim}
+modelos :: Prop -> [Estados]                 
+\end{verbatim}
+que dada una f\'ormula $\vp$ devuelve la lista de todos sus modelos. \\
+Esta funci\'on se especifica como sigue:
+\begin{alltt}
+modelos(\(\vp\)) = [i | i \(\in\) estados(\(\vp\)),\;interp\;i\;\(\vp\) = True]
+\end{alltt}
+Es decir \verb=modelos(=$\vp$\verb=)= devuelve la lista 
+con todos aquellos estados $\I$ tales que $\I(\vp)=1$.
+Los conceptos de la definici\'on \ref{def3} se implementan comparando las 
+listas \verb=estados(=$\vp$\verb=)=  y \verb=modelos(=$\vp$\verb=)=.
+
+\bi
+\item Tautolog\'ia: \\
+\verb=tautologia:: Prop -> Bool= de la definici\'on $\vp$ es tautolog\'ia syss 
+todos sus estados (interpretaciones) son modelos:
+\begin{alltt} 
+ tautologia(\(\vp\)) = estados(\(\vp\)) == modelos(\(\vp\))
+\end{alltt}
+
+\item Satisfacible en una interpretaci\'on: \\
+\verb=satisfen:: Estado -> Prop -> Bool= donde $\vp$ es satisfacible en $\I$ 
+($\I\models\vp$) syss $\I(\vp)=1$. 
+%alg\'un estado (interpretaci\'on) es modelo, es decir, si la lista de modelos 
+% no es vac\'ia.
+\begin{alltt}
+satisfen i \(\vp\) = interp i \(\vp\) == True 
+\end{alltt}
+
+\item Satisfacible: \\
+\verb~satisf:: Prop -> Bool~ es decir $\vp$ es satisfacible syss 
+alg\'un estado (interpretaci\'on) es modelo, es decir, si la lista de modelos 
+no es vac\'ia:
+\begin{alltt}
+ satisf(\(\vp\)) = modelos(\(\vp\)) /= []
+\end{alltt}
+
+\item Insatisfacible en una interpretaci\'on:\\
+\verb~insatisfen:: Estado -> Prop -> Bool~ donde $\vp$ es insatisfacible en 
+$\I$ i.e. $\I\not\models\vp$  syss $\I(\vp)=0$. 
+%alg\'un estado (interpretaci\'on) es modelo, es decir, si la 
+% lista de modelos no es vac\'ia.
+\begin{alltt}
+insatisfen i \(\vp\) = interp i \(\vp\) == False 
+\end{alltt}
+
+\item Insatisfacible o contradicci\'on: \\
+\verb~contrad:: Prop -> Bool~ donde $\vp$ es insatisfacible o contradicci\'on 
+syss ning\'un estado (interpretaci\'on) es modelo, es decir, si la lista de 
+modelos es vac\'ia:
+\begin{alltt}
+contrad(\(\vp\)) = modelos(\(\vp\)) = [] 
+\end{alltt}
+
+\item Extensi\'on a conjuntos: las funciones que generan los estados y modelos 
+para un conjunto (lista) de f\'ormulas $\G$ y aquellas que verifican si 
+$\G$ es satisfacible o insatisfacible se denotan:
+\bi
+\item \verb~estadosConj :: [Prop] -> [Estado]~
+\item \verb~modelosConj :: [Prop] -> [Estado]~
+\item \verb~satisfenConj:: Estado -> [Prop] -> Bool~
+\item \verb~satisfConj:: [Prop] -> Bool~
+\item \verb~insatisfenConj:: Estado -> [Prop] -> Bool~
+\item \verb~insatisfConj:: [Prop] -> Bool~
+\ei
+la implementaci\'on de las mismas es similar al caso de las funciones para 
+f\'ormulas y se deja como ejercicio.
+\ei
+
+
+\section{Equivalencia de F\'ormulas}
+
+\defin{Dos f\'ormulas $\vp,\psi$ son equivalentes si $\I(\vp)=\I(\psi)$ para
+  toda interpretaci\'on $\I$. En tal caso escribimos $\vp\equiv\psi$.
+}
+Es f\'acil ver que la relaci\'on $\equiv$ es una relaci\'on de equivalencia.
+
+
+\prop{Sean $\vp,\psi$ f\'ormulas. Entonces $\vp\equiv\psi$ syss
+  $\models\vp\iff\psi$}
+
+\proof
+Ejercicio
+\qed
+
+\espc
+Dado que ya implementamos la funci\'on {\tt tautolog\'ia} podemos definir 
+f\'acilmente una funci\'on \\
+\verb~equiv :: Prop -> Prop -> Bool~ que 
+decida si dos f\'ormulas son equivalentes usando la proposici\'on anterior:
+\begin{alltt}
+equiv \(\vp\; \psi\) = tautolog\'ia (\(\vp\) <-> \(\psi\))
+\end{alltt}
+
+
+La siguiente propiedad es fundamental para el razonamiento ecuacional con 
+equivalencias l\'ogicas.
+
+\prop{[Regla de Leibniz] Si $\vp\equiv\psi$ y $p\in\atom$ entonces
+  $\chi[p:=\vp]\equiv\chi[p:=\psi]$}
+
+\proof
+Inducci\'on estructural sobre $\chi$.
+\qed
+
+\espc
+
+Las f\'ormulas equivalentes son de gran importancia pues nos permiten definir
+algunos conectivos en t\'erminos de otros, as\'i como simplificar f\'ormulas
+compuestas.
+
+
+\subsection{Algunas equivalencias l\'ogicas}
+
+\bi
+\item Conmutatividad:
+$$ \vp \lor \psi \equiv \psi \lor \vp 
+\qquad \qquad 
+\vp \land \psi \equiv \psi \land \vp $$
+
+\item Asociatividad:
+$$ \vp \lor( \psi \lor \chi )\equiv(\vp \lor \psi )\lor \chi  
+\qquad \qquad 
+\vp \land( \psi \land \chi)\equiv(\vp \land \psi )\land \chi $$
+
+\item Distributividad:
+$$\vp \lor( \psi \land \chi )\equiv(\vp \lor \psi )\land(\vp \lor \chi )
+\qquad \qquad 
+\vp \land( \psi \lor \chi )\equiv(\vp \land \psi )\lor(\vp \land \chi ) $$
+
+\item Leyes de la negaci\'on:
+\bi
+\item Doble Negaci\'on: $\lnot\lnot \vp \equiv \vp $
+\item De Morgan: $\lnot(\vp \lor \psi )\equiv \lnot \vp \land\lnot \psi \qquad 
+\lnot(\vp \land \psi )\equiv \lnot \vp \lor\lnot \psi $ 
+\item $\lnot(\vp \imp \psi )\equiv \vp \land\lnot \psi $ 
+\item $\lnot(\vp \iff \psi )\equiv\lnot \vp \iff \psi \equiv \vp \iff\lnot \psi 
+$. 
+%\item $\lnot\fa x \vp \equiv\ex x\lnot \vp $
+%\item $\lnot\ex x \vp \equiv\fa x\lnot \vp $
+\ei
+
+\item Propiedades de la implicaci\'on:
+\bi
+\item Contrapositiva: $\vp \imp \psi \equiv\lnot \psi \imp\lnot \vp $
+
+\item Importaci\'on/Exportaci\'on:
+$\vp \land \psi \imp \chi \equiv \vp \imp( \psi \imp \chi )$
+
+\ei
+
+\item Eliminaci\'on de conectivos:
+$$\vp \imp \psi \equiv\lnot \vp \lor \psi 
+\qquad \qquad 
+\vp \imp \psi \equiv\lnot(\vp \land\lnot \psi ) $$
+$$ \vp \iff \psi \equiv (\vp \imp \psi )\land ( \psi \imp \vp )
+\qquad \qquad 
+\vp \iff \psi \equiv (\vp \land  \psi )\lor (\lnot \vp \land\lnot \psi )$$
+$$ \vp \lor \psi \equiv \lnot \vp \imp \psi 
+\qquad \qquad 
+\vp \land \psi \equiv \lnot(\vp \imp\lnot \psi )$$
+
+\item Leyes simplificativas:
+\bi
+\item Idempotencia: $\vp \lor \vp \equiv \vp \qquad \vp \land \vp \equiv \vp $
+
+\item Absorci\'on:
+$\vp \lor(\vp \land \psi )\equiv \vp \qquad \vp \land(\vp \lor \psi)\equiv \vp$ 
+\ei
+% En lo que sigue $\top$ denota a cualquier tautolog\'ia y
+% $\bot$ a cualquier contradicci\'on.
+\bi
+\item Neutros:
+$\vp \lor\bot\equiv \vp \qquad \vp \land\top\equiv \vp  $
+
+\item Inversos:
+\bi
+ \item Tercero Excluido: $\vp \lor\lnot \vp \equiv\top$ 
+ \item Contradicci\'on: $\vp \land\lnot \vp \equiv\bot$ 
+\ei
+
+\item Dominancia:
+$ \vp \lor\top\equiv\top \qquad \vp \land\bot\equiv\bot $
+\ei
+\ei
+
+Veamos un ejemplo de simplificaci\'on de una f\'ormula mediante el uso de 
+equivalencias l\'ogicas y la regla de Leibniz:
+\[
+\ba{rll}
+(p\lor q)\land\lnot(\lnot p\land q)&\equiv &
+(p\lor q)\land (\lnot\lnot p\lor\lnot q) \\
+& \equiv & (p\lor q)\land (p\lor\lnot q) \\
+& \equiv & p\lor (q\land\lnot q) \\
+& \equiv & p\lor \bot \\ 
+& \equiv & p
+\ea
+\]
+
+\subsection{Eliminaci\'on de implicaciones y equivalencias}
+
+Las equivalencias l\'ogicas que permiten eliminar los conectivos $\to,\iff$ son 
+de gran importancia para la llamada l\'ogica clausular que estudiaremos m\'as 
+delante. Se deja como ejercicio definir recursivamente e implementar las 
+siguientes funciones:
+\bi
+\item \verb~elimEquiv:: Prop -> Prop~ tal que
+\begin{center}
+\verb~elimEquiv~ $\vp = \psi$ syss  $\psi\equiv\vp$ y $\psi$ no 
+contiene el s\'imbolo $\iff$.
+\end{center}
+
+\item \verb~elimImp:: Prop -> Prop~ tal que
+\bc
+\verb~elimImp~ $\vp = \psi$ syss $\psi\equiv\vp$ y $\psi$ no contiene el 
+s\'imbolo $\to$.
+\ec
+\ei
+Obs\'ervese que estas funciones pueden definirse de diversas formas pero las 
+m\'as adecuadas son usando las equivalencias usuales:
+$$ \vp\iff\psi\equiv (\vp \imp \psi) \land (\psi \imp \vp)\qquad 
+\vp\imp\psi\equiv \lnot\vp\lor\psi $$
+
+
+
+\section{Consecuencia L\'ogica}
+
+\defin{Sean $\Gamma$ un conjunto de f\'ormulas y $\vp$ una f\'ormula. Decimos 
+que $\vp$ es consecuencia l\'ogica de $\Gamma$ si para toda interpretaci\'on 
+$\I$ que sastisface a $\Gamma$ se tiene $\I(\vp)=1$. 
+Es decir si se cumple que siempre que $\I$ satisface a $\Gamma$ entonces 
+necesariamente $\I$ satisface a $\vp$.
+En tal caso escribimos $\Gamma\models\vp$.}
+\noindent
+N\'otese que la relaci\'on de consecuencia l\'ogica esta dada por una 
+implicaci\'on de la forma 
+$$ \I(\Gamma)=1\Imp\I(\vp)=1 $$
+lo cual informalmente significa que 
+\emph{todo modelo de $\Gamma$ es modelo de $\vp$}.\\
+De manera que no se afirma nada acerca de la satisfacibilidad del conjunto
+$\Gamma$, simplemente se asume que es satisfacible y en tal caso se prueba que
+la f\'ormula $\vp$ tambi\'en lo es con la misma interpretaci\'on.\\
+  
+Obs\'ervese tambi\'en la sobrecarga del s\'imbolo $\models$ que previamente 
+utilizamos para denotar satisfacibilidad  $\I\models\vp$ y tautolog\'ias 
+$\models\vp$.
+
+\prop{\label{prop:conslog}La relaci\'on de consecuencia l\'ogica cumple las 
+siguientes propiedades:
+\bi
+\item Si $\vp\in\Gamma$ entonces $\Gamma\models\vp$.
+\item Principio de refutaci\'on: $\Gamma\models\vp$ syss 
+$\Gamma\cup\{\lnot\vp\}$
+  es insatisfacible.
+\item $\Gamma\models\vp\imp\psi$ syss $\Gamma\cup\{\vp\}\models\psi$.
+\item Insatisfacibilidad implica trivialidad: Si $\Gamma$ es insatisfacible
+entonces $\Gamma\models\vp$ para toda $\vp\in\propo$.
+\item Si $\Gamma\models\bot$ entonces $\Gamma$ es insatisfacible.
+\item $\vp\equiv\psi$ syss $\vp\models\psi$ y $\psi\models\vp$.
+\item $\models\vp$ (es decir si $\vp$ es tautolog\'ia) syss
+  $\vacio\models\vp$ (es decir $\vp$ es consecuencia l\'ogica del conjunto 
+vac\'io).
+\ei 
+}
+\proof
+Ejercicio
+\qed
+
+
+\subsection{Observaciones sobre la implementaci\'on funcional}
+
+\noindent La funci\'on \verb~consecuencia: [Prop] -> Prop -> Bool~ se 
+especifica como:
+\bc
+\verb~consecuencia~ $\G\;\vp =$ \verb~True~ syss $\G\models\vp$.
+\ec
+La implementaci\'on se sirve del principio de refutaci\'on dado en la 
+proposici\'on \ref{prop:conslog}:
+\bc
+\verb~consecuencia gamma phi = insatisfConj ((neg phi):gamma)~
+\ec
+donde \verb~neg: Prop -> Prop~ es una funci\'on que construye la negaci\'on 
+de una f\'ormula.
+
+
+Otra posibilidad es verificar que no existen modelos de $\G$ que no sean 
+modelos de $\vp$, es decir, que la lista de modelos de $\G$ que no son modelos 
+de $\vp$ es vac\'ia. Esto se puede hacer directamente usando 
+el mecanismo de listas por comprensi\'on de {\sc Haskell}:
+
+%{\tt consecuencia gamma phi = null [i\;|i <- estadosConj 
+% (phi:gamma),\;satisfenConj i gamma,\;not (satisfen i phi)]}
+\begin{verbatim}
+consecuencia gamma phi = null [i | i <- estadosConj (phi:gamma),
+                                   satisfenConj i gamma,
+                                   not (satisfen i phi)
+                              ]
+\end{verbatim}
+
+
+\subsection{Correctud de Argumentos L\'ogicos}
+
+\defin{Un argumento l\'ogico es una sucesi\'on de f\'ormulas 
+$\vp_1,\ldots,\vp_n$ llamadas premisas y una f\'ormula $\psi$ llamada 
+conclusi\'on. Dicha sucesi\'on se escribe usualmente como
+\begin{mathpar}
+ \inferrule*[]{
+  \vp_1  \\\\
+  \vdots \\\\
+  \vp_n 
+ }{
+ \therefore \psi
+ } 
+\end{mathpar}
+}
+Un problema central de la l\'ogica consiste en decidir si un argumento dado es
+correcto o no, para lo cual la herramienta principal es la noci\'on de
+consecuencia l\'ogica.
+
+\defin{Un argumento con premisas $\vp_1,\ldots,\vp_n$ y conclusi\'on $\psi$ es
+  l\'ogicamente correcto si la conclusi\'on se sigue l\'ogicamente de las 
+premisas, es decir si $\{\vp_1,\ldots,\vp_n\}\models\psi$
+}
+
+\noindent Esta definici\'on deja ver de inmediato una implementaci\'on 
+\verb~ argcorrecto :: [Prop] -> Prop -> Bool~
+dado que ya tenemos un programa (funci\'on) para decidir la consecuencia 
+l\'ogica.
+\begin{verbatim}
+argcorrecto [phi1,...,phin] psi = consecuencia [phi1,...,phin] psi
+\end{verbatim}
+
+Es importante tener un m\'etodo formal para decidir la correctud de argumentos
+del lenguaje natural los cuales pueden parecer correctos y no serlo. Veamos
+un ejemplo sencillo considerando el siguiente argumento: 
+\bc
+\emph{Si hoy es viernes entonces ma\~nana es s\'abado, ma\~nana es s\'abado, 
+por lo tanto hoy es viernes.}
+\ec
+\noindent
+Palabras como \enquote{por lo tanto, as\'i que, luego entonces, de forma que, 
+etc.} se\~nalan la conclusi\'on del argumento.
+La representaci\'onn l\'ogica formal del argumento anterior es:
+\begin{mathpar}
+ \inferrule*[]{
+ v\imp s \\\\
+ s
+ }{
+ \therefore v
+ }
+\end{mathpar}
+\noindent
+De manera que el argumento es correcto si y s\'olo si $\{v\imp s,s\}\models v$.
+Pero la interpretaci\'on~$\I(v)=0, \;\I(s)=1$ confirma que el argumento 
+es incorrecto.\\
+
+\newpage
+
+Y m\'as importante resaltar que al analizar argumentos lo \'unico que interesa 
+es su forma l\'ogica y no su significado, como lo muestra el siguiente ejemplo:
+\bc
+\emph{Si hoy tirila y Chubaka es kismi entonces Chubaka es borogrove.\\
+  Si hoy no tirila entonces hay fefos.\\ M\'as a\'un sabemos que no hay fefos y 
+  que\\ Chubaka es kismi, luego entonces Chubaka es borogrove.
+}
+\ec
+Lo cual nos lleva a
+\begin{mathpar}
+ \inferrule*[]{
+  t\land k\imp b \\\\
+  \lnot t\imp f \\\\
+  \lnot f\land k 
+ }{
+ \therefore b
+ }
+\end{mathpar}
+Veamos que $\{t\land k\imp b, \lnot t\imp f,\lnot f\land k\}\models b$
+es un argumento correcto: 
+
+\begin{proof}
+\locallabelreset
+
+Mostraremos que $b$ se sigue l\'ogicamente de $\G=\{t\land k\imp b, \lnot 
+t\imp f,\lnot f\land k\}$, es decir que para toda interpretaci\'on $\I$ tal que 
+$\I(\G)=1$ entonces $\I(b)=1$. \\
+
+Suponer $\I$ tal que $\I(\G)=1$, entonces $\I(t\land k\imp b)=1$~\llabel{p1}, 
+$\I(\lnot t\imp f)=1$~\llabel{p2} y $\I(\lnot f\land k)=1$~\llabel{p3}. 
+
+\noindent Analizando las suposiciones anteriores, de~\lref{p3} podemos saber 
+que $\I(\lnot f) =1$ es decir $\I(f)=0$~\llabel{p4} y que 
+$\I(k)=1$~\llabel{p5}.\\
+Utilizando~\lref{p4} y siguiendo la definici\'on de interpretaci\'on 
+para~\lref{p2} podemos concluir que $\I(\lnot t) = 0$ forzosamente, as\'i que 
+$\I(t)=1$~\llabel{p6}. \\
+Por lo tanto, $\I(t\land k) =1$ ya que tenemos~\lref{p6} y~\lref{p5} y entonces 
+podemos concluir que $\I(b)=1$ de~\lref{p1}.\\
+De lo anterior hemos \textbf{construido una interpretaci\'on} tal que $b$ es 
+consecuencia l\'ogica de $\G$ y por tanto el argumento es correcto. 
+\qed
+\end{proof}
+
+
+\subsection{M\'etodos sem\'anticos para demostrar la correctud de argumentos}
+
+Para mostrar la correctud del argumento l\'ogico 
+$\vp_1,\ldots,\vp_n\;/\therefore\; \psi$
+mediante interpretaciones, se puede proceder de alguna de las siguientes dos 
+formas:
+
+\bi
+\item M\'etodo directo: probar la consecuencia $\vp_1,\ldots,\vp_n\models \psi$.
+
+\item M\'etodo indirecto (refutaci\'on): probar que el conjunto
+$\{\vp_1,\ldots, \vp_n,\lnot \psi\}$ es insatisfacible.
+\ei
+
+Por supuesto que existen otros m\'etodos para mostrar la correctud de un
+argumento l\'ogico, que resultan m\'as adecuados para la
+automatizaci\'on, como son el c\'alculo exhaustivo de una tabla de verdad 
+(sumamente ineficiente),
+el uso de tableaux o el m\'etodo de resoluci\'on binaria que veremos m\'as 
+adelante.
+
+
+\subsection{Algunos argumentos correctos relevantes}
+\begin{mathpar}
+ \inferrule*[Right=Modus Ponens]{
+ \vp \\\\ \vp\imp \psi 
+}{
+\therefore\;\psi
+}
+
+ \inferrule*[Right=Modus Tollens]{
+ \lnot \psi \\\\ \vp\imp \psi
+}{
+\therefore\;\lnot \vp
+} \\\\
+
+ \inferrule*[Right=Silogismo hip\'otetico]{
+ \vp\imp \psi \\\\ \psi\imp \chi
+ }{
+ \therefore\;\vp\imp \chi
+ } \hspace*{2cm}
+ 
+ \inferrule*[Right=Prueba por casos]{
+ \vp\imp \chi \\\\ \psi\imp \chi 
+ }{
+ \therefore\;\vp\lor \psi\imp \chi
+ } \\\\
+ 
+ \inferrule*[Right=Introd. $\land$]{
+ \vp\\\\ \psi
+ }{
+ \therefore\;\vp\land \psi
+ }
+ 
+ \inferrule*[Right=Elim. $\land$]{
+ \vp\land \psi
+ }{
+ \therefore\;\vp
+ }
+ 
+ \inferrule*[Right=Elim. $\land$]{
+ \vp\land \psi
+ }{
+ \therefore\;\psi
+ } \\\\
+ 
+ \inferrule*[Right=Introd. $\lor$]{
+ \vp
+ }{
+ \therefore\;\vp\lor \psi
+ }
+ 
+ \inferrule*[Right=Introd. $\lor$]{
+ \psi
+ }{
+ \therefore\;\vp\lor \psi
+ }\\\\
+ 
+ \inferrule*[Right= Resoluci\'on binaria]{
+ \vp\lor \psi \\\\ \lnot \psi\lor \chi
+ }{
+ \therefore\;\vp\lor \chi
+ }\hspace*{2cm}
+ 
+ \inferrule*[Right=Dilema\; constructivo]{
+ \vp\imp \psi_1 \\\\ \chi\imp \psi_2 \\\\ \vp\lor \chi
+ }{
+ \therefore\;\psi_1\lor\psi_2
+ }\\\\
+ 
+ \inferrule*[Right=Dilema\; destructivo]{
+ \vp\imp \psi_1 \\ \chi\imp \psi_2 \\ \lnot \psi_1 \lor \lnot \psi_2
+ }{
+ \therefore\;\lnot \vp\lor\lnot \chi
+ }
+\end{mathpar}
+
+
+
+\end{document}

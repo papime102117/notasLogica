@@ -1,0 +1,1268 @@
+
+\documentclass[11pt,letterpaper]{article}
+\usepackage{../packageslc}
+\usepackage{../optionslc}
+
+\input{../macroslc}
+
+\title{Lógica Computacional 2017-2, nota de clase 15\\
+El Isomorfismo de Curry-Howard
+}
+\author{Favio Ezequiel Miranda Perea \and Araceli Liliana Reyes Cabello\and
+Lourdes Del Carmen Gonz\'alez Huesca \and Pilar Selene Linares Arévalo}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+
+\section{Un lenguaje para expresiones aritméticas y booleanas}
+
+A continuación presentamos un lenguaje para expresiones aritméticas y
+booleanas que incluye las operaciones de suma, producto,
+orden, un test para cero y la negación booleana. \\
+Las expresiones del lenguaje se definen como sigue: 
+\[
+\ba{rll} 
+e & ::= & x\mid
+n\mid\true \mid \false\mid \\ \\
+  & & e + e \mid e * e \\ \\ %\mid\pred e \mid \\ \\
+  & & e < e \mid\iszero e \mid\no e%\mid\lete{x=e}{e}
+\ea
+\]
+Ejemplos de expresiones del lenguaje son:
+\bi
+\item $3+y$
+\item $\no (\iszero 9)$
+\item $\iszero 3<\no (2+4)$
+\item $\no\false$
+\item $\no (x+1)$
+\item $\iszero\false$
+\item $\no 7 * y$
+\item $7<x+y$
+\ei
+
+
+Se observa que todas son expresiones sintácticamente correctas pero algunas de
+ellas no tienen sentido desde el punto de vista semántico, es decir,
+no es posible asignarles uno de los tipos posibles para el lenguaje
+que son $\nat$ o $\bool$. Por ejemplo 
+$\no(8+2)$ o $\iszero\false$. Además hay expresiones en donde no resulta
+claro si son válidas o no, por ejemplo $x+2$ puede o no ser válida dependiendo 
+de si $x$ representa a un número o a un booleano, lo mismo sucede con
+$\no(\iszero x)$ o con $x<y+1$. 
+
+\subsection{Intérprete}
+
+Un intérprete para el lenguaje es simplemente una función que devuelve un 
+natural o un booleano que resulta de evaluar una expresión $e$. La definición 
+recursiva de esta función 
+$$\mathtt{eval}: Exp\to \N\cup\B $$ 
+donde $\N=\{0,1,\ldots\}$ y $\B=\{t,f\}$ es:
+\begin{alltt}
+  eval n = n
+  eval true = t
+  eval false = f
+  eval (e1 + e2) = eval e1 + eval e2
+  eval (e1 * e2) = eval e1 * eval e2
+  eval (e1 < e2) = (eval e1) < (eval e2)
+  eval (not e) = \(\neg\)\,(eval e) 
+  eval (iszero e) = \(isz\)\,(eval e)
+\end{alltt}
+donde los símbolos del lado derecho $+,*,<$ denotan las operaciones usuales 
+mientras que del lado izquierdo son únicamente símbolos que forman parte de las 
+expresiones. Omitímos aquí el uso de variables por simplicidad en la 
+presentación. Para agregar variables es necesario agregar un estado como 
+argumento de entrada al intérprete, el cual se encargará de evaluar variables.\\
+
+Se observa que la función de evaluación así definida resulta una función 
+parcial puesto que la evaluación de expresiones como $(3*5)+\no\false$ no tiene 
+sentido ya que no sabemos sumar $15+\true$.
+
+  % eval (e1 < e2) = if (eval e1) < (eval e2) then true else false
+  % eval (not e) = if eval e then false else true
+  % eval (iszero e) = if eval e = 0 then true else false
+
+\espc
+
+Una manera de evitar estos errores es verificando previamente si la expresión 
+es coherente para lo cual podemos usar la deducción natural.
+
+\subsection{Eliminación de expresiones semánticamente incorrectas}
+
+Sea $\G$ el conjunto de las siguientes fórmulas:
+\[
+\ba{l}
+Nat(n)\\
+Bool(true)\\
+Bool(false)\\
+\fa x \fa y(Nat(x)\land Nat(y)\to Nat(x+y))\\
+\fa x \fa y(Nat(x)\land Nat(y)\to Nat(x*y))\\
+\fa x \fa y(Nat(x)\land Nat(y)\to Bool(x<y))\\
+\fa x \fa y(Bool(x)\to Bool(\no x))\\
+\fa x \fa y(Nat(x)\to Bool(\iszero x))\\
+\ea
+\]
+
+Podemos verificar si una expresión~$e$ es semánticamente correcta si es posible 
+\textbf{clasificarla} como natural o booleano derivando el jucio 
+$\G\vdash Nat(e)$ o $\G\vdash Bool(e)$ respectivamente. Por ejemplo
+\[
+\G\vdash \no (\iszero (2 + 3*4)) \qquad\qquad \G\not\vdash Bool(\iszero(3*7)+4)
+\]
+
+Además si hay variables debemos suponer de antemano si es que representan 
+números o booleanos. Por ejemplo
+\[
+\G,Nat(x)\vdash Bool(x<5) \qquad \G,Bool(z)\not\vdash Nat(z+6)
+\]
+Esta clase de verificaciones son exactamente lo que hace un sistema de tipos en 
+lenguajes de programación.
+
+
+\section{Sistemas de tipos}
+
+Un sistema de tipos es un formalismo lógico que impone ciertas restricciones en 
+la formación de programas de un lenguaje de programación. Las expresiones del 
+lenguaje se clasifican mediante tipos que dictan como pueden usarse en 
+combinación con otras expresiones. \\
+Intuitivamente el tipo de una expresión predice la forma de su valor, por 
+ejemplo, la expresión~$e_1+e_2$ donde $e_1$ y $e_2$ son expresiones numéricas 
+debe ser una expresión numérica nuevamente. Por otra parte si intentamos sumar 
+una expresión numérica con una expresión booleana digamos $\true + 7$  dicha 
+expresión debe ser prohibida ya que genera un error de 
+tipos~\footnote{Type-checking error}.
+
+
+% La semántica estática de un lenguaje se define con ayuda de un sistema
+% de tipos, los cuales son formalismos lógicos simples
+% y manejables cuyo objetivo es  descartar ciertos comportamientos
+% particulares en la formación de frases de programa. Las frases de un
+% lenguaje se clasifican mediante tipos los cuales rigen como éstas
+% pueden usarse en combinación con otras frases. Intuitivamente el tipo
+% de una expresión predice la forma de su valor final. Una frase está
+% correctamente tipada si se construye de manera consistente con estas
+% predicciones, por ejemplo la suma de dos expresiones numéricas debe ser
+% nuevamente una expresión numérica. Por otra parte frases como $\true+7$ 
+% producirán un error de tipos.\\
+
+El uso de sistemas de tipos en el diseño de un lenguaje de
+programación tiene las siguientes ventajas:
+\bi
+\item Permite descubrir errores de programación tempranamente.
+\item Ofrece seguridad, un programa correctamente tipado no puede funcionar mal.
+\item Soporta abstracción, importante para la descripción de interfaces.
+\item Los tipos documentan un programa de manera mas simple y
+  manejable que los comentarios.
+\item Los lenguajes tipados pueden implementarse de manera más clara y
+  eficiente.
+\ei
+
+
+% \subsection{Programas}
+% Un programa es una lista de instrucciones
+% \[
+% \ba{l}
+% P(nil)\\
+% \fa x\fa y( I(x)\land P(y)\to P(x:y))
+% \ea
+% \]
+
+% \subsection{Pilas de valores}
+% \[
+% \ba{l}
+% V(n)\\
+% V(\true)\\
+% V(\false)\\
+% S(snil)\\
+% \fa x\fa y(V(x)\land S(y)\to S(x:y))
+% \ea
+% \]
+
+
+% Esta relación se conoce como relación de tipado y se define
+% recursivamente mediante las siguientes reglas de inferencia:
+% % si y sólo si el valor de la expresión
+% % $e$ es de tipo $\Tf$. Por ejemplo $5:\nat,\true:\bool$.
+
+\espc
+
+Para decidir si una expresión es semánticamente correcta o no, los lenguajes de
+programación emplean contextos de declaración de variables que involucran a un 
+predicado binario infijo denotado~$x:\Tf$, que relaciona a una variable~$x$ con 
+un tipo~$\Tf$. Esta declaración significa que la variable~$x$ representa a un 
+valor de tipo~$\Tf$. Un contexto es entonces un conjunto~$\G$ de la forma 
+$\G=\{x_1:\Tf_1,\ldots, x_n:\Tf_n\}$ donde todas las variables~$x_i$ son 
+distintas y les corresponde un tipo~$\Tf_i$.
+
+Por ejemplo si $\G=\{x:\nat,y:\bool\}$ entonces las expresiones $x+2$
+y $\no y$ son aceptadas, mientras que $y<2$ y $\no x$ son rechazadas
+para su evaluación. Para formalizar la verificación de tipos correctos
+se utiliza una relación ternaria que involucra a un contexto $\G$, a
+una expresión cualquiera del lenguaje $e$ y a un tipo $\Tf$. \\
+Dicha relación se escribe como $\G\vdash e:\Tf$ y se lee como \enquote{la
+expresión $e$ es de tipo $\Tf$ en el contexto $\G$}.
+
+Esta relación se conoce como relación de tipado y se define
+recursivamente mediante las siguientes reglas de inferencia:
+\begin{mathpar}
+ \inferrule*[right=(Var)]{
+ }{
+ \G,x:\Tf\vdash x:\Tf
+ }
+ 
+ \inferrule*[right=(TNum)]{
+ }{
+ \G\vdash n:\nat
+ }
+ 
+ \inferrule*[right=(TSum)]{
+  \G\vdash e_1:\nat\and \G\vdash e_2:\nat
+  }{
+  \G\vdash e_1+e_2:\nat
+  }
+
+ \inferrule*[right=(TProd)]{
+ \G\vdash e_1:\nat\and \G\vdash e_2:\nat
+ }{
+ \G\vdash e_1*e_2:\nat
+ }
+% \inferrule*[right=]{\G\vdash e:\nat}{\G\vdash\suc 
+% e:\nat}\;(TSuc)\;\;\;\;\;\;\;\;\;\;
+% \inferrule*[right=]{\G\vdash e:\nat}{\G\vdash\pred 
+% e:\nat}\;(TPred)\;\;\;\;\;\;\;\;\;\;
+ 
+ \inferrule*[right=(Ttrue)]{
+ }{
+ \G\vdash \true:\bool
+ }
+
+ \inferrule*[right=(Tfalse)]{
+ }{
+ \G\vdash \false:\bool
+ }
+ 
+ \inferrule*[right=(Tmen)]{
+ \G\vdash e_1:\nat \and \G\vdash e_2:\nat
+ }{
+ \G\vdash  e_1<e_2:\bool
+ }
+
+ \inferrule*[right=(Tisz)]{
+ \G\vdash e:\nat
+ }{
+ \G\vdash\iszero e:\bool
+ }
+
+  \inferrule*[right=(Tnot)]{
+  \G\vdash e:\bool
+  }{
+  \G\vdash\no e:\bool
+  }
+\end{mathpar}
+
+Mediante estas reglas podemos cerciorarnos por ejemplo de que si
+$x:\nat$ entonces $\iszero(x+2):\bool$ como sigue:
+\be
+\item $x:\nat\vdash x:\nat\;(Var)$
+\item $x:\nat\vdash 2:\nat\;(TNum)$
+\item $x:\nat\vdash x+2:\nat\;(TSum)\;1,2$
+\item $x:\nat\vdash\iszero(x+2):\nat\;(Tisz)\;4$
+\ee
+
+Veamos otro ejemplo, esta vez tipando la expresión $\no (2+x<y)$
+en el contexto $\G=\{x:\nat,y:\nat\}$
+\be
+\item $x:\nat,y:\nat\vdash x:\nat\;(Var)$
+\item $x:\nat,y:\nat\vdash 2:\nat\;(TNum)$
+\item $x:\nat,y:\nat\vdash 2+x:\nat\;(TSum)\;1,2$
+\item $x:\nat,y:\nat\vdash y:\nat\;(Var)$
+%\item $x:\nat,y:\nat\vdash \pred y:\nat\;(Tpred)$
+\item $x:\nat,y:\nat\vdash 2+x< y:\bool\;(Tmen)\;3,4$
+\item $x:\nat,y:\nat\vdash \no (2+x< y):\bool\;(Tneg)\;5$
+\ee
+
+% En estos casos para decidir si la
+% expresión es semánticamente correcta o no, los lenguajes de
+% programación emplean contextos de declaración de variables que
+% involucran a un predicado binario infijo denotado $x:\Tf$, que relaciona a una
+% variable $x$ con un tipo $\Tf$. Esta declaración significa que la
+% variable $x$ representa a un valor de tipo $\Tf$. Un contexto es
+% entonces un conjunto $\G$ de la forma $\G=\{x_1:\Tf_1,\ldots,
+% x_n:\Tf_n\}$ donde todas las variables $x_i$ son distintas. \\
+
+% Por ejemplo si $\G=\{x:\nat,y:\bool\}$ entonces las expresiones $x+2$
+% y $\no y$ son aceptadas, mientras que $y<2$ y $\no x$ son rechazadas
+% para su evaluación. Para formalizar la verificación de tipos correctos
+% se utiliza una relación ternaria que involucra a un contexto $\G$, a
+% una expresión cualquiera del lenguaje $e$ y a un tipo $\Tf$. \\
+% Dicha relación se escribe como $\G\vdash e:\Tf$ y se lee como ``la
+% expresión $e$ es de tipo $\Tf$ en el contexto $\G$''. \\
+
+
+\section{Isomorfismo de Curry-Howard}
+
+Como se observa los sistemas de tipos son muy similares a los sistemas
+de deducción natural con contextos que ya hemos estudiado. De hecho
+los sistemas de deducción natural pueden verse, desde el punto de
+vista computacional, como un sistema de tipos para un \textit{prototipo de 
+lenguaje de programación funcional} mediante la llamada correspondencia de 
+Curry-Howard, también conocida como paradigma de derivaciones como programas o 
+proposiciones como tipos. La idea a grandes rasgos es:
+\bi
+ \item Las fórmulas de la lógica corresponden a tipos para un lenguaje
+  de programación.
+ \item Las pruebas o derivaciones en la lógica corresponden a los
+  pasos que el verificador de tipos realiza para mostrar que cierta
+  expresión o programa del lenguaje de programación está bien tipada.
+ \item Por lo tanto, verificar si una prueba es correcta en un contexto dado 
+  corresponde a verificar si un programa tiene un tipo válido en el contexto 
+  dado.
+\ei
+
+\section{Reglas de inferencia con codificación de pruebas}
+
+La relación de inferencia $\Gamma \vdash A$ se modifica anotando a cada prueba
+de un secuente $\G\vdash A$ mediante una expresión~$t$ que
+que corresponde a un programa de un prototipo de lenguaje de programación,
+esta expresión~$t$ resulta ser también un \textbf{código de la prueba} cuyo 
+secuente final es $\G\vdash A$.\\
+
+De esta manera obtenemos una relación $\G\vdash t:A$ donde
+$\G=\{x_1:A_1,\ldots,x_n:A_n\}$ es un contexto de declaración de
+variables $x_i:A_i$ consideradas locales. En este caso no sólo suponemos una
+fórmula~$A_i$ sino que también suponemos que existe una prueba $x_i$ de
+$A_i$. 
+La nueva relación entre contextos $\G$, expresiones o códigos $t$ y fórmulas
+$A$, puede entenderse desde dos puntos de vista distintos:
+\bi
+\item Lógicamente: $\G\vdash t:A$ significa que la fórmula $A$ es
+  derivable a partir de las hipótesis $\G$ y $t$ es un código de
+  prueba para la derivación $\G\vdash A$.
+\item Computacionalmente: $\G\vdash t:A$ significa que $t$ es un
+  programa con tipo $A$ cuyas variables locales están declaradas en $\G$.    
+\ei
+
+La nueva relación de inferencia se define recursivamente a partir de la regla
+de inicio:
+%It is important to remark that we make no syntactic distinction between object 
+% variables and proof-term variables.\\
+\begin{equation*}
+\G,x:\vp\vdash x:\vp\;\;(Hip)\;\;\;\;
+%\inferrule*[right=(start)]{s=t\in\Eb}{\G\vdash_\Eb s=t}
+\end{equation*}
+\noindent
+mediante reglas de introducción y eliminación para cada conectivo 
+\bi
+\item Implicación: el conectivo $\to$ corresponde al tipo de funciones.
+\begin{mathpar}
+\inferrule*[right=($\imp$ I)]{
+ \Gamma, x:\vp\vdash t:\psi
+ }{
+ \Gamma\vdash \fun(x:\vp.t):\vp\imp \psi
+ }
+ 
+ \inferrule*[right=($\imp$ E)]{
+ \Gamma\vdash f: \vp\imp \psi\and \Gamma\vdash t:\vp
+ }{
+ \Gamma\vdash f\,t:\psi
+ }
+ \end{mathpar}
+ 
+\item Conjunción: el conectivo $\land$ corresponde al tipo $\times$, es decir
+  al producto cartesiano de dos tipos.
+\begin{mathpar}
+\inferrule*[right=($\land$ I)]{
+ \G\vdash t: \vp\and \G\vdash s: \psi
+ }{
+ \G\vdash\pt{t,s}:\vp\land \psi
+ }
+ 
+ \inferrule*[right=($\land_{2}$ E)]{
+ \G\vdash t: \vp\land\psi
+ }{
+ \G\vdash {\tt fst}\, t: \vp
+ }
+
+ \inferrule*[right=($\land_{1}$ E)]{
+ \G\vdash t: \vp\land\psi
+ }{
+ \G\vdash {\tt snd}\, t: \psi
+ }
+\end{mathpar}
+
+\item Disyunción: el conectivo $\lor$ corresponde al tipo $+$, es decir a la
+  unión disjunta de dos tipos.
+\begin{mathpar}
+ \inferrule*[right=($\lor_{1}$ I)]{
+  \G\vdash t: \vp
+  }{
+  \G\vdash {\tt inl}\, t: \vp\lor\psi
+  }
+
+ \inferrule*[right=($\lor_{2}$ I)]{
+ \G\vdash t: \psi
+ }{
+ \G\vdash {\tt inr}\, t:\vp\lor\psi
+ }
+
+  \inferrule*[right=($\lor$ E)]{
+  \G\vdash r: \vp\lor\psi \and 
+  \G, x:\vp \vdash  s: \chi \and
+  \G, y:\psi \vdash t:\chi
+  }{
+  \G\vdash {\tt case}\,r\,{\tt of }\;
+  {\tt inl}\,x\Rightarrow s\mid{\tt inr}\,y\Rightarrow t\;:\chi
+  }
+\end{mathpar}
+
+\item Falso: la constante de falsedad corresponde a un tipo vacío.
+\begin{mathpar}
+\inferrule*[right=($\bot$ E)]{
+\G\vdash r: \bot
+}{
+\G\vdash {\tt abort}\, r:\vp
+}
+\end{mathpar}
+\ei
+
+\section{Ejemplos}
+
+En los siguientes ejemplos se trata de hallar el programa~$t$ que
+codifique la prueba correspondiente. Como ejercicios el lector debe
+justificar cada paso y/o agregar algunos pasos faltantes.
+
+\bi
+\item $\vdash t: A\imp A$
+  \be
+  \item $x:A \vdash x:A$
+    \item $\vdash \fun(x:A.x): A\imp A$
+  \ee
+
+\item $\vdash t: A\imp A\lor B$
+  \be
+  \item $x:A\vdash x:A$
+    \item $x:A\vdash\inl x:A\lor B$
+      \item $\vdash \fun(x:A.\inl x):A\imp A\lor B$
+  \ee
+  
+
+\item $\vdash t: A\land B\imp B$
+  \be
+  \item $x:A\land B\vdash x:A\land B$
+    \item $x:A\land B\vdash \Rp x:B$
+      \item $\vdash\fun(x:A\land B.\Rp x):A\land B\imp B$
+  \ee
+
+\item $f:A\imp B,\;g:B\imp C\vdash t: A\imp C$
+  \be
+  \item $f:A\imp B,\;g:B\imp C, x:A \vdash f: A\imp B$
+    \item $f:A\imp B,\;g:B\imp C, x:A\vdash g: B\imp C$
+      \item $f:A\imp B,\;g:B\imp C, x:A\vdash x:A$
+        \item $f:A\imp B,\;g:B\imp C, x:A\vdash fx:B$
+          \item $f:A\imp B,\;g:B\imp C, x:A\vdash g(fx):C$
+            \item $f:A\imp B,\;g:B\imp C\vdash \fun(x:A.g(fx)):A\imp C$
+  \ee
+
+\item $\vdash: t: B\imp (A\imp B)$
+  \be
+  \item $x:B,y:A\vdash x:B$
+    \item $x:B\vdash\fun(y:A.x):A\imp B$
+      \item $\vdash\fun(x:B.\fun(y:A.x)):B\imp (A\imp B)$
+      
+  \ee
+
+\item $\vdash t: (A\land B\imp C)\imp (A\imp B\imp C)$
+  \be
+  \item $f:A\land B\imp C, x:A, y:B\vdash f:A\land B\imp C $
+    \item $f:A\land B\imp C, x:A, y:B\vdash x:A$
+      \item $f:A\land B\imp C, x:A, y:B\vdash y:B$
+        \item $f:A\land B\imp C, x:A, y:B\vdash\pt{x,y}:A\land B$
+         \item $f:A\land B\imp C, x:A, y:B\vdash f\pt{x,y}:C$
+           \item $f:A\land B\imp C, x:A \vdash
+             \fun(y:B.f\pt{x,y}):B\imp C$
+              \item $f:A\land B\imp C \vdash
+             \fun\big(x:A.\fun(y:B.f\pt{x,y})\big):A\imp B\imp C$
+             \item $\vdash
+             \fun\Big(f:A\land B\imp
+             C.\fun\big(x:A.\fun(y:B.f\pt{x,y})\big)\Big): (A\land
+             B\imp C)\imp A\imp B\imp C$ 
+  \ee
+
+  \item $f:A\imp B\imp C\vdash t: A\land B\imp C$
+    \be
+    \item $f:A\imp B\imp C, x: A\land B\vdash f:A\imp B\imp C$
+      \item $f:A\imp B\imp C, x: A\land B\vdash f:A\imp B\imp C$
+        \item $f:A\imp B\imp C, x: A\land B\vdash x:A\land B$
+          \item $f:A\imp B\imp C, x: A\land B\vdash \Lp x:A$
+            \item $f:A\imp B\imp C, x: A\land B\vdash \Rp x:B$
+              \item $f:A\imp B\imp C, x: A\land B\vdash f(\Lp x):B\imp
+                C$
+                \item $f:A\imp B\imp C, x: A\land B\vdash f(\Lp x)(\Rp
+                  x):
+                C$
+                \item $f:A\imp B\imp C\vdash \fun\big( x: A\land B.f(\Lp x)(\Rp
+                  x)\big): A\land B\imp C$
+              
+    \ee
+  
+  \item $f:A\lor B\imp C\vdash t:A\imp C$
+    \be
+    \item $f:A\lor B\imp C, x:A\vdash f:A\lor B\imp C$
+      \item $f:A\lor B\imp C, x:A\vdash x:A$
+      \item $f:A\lor B\imp C, x:A\vdash \inl x:A\lor B$
+        \item $f:A\lor B\imp C, x:A\vdash f(\inl x):C$
+          \item $f:A\lor B\imp C \vdash \fun(x:A.f(\inl x)):A\imp C$
+    \ee
+
+\item $x:A\lor B, f:A\imp C, g:B\imp C\vdash t:C$
+\be
+ \item $x:A\lor B, f:A\imp C, g:B\imp C\vdash x: A\lor B $
+ \item $x:A\lor B, f:A\imp C, g:B\imp C, y:A\vdash f y: C $
+ \item $x:A\lor B, f:A\imp C, g:B\imp C, z:B\vdash g z:C $
+ \item $x:A\lor B, f:A\imp C, g:B\imp C\vdash ($ {\tt case} $x$ {\tt of} 
+ $\inl y\Imp fy\mid\inr z\Imp gz): C$
+\ee
+    
+\item $f: A\imp B, g: C\imp D, x:A\lor C\vdash t:B\lor D$
+
+  \be
+  \item $f: A\imp B, g: C\imp D, x:A\lor C\vdash x:A\lor C$
+    \item $f: A\imp B, g: C\imp D, x:A\lor C, y:A\vdash \inl
+      (fy):B\lor D$
+          \item $f: A\imp B, g: C\imp D, x:A\lor C, z:C\vdash\inr
+            (gz):B\lor D$
+                \item $f: A\imp B, g: C\imp D, x:A\lor C\vdash ($ {\tt case} 
+$x$ {\tt
+        of} $\inl y\Imp \inl (fy)\mid\inr z\Imp \inr (gz)): B\lor D$
+  \ee
+
+
+\item $x: (A\lor C)\land (B\imp C), f:(A\imp B)\vdash t:C$
+
+  \be
+  \item $x: (A\lor C)\land (B\imp C), f:(A\imp B)\vdash \Lp x:A\lor C$
+    \item $x: (A\lor C)\land (B\imp C), f:(A\imp B)\vdash \Rp x:B\imp
+      C$
+      \item $x: (A\lor C)\land (B\imp C), f:(A\imp B), y:A\vdash fy: B$
+        \item $x: (A\lor C)\land (B\imp C), f:(A\imp B), y:A\vdash
+          (\Rp x)(fy): C$
+          \item $x: (A\lor C)\land (B\imp C), f:(A\imp B), z:C\vdash
+            z: C$
+            \item $x: (A\lor C)\land (B\imp C), f:(A\imp B)\vdash ($ {\tt case} 
+$x$ {\tt
+        of} $\inl y\Imp \inl (\Rp x)(fy)\mid\inr z\Imp z): C$
+  \ee
+  
+\item $x: A\land (B\lor C)\vdash t: (A\land B)\lor (A\land C)$
+  \be
+  \item $x: A\land (B\lor C)\vdash \Lp x: A$
+    \item $x: A\land (B\lor C)\vdash \Rp x: B\lor C$
+      \item $x: A\land (B\lor C), y:B \vdash \pt{\Lp x, y}:A\land B$
+        \item $x: A\land (B\lor C), y:B \vdash \inl\pt{\Lp x, y}:(A\land
+          B)\lor (A\land C)$
+          \item $x: A\land (B\lor C), z:C \vdash \inr\pt{\Lp x, z}:(A\land
+          B)\lor (A\land C)$
+          \item $x: A\land (B\lor C)\vdash
+               ($ {\tt case} $\Rp x$ {\tt
+        of} $\inl y\Imp \inl \pt{\Lp x,y}\mid\inr z\Imp \inr\pt{\Lp x,z})
+            :(A\land B)\lor (A\land C)$
+          
+  \ee
+
+
+\item $x: (A\land B)\lor (A\land C)\vdash t: A\land (B\lor C)$
+  \be
+  \item $x: (A\land B)\lor (A\land C), y:A\land B\vdash \inl(\Rp
+    y):B\lor C$
+     \item $x: (A\land B)\lor (A\land C), y:A\land B\vdash \pt{\Lp y,\inl(\Rp
+    y)}:A\land (B\lor C)$
+     \item $x: (A\land B)\lor (A\land C), z:A\land C\vdash \pt{\Lp z,\inr(\Rp
+    z)}:A\land (B\lor C)$
+       \item $x: (A\land B)\lor (A\land C)\vdash
+               ($ {\tt case} $x$ {\tt
+        of} $\inl y\Imp \pt{\Lp y,\inl(\Rp
+    y)}\mid\inr z\Imp \pt{\Lp z,\inr(\Rp
+    z)}
+            : A\land (B\lor C)$
+  \ee
+  
+
+\item $x: A\lor B, f: B\lor C\imp D, g:A\imp C\vdash t:D$
+  \be
+  \item $x: A\lor B, f: B\lor C\imp D, g:A\imp C, y:A\vdash \inr (g
+    y):B\lor C$
+    \item $x: A\lor B, f: B\lor C\imp D, g:A\imp C, y:A\vdash f\inr (g
+    y):D$
+       \item $x: A\lor B, f: B\lor C\imp D, g:A\imp C, z:B\vdash
+         f(\inl z):D$
+               \item $x: A\lor B, f: B\lor C\imp D, g:A\imp C\vdash ($ {\tt 
+case} $x$ {\tt
+        of} $\inl y\Imp f\inr (gy)\mid\inr z\Imp f(\inl z):D$
+  \ee
+  
+    
+%    \item $x:(A\imp C)\land (B\imp C)\vdash t: A\lor B\imp C$
+%\be
+%\item $x:(A\imp C)\land (B\imp C), y:A\lor B\vdash x:(A\imp C)\land (B\imp C)$
+
+%\item $x:(A\imp C)\land (B\imp C), y:A\lor B\vdash \Lp x:A\imp C$
+%  \item $x:(A\imp C)\land (B\imp C), y:A\lor B\vdash \Rp x:B\imp C$
+%    \item $x:(A\imp C)\land (B\imp C), y:A\lor B\vdash y:A\lor B$
+%  \item $x:(A\imp C)\land (B\imp C), z:A\vdash z:A$
+%    \item $x:(A\imp C)\land (B\imp C), z:A\vdash (\Lp x)z:C$
+%        \item $x:(A\imp C)\land (B\imp C), w:B\vdash w:B$
+%    \item $x:(A\imp C)\land (B\imp C), w:B\vdash (\Rp x)w:C$
+  
+%\ee
+
+      
+
+
+
+%\[
+%\inferrule*[right=]{\Gamma\vdash_\Eb t:A}{\Gamma\vdash_\Eb t:\forall 
+% xA}\;(\forall I)\;\;\inferrule*[right=]{\Gamma\vdash_\Eb t:\forall
+%  xA}{\Gamma\vdash_\Eb t:A[x:=s]}\;(\forall E)
+%\]
+
+%\[
+%\inferrule*[right=]{\Gamma\vdash_\Eb t:A}{\Gamma\vdash_\Eb t:\forall 
+% XA}\;(\forall^2 I)\;\;\inferrule*[right=]{\Gamma\vdash_\Eb t:\forall
+%  XA}{\Gamma\vdash_\Eb t:A[X:=\mathcal{F}]}\;(\forall^2 E)
+%\]
+
+%\[
+%\inferrule*[right=]{\G\vdash_\Eb r:A[x:=s]\;\;\;\;\G\vdash_\Eb 
+% s=t}{\G\vdash_\Eb r:A[x:=t]}\;\;(Eq)
+%\]
+
+
+%\section{Reglas de Inferencia para los Cuantificadores}
+
+%Las reglas intuitivas discutidas en la sección anterior nos conducen a las
+%siguientes reglas formales de deducción natural:
+%\item Cuantificador Universal:
+%\[
+%\inferrule*[right=]{\G\vdash \vp\;\;\;\;\;x\notin Vl(\G)}{\G\vdash\fa 
+% x\vp}\;(\fa I) \;\;\;\;\;\;\;\;\;
+%\inferrule*[right=]{\G\vdash \fa x\vp}{\G\vdash \vp[x:=t]}\;(\fa E)
+%\]
+%\item Cuantificador Existencial:
+%\[
+%\inferrule*[right=]{\G\vdash \vp[x:=t]}{\G\vdash \ex x\vp}\;(\ex I) 
+% \;\;\;\;\;\;\;\;\;
+%\inferrule*[right=]{\G\vdash\ex x\vp\;\;\;\;\;\G,\vp\vdash 
+% \psi\;\;\;\;\;x\notin
+%  Vl(\G,\psi)}{\G\vdash\psi}\;(\ex E)
+%\]
+
+%La siguiente regla llamada \emph{monotonía} es derivable en el
+%sistema, y será utilizada frecuentemente:
+%\[
+%\inferrule*[right=]{\G\vdash\vp}{\G,\psi\vdash\vp}\;(Mon)
+%\]
+
+
+%\item Verdadero (regla derivada):
+%\[
+%\inferrule*[right=]{}{\;\;\G\vdash \top\;\;}\;(\top I)
+%\]
+
+
+\section{Pruebas redundantes}
+
+\bi
+\item Dadas las derivaciones $\G\vdash\fun (x:A.e):A\to B$ y $\G\vdash r:A$ 
+construir una derivación de $\G\vdash ?:B$.
+\bi
+\item La solución que salta a la vista es $\G\vdash\fun(x:A.e)\,r:B$
+\item Sin embargo de las reglas y la prueba dada de $A\to B$, sabemos que
+   previamente debio obtenerse la prueba $\G,x:A\vdash e:B$ puesto que la
+   regla usada fue $(\to I)$. Ahora bien,
+   obsérvese que como ya tenemos una prueba $\G\vdash r:A$, no es necesario 
+   suponer $x:A$ puesto que en la prueba codificada por $e$ podemos sustituir 
+   cada prueba $x$ de $A$ por la prueba dada $r$, obteniendo así una prueba 
+   de $B$ sin necesidad de usar el modus ponens, a saber $\G\vdash e[x:=r]:B$. 
+\ei
+
+\item Dada la derivación $\G\vdash \pt{e_1,e_2}:A\land B$ construir una
+    prueba $\G\vdash\,?:A$.
+\bi
+\item La respuesta más inmediata es $\G\vdash\Lp\pt{e_1,e_2}:A$.
+\item Pero obsérvese que para construir la prueba codificada por
+  $\Lp\pt{e_1,e_2}$ antes tuvo que construirse una prueba codificada por $e_1$
+  que tiene que ser $\G\vdash e_1:A$ puesto que la regla utilizada fue 
+  $(\land I)$.
+\ei
+
+% Sean $\G\vdash e_1:A,\;\G\vdash e_2:B$ dos pruebas dadas y supóngase que se 
+% requiere dar una prueba de
+%   $A$. Una respuesta posible es: 
+% \be
+% \item $\G\vdash e_1:A$ dada.
+% \item $\G\vdash e_2:B$ dada.
+% \item $\G\vdash \pt{e_1,e_2}:A\land B$
+% \item $\G\vdash \Lp\pt{e_1,e_2}:A$
+% \ee
+% Por supuesto que existe una prueba más sencilla y directa, a saber $\G\vdash
+% e_1:A$ que ya está dada. De manera que 
+% requiera llamar a una prueba de $A$ 
+\ei
+\ei
+
+De lo anterior se observa que las primeras pruebas son redundantes y podemos 
+simplificarlas como sigue:
+\bc
+$\fun(x:A.e)\,r$ se simplifica a $e[x:=r]$
+\ec
+\bc
+$\Lp\pt{e_1,e_2}$ se simplifica a $e_1$.
+\ec
+
+De la misma manera podemos justificar las siguientes simplificaciones
+
+\bc
+$\Rp\pt{e_1,e_2}$ se simplifica a $e_2$.
+\ec
+\bc
+${\tt case}\,(\inl r)\,{\tt of }\;{\tt inl}\,x\Rightarrow s\mid{\tt
+  inr}\,y\Rightarrow t$ se simplifica a $s[x:=r]$
+\ec
+\bc
+${\tt case}\,(\inr r)\,{\tt of }\;{\tt inl}\,x\Rightarrow s\mid{\tt
+  inr}\,y\Rightarrow t$ se simplifica a $t[x:=r]$
+\ec
+
+Estas reglas de simplificación pueden utilizarse como reglas de evaluación de
+las expresiones de un lenguaje de programación. En conclusión las pruebas
+redundantes de la lógica y su simplificación corresponden a un proceso de
+evaluación de expresiones en un lenguaje de programación. 
+
+
+
+
+% \subsection{Evaluación de expresiones}
+
+% \begin{alltt}
+%   eval n = n
+%   eval true = t
+%   eval false = f
+%   eval (e1 + e2) = eval e1 + eval e2
+%   eval (e1 * e2) = eval e1 * eval e2
+%   eval (e1 < e2) = if (eval e1) < (eval e2) then true else false
+%   eval (not e) = if eval e then false else true
+%   eval (iszero e) = if eval e = 0 then true else false
+% \end{alltt}
+
+
+\subsection{Compilación de expresiones aritméticas y booleanas}
+
+Presentamos un ejemplo de compilación del lenguaje de expresiones aritméticas y 
+booleanas a una máquina abstracta de pila. Nos interesa en particular 
+formalizar la prueba de la correctud del proceso de compilación mediante 
+deducción natural.
+
+\bi
+\item Especificación del lenguaje objeto: se trata de un lenguaje de 
+instrucciones primitivas
+$$ i ::= n\mid t\mid f\mid+\mid*\mid<\mid\no\mid\iszero $$
+de manera que una instrucción es un valor natural o booleano o bien un operador 
+del lenguaje fuente de expresiones aritméticas y booleanas
+
+\item Programas: un programa es una lista\footnote{En realidad es una pila y 
+elegimos implementarla como una lista, lo mismo sucede con la memoria} de 
+instrucciones
+$p=[i_1,\ldots,i_n]$
+% \[
+% P (nil)\;\;\;\;\;\;
+% \fa x\fa y(I(x)\land P(y)\to P(cons x y))
+% \]
+
+\item Memoria: la memoria es una lista de valores
+$s=[v_1,\ldots,v_n]$ donde $v_i\in\{n,t,f\}$
+% \[
+% M(nil)\;\;\;\;;\
+% \fa x \fa y((Nat(x)\lor Bool(x))\land M(y)\to S(push x y))
+% \]
+
+\item Ejecución de una instrucción: la función de ejecución de una instrucción 
+$\ej$ recibe una instrucción {\tt i} y una memoria {\tt s} devolviendo la 
+memoria resultante al ejecutar la instrucción.
+
+  \begin{alltt}
+    ej n s = (n:s)
+    ej true s = (t:s)
+    ej false s = (f:s)
+    ej + (v1:v2:s) = (v1+v2) : s 
+    ej * (v1:v2:s) = (v1*v2) : s
+    ej < (v1:v2:s) = (v1<v2) : s
+    ej \(\no\) (v:s) = (\(\neg\) v) : s
+    ej \(\iszero\) (v:s) = (isz v) : s
+  \end{alltt}
+
+donde del lado derecho de las ecuaciones nos referimos a las operaciones 
+binarias $+,*::\N\times\N\to\N,\;
+<:\N\times\N\to\B$ y a las operaciones unarias $\neg:\B\to\B,\;isz:\N\to\B$ 
+
+% \[
+% \ba{rll}
+% ej n s = push n s
+% \ea
+% \]
+
+
+\item Ejecución de un programa: ejecutar un programa $p$ en la memoria dada $s$ 
+devuelve la memoria obtenida al 
+ ejecutar en orden todas instrucciones de $p$.
+
+  \begin{alltt}
+    ejp nil s = s
+    ejp (i:p) s = ejp p (ej i s)
+  \end{alltt}
+
+\item Compilación de una expresión en un programa: el proceso de compilación 
+convierte una expresión $e$ en un programa. 
+
+  \begin{alltt}
+    comp n = [n]
+    comp true = [t]
+    comp false = [f]
+    comp (e1+e2) = comp e2 ++ comp e1 ++ [+]
+    comp (e1*e2) = comp e2 ++ comp e1 ++ [*]
+    comp (e1<e2) = comp e2 ++ comp e1 ++ [<]
+    comp (not e) = comp e ++ [not] 
+    comp (iszero e) = comp e ++ [iszero] 
+  \end{alltt}
+
+donde $\ap$ es la función de concatenación de listas. ?` Porqué en los casos de 
+operadores binarios queda el programa resultado de compilar la segunda 
+expresión $e_2$ al inicio de la lista?
+
+
+\item Correctud del compilador: la memoria resultado de ejecutar el programa 
+$p$ obtenido al compilar la expresión $e$ con la memoria vacía coincide con la 
+memoria cuyo único valor es la evaluación de la expresión $e$
+
+  \begin{alltt}
+    \(\fa\) e (ejp (comp e) nil = [eval e])
+  \end{alltt}
+%\fa e (ejp (comp e) nil = [eval e])
+
+Por supuesto en todas las definiciones anteriores estamos suponiendo que las 
+expresiones de entrada son coherentes en el sentido de que cualquier operación 
+estará bien definida. Es decir, estamos suponiendo que el proceso de 
+verificación previa 
+fue hecho por el sistema de tipos. Por lo que el cuantificador $\fa e$ se 
+refiere únicamente a todas las expresiones semánticamente correctas.
+
+\ei
+
+
+\subsection{Prueba de la correctud (informal)}
+
+
+
+Para probar la correctud del compilador  vamos a probar algo más general:
+
+  \begin{alltt}
+                  \(\fa\) e \(\fa\) p \(\fa\) s \big(ejp ( comp e \( \ap \) p) 
+s =  ejp p (eval e:s)\big)
+  \end{alltt}
+
+de esta propiedad la correctud del compilador resulta un corolario tomando 
+$p=nil,s=nil$.
+
+\espc
+
+La prueba es por inducción sobre las expresiones. Analizamos aquí un caso base 
+y dos casos inductivos:
+
+\bi
+\item Base $e=n$: P.D. $\fa p\fa s(\ejp\; (\comp n\ap p)\; s =  \ejp\; p\; 
+(\eval n:s))$.
+\[
+\ba{rll}
+\ejp\;(\comp n\ap p)\; s & = & \ejp\; ( [n]\ap p)\; s\\
+& = & \ejp\;(n:p)\;s\\
+& = & \ejp\;p\;(\ej n\;s)\\
+& = & \ejp\;p\;(n:s) \\
+& = & \ejp\;p\;(\eval n:s) \\
+\ea
+\]
+\item Paso inductivo $e=e_1*e_2$.
+\bi
+\item I.H.1.: $\fa p\fa s(\ejp\; (\comp e_1\ap p)\; s =  \ejp\; p\; (\eval 
+e_1:s))$
+\item I.H.2.: $\fa p\fa s(\ejp\; (\comp e_2\ap p)\; s =  \ejp\; p\; (\eval 
+e_2:s))$
+\ei
+
+Queremos demostrar que:
+\[
+\fa p\fa s(\ejp\; (\comp (e_1*e_2)\ap p)\; s =  \ejp\; p\; (\eval (e_1*e_2):s))
+\]
+
+\[
+\ba{rll}
+\ejp\;(\comp (e_1*e_2)\ap p)\; s & = & 
+\ejp\; ( (\comp e_2\ap\comp e_1\ap[*])\ap p)\; s\\
+& = & \ejp\; ( (\comp e_2\ap(\comp e_1\ap[*]\ap p))\; s\\
+& =_{Asoc\ap} & \ejp\; ( (\comp e_2\ap(\comp e_1\ap[*]\ap p))\; s\\
+& =_{I.H.\text{2}} & \ejp\; (\comp e_1\ap[*]\ap p))\; (\eval e_2:s)\\
+& =_{Asoc\ap} & \ejp\; (\comp e_1\ap([*]\ap p))\; (\eval e_2:s)\\
+& =_{I.H.\text{1}} & \ejp\; ([*]\ap p)\; (\eval e_1:\eval e_2:s)\\
+& = & \ejp\; (*:p)\; (\eval e_1:\eval e_2:s)\\
+& = & \ejp\; p\; (\ej\; [*]\; (\eval e_1:\eval e_2:s))\\
+& = & \ejp\; p\; (\eval e_1*\eval e_2:s)\\
+& = & \ejp\; p\; (\eval (e_1*e_2):s)\\
+% & & \ejp\;(n:p)\;s\\
+% & & \ejp\;p\;(\ej n\;s)\\
+% & = & \ejp\;p\;(n:s) \\
+% & = & \ejp\;p\;(\eval n:s) \\
+\ea
+\]
+
+
+\item Paso inductivo $e=\no e_1$.
+\bi
+\item I.H: $\fa p\fa s(\ejp\; (\comp e_1\ap p)\; s =  \ejp\; p\; (\eval e_1:s))$
+%\item I.H.2.: $\fa p\fa s(\ejp\; (\comp e_2\ap p)\; s =  \ejp\; p\; (\eval 
+% e_2:s))$
+\ei
+
+Queremos demostrar que:
+\[
+\fa p\fa s(\ejp\; (\comp (\no e_1)\ap p)\; s =  \ejp\; p\; (\eval (\no e_1):s))
+\]
+
+\[
+\ba{rll}
+\ejp\;(\comp (\no e_1)\ap p)\; s & = & 
+\ejp\; ( (\comp e_1\ap[\neg])\ap p)\; s\\
+%& = & \ejp\; ( (\comp e_2\ap(\comp e_1\ap[*]\ap p))\; s\\
+& =_{Asoc\ap} & \ejp\; ( (\comp e_1\ap([\neg]\ap p))\; s\\
+% & =_{I.H.\text{2}} & \ejp\; (\comp e_1\ap[*]\ap p))\; (\eval e_2:s)\\
+% & =_{Asoc\ap} & \ejp\; (\comp e_1\ap([*]\ap p))\; (\eval e_2:s)\\
+& =_{I.H} & \ejp\; ([\neg]\ap p)\; (\eval e_1:s)\\
+& = & \ejp\; (\neg:p)\; (\eval e_1:s)\\
+& = & \ejp\; p\; (\ej\; [\neg]\; (\eval e_1:s))\\
+& = & \ejp\; p\; (\neg(\eval e_1):s)\\
+& = & \ejp\; p\; (\eval (\no e_1):s)\\
+\ea
+\]
+
+\ei
+
+%de manera que por el principio de inducción estructural para expresiones 
+% concluimos que
+
+A continuación damos una idea de la formalización de esta prueba en el sistema 
+de deducción natural.
+
+
+\subsection{Bosquejo de la prueba formal (dentro del sistema de deducción 
+natural)}
+
+Queremos probar que $\G\vdash \fa e P(e)$ donde $\G$ es un conjunto de premisas 
+adecuado y $P(e)$ es la fórmula que formaliza la propiedad requerida.
+
+\bi
+\item La fórmula a probar es $P(e)$ definida como
+\[
+P(e)=_{def} \fa p\fa s\big(\ejp\;(\comp e\ap p)\;s = \ejp\;p\;(\eval e : s)\big)
+\]
+
+\item $\G$ se define como la siguiente unión de conjuntos de fórmulas:
+\[
+\G=\{\I_P\}\cup\mathbb{F}\cup\mathbb{L}\cup\mathbb{E}
+\]
+
+donde
+
+\item $\I_P$ es el principio de inducción para expresiones para el caso de $P$:
+\[
+\ba{rll}
+\I_P & =_{def} & P(n) \land P(\true)\land P(\false) \land \\
+     & & \fa e_1\fa e_2(P(e1)\land P(e_2)\to P(e_1+e_2))\;\land \\   
+     & & \fa e_1\fa e_2(P(e1)\land P(e_2)\to P(e_1*e_2))\;\land \\    
+     & & \fa e_1\fa e_2(P(e1)\land P(e_2)\to P(e_1<e_2))\;\land \\   
+     & & \fa e(P(e)\to P(\no e))\land \\   
+     & & \fa e(P(e)\to P(\iszero e)) \\   
+     & & \to \fa eP(e) \\   
+\ea
+\]
+
+\item $\mathbb{F}$ consta de las cerraduras universales de las ecuaciones que 
+definen a las funciones $\eval,\ej,\ejp,\comp$. 
+\[
+\ba{rll}
+\mathbb{F} & = \{ & \fa n (\eval n = n),\ldots,\\ 
+ & & \fa e_1\fa e_2\big(\eval (e1 + e2) = \eval e1 + \eval e2\big),\ldots \\
+ & & \fa v1\fa v2\fa s\big( \ej < (v1:v2:s) = (v1<v2) : s\big),\ldots\\
+ & & \vdots \\
+ & & \fa e\big(\comp (\iszero e) = \comp e \ap [\iszero]\big) 
+\\ & \;\;\;\} &
+\ea
+\]
+
+
+\item $\mathbb{L}$ consta de las propiedades requeridas de las operaciones de 
+listas:
+\bi
+\item Concatenación de lista unitaria: $\fa x\fa \ell([x]\ap\ell=x:\ell)$.
+\item Asociatividad de la concatenación:
+\[
+\fa x\fa y\fa z\big(x\ap(y\ap z)=(x\ap y)\ap z\big)
+\]
+\ei
+\item $\Eb$ contiene los llamados axiomas de igualdad:
+\bi
+\item Reflexividad: $\fa x (x=x)$
+\item Simetría $\fa x\fa y(x=y \to y = x)$
+\item Transitividad: $\fa x\fa y\fa z(x=y\land y=z \to x=z)$
+\item Sustitución (Leibniz): $\fa x\fa y (x=y\land A(x)\to A(y))$ donde $A$ es 
+una fórmula cualquiera\footnote{Basta con agregar la instancia de esta fórmula 
+para las fórmulas $A$ que necesitemos}
+\ei
+Alternativamente en vez de usar estas fórmulas directamente para derivar nuevas 
+fórmulas o ecuaciones podemos utilizar la lógica ecuacional discutida antes, es 
+decir, usar las siguientes reglas: 
+% usarlas una vez para mostrar que las siguientes reglas de deducción natural 
+para la igualdad son admisibles y en adelante usar directamente estas reglas 
+adicionales para la igualdad: aquí $\G$ es cualquier contexto
+\[
+\inferrule*[right=]{}{\G\vdash 
+t=t}(Refl)\;\;\;\;\;\;\inferrule*[right=]{\G\vdash s=t}{\G\vdash t =s}(Sim)
+\;\;\;\;\;\;\;\;\;\;\inferrule*[right=]{\G\vdash s=t\;\;\;\;\;\G\vdash 
+t=r}{\G\vdash s =r}(Trn)
+\]
+
+
+\[
+\inferrule*[right=]{\G\vdash s=t\;\;\;\G\vdash A(s)}{\G\vdash A(t)}(Rewrite)
+\]
+\ei
+donde $A$ es cualquier fórmula.
+
+\espc
+
+
+A continuación bosquejamos la prueba formal $\G\vdash \fa e P(e)$.
+
+\bi
+\item Para esto basta probar el antecedente del axioma de inducción $\I_P$ y 
+usar modus ponens.
+\item Como dicho antecedente es una conjunción basta probar cada parte por 
+separado y usar la regla $(\land I)$.
+\item Cada parte se prueba formalizando las pruebas informales, dado que el 
+razonamiento ecuacional está permitido por las hipótesis de $\Eb\inc \G$ y por 
+las propiedades de listas $\mathbb{L}\inc\G$. Como ejemplo formalizemos el caso 
+base para números naturales:
+\bi
+\item Base P.D. $\G\vdash P(n)$, es decir, $\G\vdash \fa p\fa s(\ejp\; (\comp 
+n\ap p)\; s =  \ejp\; p\; (\eval n:s))$.
+\[
+\ba{rll}
+1.\;\;\G\vdash & \ejp\;(\comp n\ap p)\; s  =  \ejp\;(\comp n\ap p)\; s & (Refl) 
+\\
+2.\;\;\G\vdash & \ejp\;(\comp n\ap p)\; s  =  \ejp\; ( [n]\ap p)\; s & 
+(Rewrite)\;1\; def. \comp n\\
+3.\;\; \G\vdash & \ejp\;(\comp n\ap p)\; s  = \ejp\;(n:p)\;s & (Rewrite)\;2\; 
+prop.\;de\; listas\\
+4.\;\; \G\vdash & \ejp\;(\comp n\ap p)\; s  =  \ejp\;p\;(\ej n\;s) & 
+(Rewrite)\;3\; def. \ejp \\
+5.\;\;\G\vdash & \ejp\;(\comp n\ap p)\; s  =  \ejp\;p\;(n:s) & (Rewrite)\;4\; 
+def. \ej \\
+6.\;\;\G\vdash & \ejp\;(\comp n\ap p)\; s  =  \ejp\;p\;(\eval n:s) & 
+(Rewrite)\;5\; def. \eval\\
+7.\;\;\G\vdash & \fa s\big(\ejp\;(\comp n\ap p)\; s  =  \ejp\;p\;(\eval 
+n:s)\big) & (\fa I)\;6,\;s\notin FV(\G)\\
+8.\;\;\G\vdash & \fa p\fa s\big(\ejp\;(\comp n\ap p)\; s  =  \ejp\;p\;(\eval 
+n:s)\big) & (\fa I)\;7,\;p\notin FV(\G)\\
+
+\ea
+\]
+% \item Paso inductivo $e=e_1*e_2$.
+% \bi
+% \item I.H.1.: $\fa p\fa s(\ejp\; (\comp e_1\ap p)\; s =  \ejp\; p\; (\eval 
+% e_1:s))$
+% \item I.H.2.: $\fa p\fa s(\ejp\; (\comp e_2\ap p)\; s =  \ejp\; p\; (\eval 
+% e_2:s))$
+% \ei
+
+% Queremos demostrar que:
+% \[
+% \fa p\fa s(\ejp\; (\comp (e_1*e_2)\ap p)\; s =  \ejp\; p\; (\eval 
+% (e_1*e_2):s))
+% \]
+
+% \[
+% \ba{rll}
+% \ejp\;(\comp (e_1*e_2)\ap p)\; s & = & 
+% \ejp\; ( (\comp e_2\ap\comp e_1\ap[*])\ap p)\; s\\
+% & = & \ejp\; ( (\comp e_2\ap(\comp e_1\ap[*]\ap p))\; s\\
+% & =_{Asoc\ap} & \ejp\; ( (\comp e_2\ap(\comp e_1\ap[*]\ap p))\; s\\
+% & =_{I.H.\text{2}} & \ejp\; (\comp e_1\ap[*]\ap p))\; (\eval e_2:s)\\
+% & =_{Asoc\ap} & \ejp\; (\comp e_1\ap([*]\ap p))\; (\eval e_2:s)\\
+% & =_{I.H.\text{1}} & \ejp\; ([*]\ap p)\; (\eval e_1:\eval e_2:s)\\
+% & = & \ejp\; (*:p)\; (\eval e_1:\eval e_2:s)\\
+% & = & \ejp\; p\; (\ej\; [*]\; (\eval e_1:\eval e_2:s))\\
+% & = & \ejp\; p\; (\eval e_1*\eval e_2:s)\\
+% & = & \ejp\; p\; (\eval (e_1*e_2):s)\\
+% % & & \ejp\;(n:p)\;s\\
+% % & & \ejp\;p\;(\ej n\;s)\\
+% % & = & \ejp\;p\;(n:s) \\
+% % & = & \ejp\;p\;(\eval n:s) \\
+% \ea
+% \]
+
+
+% \item Paso inductivo $e=\no e_1$.
+% \bi
+% \item I.H: $\fa p\fa s(\ejp\; (\comp e_1\ap p)\; s =  \ejp\; p\; (\eval 
+% e_1:s))$
+% %\item I.H.2.: $\fa p\fa s(\ejp\; (\comp e_2\ap p)\; s =  \ejp\; p\; (\eval 
+% e_2:s))$
+% \ei
+
+% Queremos demostrar que:
+% \[
+% \fa p\fa s(\ejp\; (\comp (\no e_1)\ap p)\; s =  \ejp\; p\; (\eval (\no 
+% e_1):s))
+% \]
+
+% \[
+% \ba{rll}
+% \ejp\;(\comp (\no e_1)\ap p)\; s & = & 
+% \ejp\; ( (\comp e_1\ap[\neg])\ap p)\; s\\
+% %& = & \ejp\; ( (\comp e_2\ap(\comp e_1\ap[*]\ap p))\; s\\
+% & =_{Asoc\ap} & \ejp\; ( (\comp e_1\ap([\neg]\ap p))\; s\\
+% % & =_{I.H.\text{2}} & \ejp\; (\comp e_1\ap[*]\ap p))\; (\eval e_2:s)\\
+% % & =_{Asoc\ap} & \ejp\; (\comp e_1\ap([*]\ap p))\; (\eval e_2:s)\\
+% & =_{I.H} & \ejp\; ([\neg]\ap p)\; (\eval e_1:s)\\
+% & = & \ejp\; (\neg:p)\; (\eval e_1:s)\\
+% & = & \ejp\; p\; (\ej\; [\neg]\; (\eval e_1:s))\\
+% & = & \ejp\; p\; (\neg(\eval e_1):s)\\
+% & = & \ejp\; p\; (\eval (\no e_1):s)\\
+% \ea
+% \]
+
+\ei
+\ei
+
+
+% \[
+% P(e,p,s)=_{def} \ejp (\comp e ++ p) s = \ejp p (\eval e : s)
+% \]
+% \item Principio de inducción para $P$:
+% \[
+% \ba{rll}
+% \I_P & =_{def} & P(n,p,s) \land P(\true,p,s)\land P(\false,p,s) \\
+%      & & \fa e_1\fa e_2(P(e1)   
+% \ea
+% \]
+
+
+% \bi
+% \item $\fa x\fa y()$
+% \item $C(n,push n nil)$
+% \item $C(\true,push \true nil)$
+% \item $C(\false,push\false nil)$
+% \item $\fa x\fa y\fa w\fa v\fa z(C(x,w)\land C(y,v)\to C(x+y, w++v++[+])$
+% \item $\fa x\fa y\fa w\fa v\fa z(C(x,w)\land C(y,v)\to C(x*y, w++v++[*])$
+% \item $\fa x\fa y\fa w\fa v\fa z(C(x,w)\land C(y,v)\to C(x<y, w++v++[<])$
+% \item $\fa x\fa y(C(x,w)\to C(not x, w++[\neg])$
+% \item $\fa x\fa y(C(x,w)\to C(\iszero x, w++[isz])$
+% \ei
+
+
+
+
+
+
+
+% Como se observa los sistemas de tipos son muy similares a los sistemas
+% de deducción natural con contextos que ya hemos estudiado. De hecho
+% los sistemas de deducción natural pueden verse, desde el punto de
+% vista computacional, como un sistema de tipos para un prototipo de lenguaje de 
+% programación
+% funcional mediante la llamada correspondencia de Curry-Howard, también
+% conocida como paradigma de derivaciones como programas o proposiciones
+% como tipos. La idea a grandes rasgos es:
+
+% \bi
+% \item Las fórmulas de la lógica corresponden a tipos para un lenguaje
+%   de programación.
+%   \item Las pruebas o derivaciones en la lógica corresponden a los
+%     pasos que el verificador de tipos realiza para mostrar que cierta
+%     expresión o programa del lenguaje de programación está bien tipada.
+%     \item Por lo tanto, verificar si una prueba es correcta en un contexto 
+% dado corresponde a verificar
+%       si un programa tiene un tipo válido en el contexto dado.
+% \ei
+
+
+
+
+
+
+
+
+% \section{Carácter Constructivo de Conectivos y Cuantificadores}
+
+% Para poder poner en correspondencia el mundo de las pruebas formales con el
+% mundo de los programas computacionales debemos darle un caracter constructivo
+% a las primeras, de manera que puedan ser implementadas más adelante. Este
+% caracter constructivo se obtiene al olvidarnos de la noción clásica 
+% (platónica) de
+% verdad y en su lugar entender al juicio $\vp\,\true$ mediante la existencia
+% de una prueba constructiva de $\vp$, es decir la existencia de un método bien
+% definido que nos lleve a construir a $\vp$. Las siguientes reglas de
+% construcción se conocen como la \emph{interpretación de 
+% Brouwer-Heyting-Kolmogorov (BHK)},
+% y su sabor algorítmico nos llevará más tarde a la famosa correspondencia de
+% Curry-Howard.\\ 
+
+
+
+% \bi
+% \item Una construcción de $\vp\land\psi$ consiste de una construcción de
+%   $\vp$ y una construcción de $\psi$.
+% \item Una construcción de $\vp\lor\psi$ consiste de una construcción de $\vp$
+%   ó de una construcción de $\psi$.
+% \item Una construcción de $\vp\imp\psi$ consiste de un método que transforma
+%   cada construcción de $\vp$ en una construcción de $\psi$.
+% \item Una construcción de $\fa x\vp$ es un método que transforma
+%   cualquier objeto $t$ en una construcción de $\vp[x:=t]$.
+%   \item Una construcción de $\ex x\vp$ es un par consistente de un
+%     objeto $t$ y una construcción de $\vp[x:=t]$.
+% \item No existe una construcción para $\bot$
+%   \item $\top$ siempre es construible.
+
+% \ei
+
+
+
+\subsection{?`Para qué una prueba formal?}
+
+Una prueba formal como la que acabamos de bosquejar no es una argumentación en 
+algún lenguaje natural, como el español, o  bien semiformal como la mezcla de 
+español y  matemáticas, la cual es susceptible de errores díficiles de encontrar 
+en casos de aplicación real. Por ejemplo la construcción de un compilador 
+correcto (altamente confiable) de un lenguaje real como {\sc C} (ver 
+\url{http://compcert.inria.fr}). Las pruebas formales constan de un proceso de 
+cálculo preciso que sigue reglas bien definidas, en nuestro caso las reglas de 
+deducción natural. Una ventaja de construir esta clase de pruebas es que debido 
+a su naturaleza precisa son rigurosas, libres de ambigüedades y susceptibles de 
+construirse y verificarse mecánicamente por programas llamados asistentes de 
+prueba como {\sc Coq} (ver \url{http://coq.inria.fr}). Esta verificación a la 
+vez produce una certificación que garantiza que ciertas propiedades se cumplen, 
+como por ejemplo la correctud de un compilador. Esto es deseable en sistemas 
+cuyo funcionamiento incorrecto causa errores graves como sistemas de radiación 
+para enfermos de cancer y sistemas de navegación de vuelo. \\
+El uso de sistemas lógicos para desarrollar aplicaciones con propiedades 
+certificadas mediante prueba formales ha generado una nueva área dentro de las 
+ciencias de la computación conocida como Métodos Formales.
+
+\end{document}

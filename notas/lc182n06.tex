@@ -1,0 +1,954 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage{../packageslc}
+\usepackage{../optionslc}
+
+\input{../macroslc}
+
+
+\title{Especificación formal con lógica de predicados. \\ 
+Lógica Computacional 2018-2, Nota de clase 6}
+\author{Favio Ezequiel Miranda Perea \and Araceli Liliana Reyes Cabello \and
+Lourdes Del Carmen Gonz\'alez Huesca \and Pilar Selene Linares Ar\'evalo}
+\date{\today\\ Facultad de Ciencias UNAM}
+
+\begin{document}
+\maketitle
+
+El proceso de especificación o traducción de un lenguaje natural, en 
+nuestro caso del español, a la lógica formal no es siempre sencillo. Algunas 
+frases del español no se pueden traducir o especificar de una manera 
+completamente fiel a la lógica de predicados, como veremos en algunos ejemplos. 
+Sin embargo, el proceso es de gran importancia pues es la base de muchos métodos 
+de especificación formal utilizados en inteligencia artificial o ingenieria de 
+software, como son el lenguaje de especificación \textsc{Z} que es un lenguaje 
+formal basado en la teoría de conjuntos de Zermelo-Fraenkel y en la lógica de 
+predicados que se usa en la industria, especialmente en sistemas de alta 
+integridad, como parte del proceso de desarrollo de software o hardware
+tanto en Europa como en Estados Unidos. % o el analizador de modelos Alloy
+
+\section{Algunos consejos}
+
+A continuación presentamos algunos consejos y observaciones que pretenden 
+facilitar el proceso de especificación del español por medio de la lógica.
+\begin{itemize}
+ \item Únicamente podemos especificar afirmaciones o proposiciones, no es 
+  posible traducir preguntas, exclamaciones, órdenes, invitaciones, etcétera.
+
+ \item La idea básica es extraer predicados a partir de los enunciados dados 
+  en español de manera que el enunciado completo se construya al combinar 
+  dichos predicados mediante conectivos y cuantificadores.\\
+  Por ejemplo la frase \textit{me gustan los tacos y las pizzas} debe entenderse 
+  como \textit{me gustan los tacos y me gustan las pizzas}.\\
+  Análogamente \textit{iré de vacaciones a la playa o a la montaña} significa 
+  \textit{iré de vacaciones a la playa ó iré de vacaciones a la montaña}.
+
+ \item La conjunción \enquote{y} se traduce como $\land$. La palabra 
+  \enquote{pero} también corresponde a una conjunción aunque el sentido 
+  original del español se pierde. \\ 
+  Por ejemplo \textit{te doy dulces pero haces la tarea} sólo puede 
+  especificarse como \textit{te doy dulces y haces la tarea}. Lo cual es 
+  diferente en el español.
+
+ \item La disyunción es incluyente \textit{comeremos pollo o vegetales} es 
+  decir, se incluye el caso en que se coman ambos.
+
+ \item Con la implicación hay que ser cautelosos, sobre todo en el caso de 
+  frases de la forma  \textit{A sólo si B}, lo cual es equivalente con la frase
+  \textit{Si no B entonces no A}, que a su vez es equivalente con        
+  \textit{Si A entonces~B}. 
+  Es un error común intentar especificar dicha frase inicial mediante~$B\imp A$.
+
+ \item Si en el español aparecen frases como \textit{para todos, para 
+cualquier,   todos, cualquiera,los, las etc.} debe usarse el cuantificador 
+universal~$\fa$
+
+ \item Si en el español frases como \textit{para alg\'un, existe un, 
+  alguno,alguna, uno, una etc.} debe usarse el cuantificador 
+  existencial~$\ex$.\\ 
+  \textbf{Importante:} En ciertas ocasiones, frases en español que
+  involucran \textit{alguien, algo} deben especificarse con un cuantificador 
+  universal y no un existencial. \\
+  Por ejemplo, el enunciado \textit{si hay alguien demasiado alto entonces se 
+  pegará con el marco de la puerta} se puede reescribir en español como
+  \textit{cualquiera demasiado alto se pegará con el marco de la puerta},
+  lo cual nos lleva a la f\'ormula~$\fa x(A(x)\imp C(x))$.\\
+  El lector debe convencerse de que no es posible especificar esta oración 
+  usando un cuantificador existencial. 
+% a veces alguna presencia de \textit{alguien} en
+% español puede generar un cuantificador universal y no un existencial. 
+% % debido a la equivalencia
+% % lógica $\ex x\vp \imp \psi\equiv \fa x(\vp\imp\psi)$ cuando $x\notin
+% % Vl(\psi)$.
+% Por ejemplo el enunciado 
+% \textit{si hay alguien demasiado alto entonces chocará con el marco de la 
+% puerta} se puede reescribir en español 
+% como \textit{cualquier persona muy alta chocará con el marco de la puerta}, 
+% lo cual nos lleva a $\fa x(Ax\imp Cx)$
+
+ \item Cualquier especificación compuesta que involucre cuantificadores puede
+  formarse identificando en ella alguno de los cuatro juicios aristotélicos:
+  \bi
+   \item Universal afirmativo \textit{Todo S es P} traducido mediante
+    $\fa x(S(x)\imp P(x))$.
+%  Est\'a proposici\'on corresponde al juicio universal afirmativo y
+%se traduce con la f\'or\-mu\-la  
+   \item Existencial afirmativo. \textit{Alg\'un S es P} traducido mediante
+    $\ex x(S(x)\land P(x)).$
+%Corresponde al juicio existencial afirmativo y se traduce
+%mediante la f\'or\-mu\-la
+   \item Universal negativo: \textit{Ning\'un S es P} traducido mediante 
+    $\fa x(S(x)\imp \neg P(x))$
+%Corresponde al juicio universal negativo, la palabra \enquote{ning\'un} es 
+%una contracci\'on de \enquote{no alg\'un} y se traduce con
+ %o equivalentemente con $\neg\ex x\;(S(x)\land P(x))$. 
+   \item Existencial negativo:  \textit{Alg\'un S no es P} traducido mediante
+    $\ex x(S(x)\land \neg P(x))$
+  %Esta proposici\'on corresponde al juicio existencial afirmativo y
+%se traduce con la f\'ormula
+  \ei
+  Por supuesto que en especificaciones complicadas $S$ y $P$ no serán predicados
+  sino fórmulas compuestas.
+
+ \item Pronombres como \textit{él, ella, eso} no se refieren a un individuo
+  particular sino que se usan como referencia a algo o alguien mencionado 
+  previamente, por lo que obtienen significado del contexto particular.
+  Cuando un pronombre aparezca en un enunciado debe uno averiguar primero a 
+  quién o qué se refiere. \\
+  Por ejemplo, en el enunciado \textit{Martha es amiga de Lupita pero ella no 
+es   amiga de Karla} debe traducirse como \textit{Martha es amiga de Lupita y 
+  Lupita no es amiga de Karla}. Similarmente, cuando necesitamos de 
+  variables, como en \textit{hay un perro con manchas y él ladra en las 
+  mañanas} es un error tratar de traducir por separado \textit{hay un perro con
+  manchas} y \textit{él ladra en las mañanas} puesto que lo que existe está
+  ligado con lo que ladra por la conjunción, de manera que debe
+  utilizarse una variable que modele esta conexión. 
+
+ \item Las variables no se mencionan en español, son sólo un formalismo
+  para representar individuos, por ejemplo la fórmula~$\fa x(M(x)\imp T(x))$ 
+  puede escribirse en español como \textit{Cualquier minotauro es troyano} 
+  y no como \textit{para cualquier x, si x es minotauro entonces x es 
+  troyano}. \\
+  Enunciados de esta forma sólo sirven como pasos intermedios en el proceso de 
+  traducción pues no forman parte del español correcto ni de la lógica formal. 
+  A este mismo respecto es prácticamente imposible que en una traducción del 
+  español figuren variables libres.
+
+ \item Los esquemas~$\forall x(A\to B)$ y~$\exists x(A\land B)$ son de gran
+  utilidad y bastante comunes. \\
+  Menos comunes, aunque también adecuados, son los esquemas 
+  \makebox[4em]{$\forall x(A\!\land\!B)$}, 
+  \makebox[4em]{$\forall x(A\!\lor\!B)$} y 
+  \makebox[4em]{$\exists x(A\!\lor\!B)$}\;.
+
+ \item El esquema \makebox[4.5em]{$\exists x(A\!\to\!B)$}, si bien es una 
+  fórmula sintácticamente correcta, es extremadamente raro que figure en una
+  traducción del español.
+  
+ \item El hecho de que se usen dos o más variables distintas no implica
+  que éstas representen a elementos distintos del universo, de manera
+  que para especificar dos individuos distintos no es suficiente contar
+  simplemente con variables distintas.\\
+  Las fórmulas~$\exists x P(x)$ y~$\exists x\exists y(P(x)\land P(y))$ expresan 
+  ambas lo mismo, a saber que un objeto del universo cumple~$P$. Se debe 
+  agregar explícitamente que $x$ e $y$ tienen la propiedad de ser distintos, es 
+  decir~$x\ne y$.
+
+% \item El cuantificador existencial no restringe a que el objeto del
+%   que se habla sea único. Tanto la afirmación \textit{hay una luna} como {\em
+%     hay lunas} se traducen como $\ex x L(x)$. Esta fórmula es equivalente a 
+% $\ex x L(x)\land \ex y L(y)$
+%  y a $\ex x\ex y (L(x)\land L(y))$ de manera que el hecho de que se usen dos
+%  variables no implica la existencia de dos objetos puesto que ambas variables
+%  pueden denotar al mismo individuo.
+%  Si se debe enfatizar por ejemplo \textit{hay dos lunas} entonces debe usarse
+%   la igualdad como en la siguiente fórmula $\ex x\ex y(L(x)\land L(y)\land 
+% x\neq y)$.
+
+% \item La frase \textit{Todo gato maulla} debe traducirse como
+% $\fa x(G(x)\imp M(x))$ y no como $\fa x(G(x)\land M(x))$
+% ya que esta última se traduce como \textit{Todos son gatos y maullan}.
+
+% \item La frase \textit{Si el dios Baco bebe vino entonces todos beben vino} 
+% se traduciría como $\ex x (B(x)\imp \fa y V(y))$ pero esta frase
+% es falsa, se ha generado una fórmula válida que no lo es ya que 
+% no es cierto que el dios Baco exista y que no es cierto que todos
+% bebamos.
+\end{itemize}
+
+
+En las siguientes secciones damos diversos ejemplos de especificación formal
+con lógica de predicados.
+
+\section{Especificación de listas}
+
+En lenguajes de programación dado un tipo de datos $A$ se define el tipo de
+datos de las listas con elementos de tipo $A$, denotado $L_A$ recursivamente
+como sigue:
+\be
+\item La lista vacía, denotada $nil$ es un elemento de $L_A$
+\item Si $a$ es un elemento de $A$ y $\ell$ es una lista entonces
+  $cons(a,\ell)$ es un elemento de $L_A$.
+\item Son todas.
+\ee
+
+A continuación presentamos la especificación formal en lógica de predicados 
+para este tipo de datos y para algunas de sus operaciones: \\
+Sean $nil$ un símbolo de constante para la lista vacía, $cons^{(2)}$ un
+símbolo de función para la construcción de listas y $A^{(1)},L_A^{(1)}$  
+símbolos de predicado para el tipo $A$ y listas de $A$ respectivamente.\\
+La definición del tipo de datos de listas con elementos en $A$ se formaliza 
+como sigue:
+\bi
+ \item $L_A(nil)$
+ \item $\fa x\fa y\big(A(x)\land L_A(y)\to L_A(cons(x,y)\big)$
+ \item $\fa x\Big(L_A(x)\to x=nil \lor \exists y\exists z\big(A(y) \land 
+  L_A(z) \land x = cons(y,z)\big)\Big)$
+\ei
+La \'ultima f\'ormula indica que cualquier lista s\'olo puede tener una de dos 
+formas.
+  
+\noindent Otras especificaciones acerca de listas son:
+\bi
+ \item La lista vacía no se puede construir con la función~$cons$. 
+ $$ \fa x \fa y (cons(x,y)\neq nil)$$
+
+ \item La concatenación de dos listas es una lista.
+  \bi
+   \item Funcionalmente: sea $app^{(2)}$ un símbolo de función que
+    representa a la concatenación de dos listas. La especificación es
+    $$ \fa x\fa y \big(L_A(x)\land L_A(y)\to L_A(app(x,y))\big)$$ 
+   \item Relacionalmente: sea $App^{(3)}$ un predicado ternario
+    que simbolice a la relación 
+    \enquote{$z$ es la concatenación de $x$ con $y$}. La especificación es
+    $$\fa x \fa y \fa z\big(L_A(x)\land L_A(y)\land App(x,y,z)\to L_A(z)\big)$$
+   \ei
+De este ejemplo se observa que una especificación formal puede darse usando 
+funciones o bien predicados o relaciones. Cúal opción elegir dependerá de los 
+objetivos particulares del problema en cuestión. 
+
+ \item La concatenación de la lista vacía con cualquier otra lista $\ell$ 
+  es~$\ell$.
+  \bi
+   \item Funcionalmente: $ \fa x (app(nil,x)=x) $
+   \item Relacionalmente: $ \fa x App(nil,x,x)$
+  \ei
+
+ \item La concatenación de una lista no vacía~$\ell_1$ con una lista
+  cualquiera~$\ell_2$ es la lista cuya cabeza es la cabeza de~$\ell_1$ y cuya 
+  cola es la concatenación de la cola de $\ell_1$ con $\ell_2$.
+ \bi
+  \item Funcionalmente utilizando las funciones $cons$ y $app$:
+    $$ \fa x\fa y\fa z \big(app(cons(x,y),z) = cons(x,app(y,z))\big)$$
+  \item Funcionalmente utilizando funciones $hd^{(1)}$ y $tl^{(1)}$ que 
+   calculan la cabeza y cola de una lista:
+    $$\fa x\fa y\big(x\neq nil \to app(x,y)=cons(hd(x),app(tl(x),y))\big)$$
+  \item Relacionalmente usando el constructor de listas~$cons$
+    $$\fa x\fa y\fa w\fa z\big(App(x,y,w)\to App(cons(z,x),y,cons(z,w))\big)$$
+  \item Relacionalmente usando cabeza y cola:
+    $$\fa x\fa y\fa w\fa z\big(App(tl(x),y,w)\to App(x,y,cons(hd(x),w))\big)$$
+ \ei
+
+ \item La reversa de una lista es una lista.
+ \bi
+  \item Funcionalmente: sea $rev$ un símbolo de función de índice uno
+  que representa a la reversa de una lista. La especificación es:
+    $$ \fa x \big(L_A(x)\to L_A(rev(x))\big) $$
+  \item Relacionalmente: sea $Rev(x,y)$ un predicado binario que represente
+  a la relación \enquote{y es la reversa de x}. La especificación es:
+    $$\fa x \fa y\big(L_A(x)\land Rev(x,y)\to L_A(y)\big)$$
+ \ei
+
+ \item La reversa de la lista vacía es la lista vacía.
+ \bi
+  \item Funcionalmente: $ rev\,nil=nil $
+  \item Relacionalmente: $ Rev(nil,nil) $
+ \ei
+ 
+ \item La reversa de una lista no vacía es la concatenación de la
+  reversa de su cola con la lista que contiene a su cabeza.
+ \bi
+  \item Funcionalmente: 
+    $\fa x\fa y \big(rev(cons(x,y))=app(rev(y),cons(x,nil))\big)$
+  \item Funcionalmente usando cabeza y cola:
+    $\fa x\big(x\neq nil \to rev(x)=app(rev(tl(x)),cons(hd(x),nil))\big)$
+  \item Relacionalmente usando~$cons$:
+    $ \fa x Rev\big(cons(x,y),app(rev(y),cons(x,nil))\big) $
+  \item Relacionalmente usando cabeza y cola:
+    $\fa x \big(x\neq nil\to Rev(x,app(rev(tl(x)),cons(hd(x),nil)))\big)$
+ \ei
+\ei
+
+  
+\section{El juego de Risk}
+
+Risk es un juego de mesa que modela estrategias de guerra en el cual pueden 
+participar de 2 a 6 jugadores. Aquí vamos a representar algunos aspectos de la
+versión Risk II para computadora. \\
+En el mundo hay jugadores, pa\'ises, tarjetas y n\'umeros:
+\bi
+ \item Los jugadores pueden ser humanos o virtuales manejados por la
+  computadora. Aquí no haremos distinción. Algunos jugadores son
+  \textit{Barbacena, Bonaparte, Wellington, Solignac, Maransin, Marmont,
+  Spencer, Mackenzie, Pach, Menelao, Mega, Charal, Polain, Ardilio, Taupin, 
+  Vauban}
+ \item Los pa\'ises son algunos de los pa\'ises actuales y otros que no 
+  necesariamente corresponden a la división política actual.
+ \item Las tarjetas se otorgan si un jugador hizo al menos una conquista en 
+  su turno. Al tener un jugador 5 tarjetas está obligado a cambiarlas. De 
+  acuerdo a la figura en la tarjeta (tropa, cañ\'on, caballo) se reciben 
+  refuerzos por cada 3 tarjetas.
+ \item Los números se usarán como auxiliar para contar.
+\ei
+
+Introducimos un lenguaje de predicados para representar el juego
+mediante ejemplos, usaremos nombres completos para constantes y
+nombres cortos para predicados para facilitar la correspondencia con
+el español.
+\bi
+ \item Solignac ha ocupado China   $\qquad  Oc(solignac,china)$
+
+ \item Barbacena ha defendido con éxito Peru  $\qquad  DefEn(barbacena,peru)$
+
+ \item Bonaparte ha ganado una tarjeta $\qquad  Gt(bonaparte,1)$
+
+ \item Vauban vence a Mackenzie en Quebec  
+    $\qquad Ven(vauban,mackenzie,quebec)$
+
+ \item Taupin se retira de Japón  $\qquad   Ret(taupin,japon)$
+
+ \item Spencer ha intercambiado tarjetas $\qquad  Int(spencer)$
+
+ \item Mackenzie ataca a D'erlon en Argentina desde Brasil 
+    $\qquad At(mackenzie,d'erlon,argentina,brasil)$
+
+ \item Menelao recibe 10 refuerzos  $\qquad  Ref(menelao,10)$
+
+ \item Vauban hace un movimiento táctico de Alaska a Ucrania 
+    $\qquad Tac(vauban,alaska,ucrania)$
+
+ \item Spencer ha sido aniquilado por Bonaparte  $\qquad Ani(bonaparte,spencer)$
+
+ \item $3$ tropas se colocan en Francia $\qquad Tro(3,francia)$
+
+ \item $5$ tropas se mueven de Quebec a Groenlandia 
+    $\qquad Mov(5,quebec,groenlandia)$
+                 
+ \item Maransin tiene 8 refuerzos $\qquad Tref(maransin,8)$
+ 
+ \item Marmont tiene 5 tarjetas $\qquad Ttar(marmont,5)$
+ 
+ \item Wellington tiene 23 pa\'ises $\qquad Tpais(wellington,23)$
+\ei
+
+\newpage
+
+A partir de estos predicados básicos podemos representar más propiedades del 
+juego o partida en particular.
+Obsérvese que algunos predicados requieren más información de la que a veces se 
+tiene, analicemos por ejemplo el caso de un ataque:
+\bi
+\item \textit{Wellington ataca a Menelao.}\\ En este caso no se tiene
+  información acerca de los lugares de ataque. Con el predicado
+  definido anteriormente tendr\'iamos 
+  \[
+  \ex x\ex y At(wellington,menelao,x,y)
+  \]
+Si se prefiere evitar el uso de cuantificadores se pueden definir predicados 
+mas simples, por ejemplo:
+\bi
+ \item $x$ ataca.  $At1(x)$.
+ \item $x$ ataca a $y$.  $At2(x,y)$
+ \item $x$ ataca a $y$ en $z$ $At2e(x,y,z)$
+ \item Atacar desde el pais $x$ hacia el pais $y$.  $AtD(x,y)$
+\ei
+
+ \item \textit{Hay un ataque.} Usando distintos predicados de ataque:
+     \[
+     \ba{l}
+     \ex x At1(x)\\
+     \ex x\ex y At2(x,y)\\
+     \ex x \ex y\ex z At2e(x,y,z)\\
+     \ex x\ex y\ex z\ex w At(x,y,z,w)\\
+     \ea
+     \]
+     
+ \item \textit{Alguien ataca a Freire (Freire es atacado.)}
+     \[
+     \ba{l}
+     \ex x At2(x,freire)\\
+     \ex y\ex y At2e(x,freire,y)\\
+     \ex x\ex z\ex w At(x,Freire,z,w)
+     \ea
+     \]
+ \item \textit{Aubert ataca}
+      \[
+      \ba{l}
+        \ex x At1(aubert)\\
+       \ex x At2(aubert,x)\\
+       \ex x\ex y At2e(aubert,x,y)\\
+      \ex y\ex z\ex w At(Aubert,y,z,w)
+      \ea
+      \]
+ \item \textit{Hay un ataque en Argentina}
+  \[
+  \ba{l}
+  \ex x AtD(x,argentina)\\
+  \ex x \ex y\ex z At2e(x,y,argentina)\\
+  \ex x\ex y\ex w At(x,y,argentina,w)
+  \ea
+  \]
+
+ \item \textit{Hay un ataque desde Madagascar}
+    \[
+    \ba{l}
+    \ex x AtD(madagascar,x)\\   
+    \ex x,y,z At(x,y,z,madagascar)
+    \ea
+    \]
+
+ \item \textit{Todos los pa\'ises están ocupados.}
+  \[
+  \fa x\ex y Oc(y,x)
+  \]
+    
+ \item \textit{Si un jugador tiene 3 tarjetas y las intercambia entonces recibe
+  refuerzos.}
+  \[
+  \fa x (Ttar(x,3)\land Int(x)\imp \ex y Ref(x,y))
+  \]
+  
+ \item \textit{Si un jugador tiene 5 o mas tarjetas debe intercambiarlas.}
+  \[
+  \fa x,y(Ttar(x,y) \land y>5\imp Int(x))
+  \]
+
+ \item \textit{Si un jugador tiene 8 pa\'ises o menos  entonces recibe $3$
+  refuerzos.}
+  \[
+  \fa x\fa n(Tpais(x,n)\land n\leq 8 \imp Ref(x,3))
+  \]
+ 
+ \item Si un jugador ocupa $n$  pa\'ises con $n \geq 9$ entonces recibe
+  $(n\;mod\;3)$ refuerzos
+    \[
+    \fa x\fa n(Tpais(x,n)\land n\geq 9\imp Ref(x,n\;mod\;3))
+    \]
+ Obsérvese en este ejemplo el uso de una función ($mod$) como
+ argumento de un predicado. 
+
+ \item \textit{Un pais puede ser ocupado por un único jugador.}
+  \[
+  \fa x\fa y\fa z (Oc(x,z)\land Oc(y,z)\imp x=y)
+  \]
+  Cuando hablamos de cosas únicas es necesario usar la igualdad.
+  
+ \item \textit{Un jugador puede hacer movimiento táctico de un pais a otro
+   sólo si posee ambos pa\'ises y estos están contiguos.}
+   \[
+   \fa x\fa y\fa z\Big( Tac(x,y,z)\imp Oc(x,y)\land Oc(x,z)\land Cont(y,z)\Big)
+   \]
+Aquí introducimos el nuevo predicado binario $Cont(x,y)$. 
+  
+ \item \textit{Solignac fue aniquilado}  \[ \ex y Ani(y,solignac)\]
+
+ \item \textit{Si Pach ataca a Mega en Siam y lo vence entonces lo aniquilará}
+  \[
+  \ex y (At(pach,mega,siam,y))\land Ven(pach,mega,siam)\imp Ani(pach,mega)
+  \]
+
+ \item \textit{Polain ataca desde Ontario a Menelao quien se defiende con
+   éxito.}
+  \[
+   \ex x\big(  At(polain,menelao,x,Ontario)\land DefEn(menelao,x))
+  \]
+
+ \item \textit{Si todos atacan a Ardilio en Rusia entonces  él intercambiará
+  tarjetas y colocará 50 tropas ahí.}
+  \[
+   \fa x \ex y At(x,ardilio,rusia,y)\imp Int(ardilio)\land Trop(50,rusia)
+  \]
+
+ \item \textit{Si Mega ataca a Polain en Venezuela y gana entonces Polain
+   es aniquilada, Mega moverá 7 tropas ahí y recibirá 4 tarjetas.}
+        \[
+        \ba{c}
+        At2e(mega,polain,venezuela) \land Ven(mega,polain,venezuela)\imp
+        \\
+        Ani(mega,polain)\land MovA(mega,7,venezuela)\land Gt(mega,4)\Big)
+        \ea
+        \]
+ Aquí introducimos un nuevo predicado $MovA(x,y,z)$ para la relación 
+ \enquote{x mueve y tropas a z}.
+ 
+ \item Menelao recibe 10 refuerzos y los coloca en Gibraltar mientras que
+  Mega se retira de Egipto moviendo 7 tropas hacia el Congo.
+  \[
+  Ref(menelao,10)\land Tro(10,gibraltar)\land Ret(mega,egipto)\land 
+  Mov(7,egipto,congo)
+  \]
+Obsérvese que en la formalización no se captura el hecho de que las 10
+tropas de refuerzo son las mismas 10 que se colocan en Gibraltar. Una
+mejor solución sería utilizar un nuevo predicado ternario
+$RefEn(x,y,z)$ para la relación 
+\enquote{x recibe y refuerzos y los coloca en z}.
+  
+ \item Todos los que ataquen a menelao serán derrotados y aniquilados por él.
+  \[
+  \fa x \fa y\fa z\Big(At(x,menelao,y,z)\imp Ven(menelao,x,y)\land 
+  Ani(menelao,x)\Big)
+  \]
+
+ \item Si Mega recibe 15 refuerzos y los coloca en Filipinas entonces
+  Charal no lo atacará en Japón y se retirará de Kamchatka a Alaska.
+  \[
+  \ba{c}
+  Ref(mega,15)\land Tro(15,filipinas)\imp \\
+  \neg
+  At2e(charal,mega,japon)\land RetH(charal,kamchatka,alaska)
+  \ea
+  \]
+ Aquí introducimos el nuevo predicado~$RetH(x,y,z)$ para la relación
+ \enquote{x se retira de y hacia z}.
+\ei
+
+
+\subsection{Predicados para tipos}
+
+Obsérvese que aún cuando el mundo es heterog\'eneo en las especificaciones 
+acerca del juego de Risk no hemos tenido el cuidado de distinguir entre los
+distintos tipos de objetos, con lo cual podemos construir fórmulas con
+argumentos incorrectos desde el punto de vista semántico. Por ejemplo
+\[
+Tro(filipinas,mega), Ret(venezuela,peru), At2e(15,polain, mega)
+\]
+Si bien éstas son fórmulas bien formadas, no tienen sentido en la situación que
+hemos fijado. Hemos preferido no especificar los tipos para simplificar las
+traducciones, sin embargo éstos pueden recuperarse introduciendo predicados
+unitarios por ejemplo $J(x), N(x), P(x)$ para las propiedades de ser jugador,
+número y predicado respectivamente. En tal caso por ejemplo la frase
+\textit{alguién ataca a Mega} traducida antes como~$\ex x At2(x,mega)$
+debe traducirse ahora como~$\ex x(J(x)\land At2(x,mega))$ de esta manera se
+evitan fórmulas sin sentido como las de arriba. 
+Por ejemplo \textit{Cualquier entero es más pequeño que un natural} se puede 
+traducir como~$\fa x\ex y (x < y)$ sin embargo se pierde mucha información por
+lo que debe preferirse la traducción con tipos
+$\fa x\big(Int(x)\imp \ex y(Nat(y)\land x<y)\big)$. 
+
+Para ahorrarnos algunos conectivos podemos introducir abreviaturas al
+estilo de los lenguajes de programación:
+\[
+\fa x\!:\!A.\, P(x) \mbox{ significa }  \fa x (A(x)\imp P(x))
+\]
+\[
+\ex x\!:\!A.\, P(x) \mbox{ significa }  \ex x (A(x)\land P(x))
+\]
+Por ejemplo la traducción anterior se expresa como 
+$\fa x:Int.\,\ex y:Nat.(x<y)$.
+Veamos un último ejemplo considerando un tipo~$Prog(x)$ para programas
+así como los predicados $F(x)$ para funcionar y $T(x)$ para terminar.
+\bc
+\textit{Todos los programas que funcionan terminan.}
+\ec
+\bi
+ \item Sin tipos: $\fa x (F(x)\imp T(x))$
+ \item Con tipos: $\fa x (P(x)\imp F(x)\imp T(x))$
+ \item Con tipos abreviados: $\fa x:P. (F(x)\imp T(x))$
+\ei
+
+\section{Libros y Autores}
+Considérense las siguientes declaraciones de predicados y constantes: \\
+%$\Si=\{L^{(2)},\;E^{(2)},\;A^{(1)},\;F^{(1)},\allowbreak
+%M^{(1)},\;g,q,c,a, h, d\}$, con el siguiente significado:\\
+\begin{tabular}{ll}
+ $L(x,y)$  & \enquote{x es m\'as largo que y} \\
+ $E(x,y)$ & \enquote{x es escrito por y}\\
+ $A(x)$  &  \enquote{x est\'a escrito en alem\'an}\\
+ $M(x)$ & \enquote{x es matem\'atico}\\
+ $F(x)$ & \enquote{x es fil\'osofo}\\
+ $B(x)$ & \enquote{x es libro}\\
+ $g$ & \enquote{Grund\-leh\-ren der Mathematik}\\
+ $q$ & \enquote{El Quijote de la Mancha}\\
+ $c$ & \enquote{La construcci\'on l\'ogica del mundo}\\
+ $a$ & \enquote{Alicia en el pa\'{\i}s de las maravillas}\\
+ $h$ & David Hilbert \\
+ $d$ & Charles Dogdson.
+\end{tabular}\\
+
+Usaremos especificaciones con tipos para libros, matemáticos y filósofos en 
+algunos casos:
+\bi
+ \item \textit{\enquote{Grundlehren der Mathematik} es un libro escrito en
+  alem\'an.}
+  $$ B(g)\land A(g)$$
+ \item \textit{Hay un libro m\'as largo que \enquote{El Quijote de la Mancha}.}
+  $$ \ex x:B.\,L(x,q) $$
+ \item \textit{\enquote{La construcci\'on l\'ogica del mundo} es un libro 
+  escrito por un fil\'osofo y no es mas largo que 
+  \enquote{Alicia en el pa\'{\i}s de las maravillas}}
+  $$ (\ex x:F.\,E(c,x)) \land \neg L(c,a) $$
+ \item \textit{\enquote{Alicia en el pa\'{\i}s de las maravillas} es un libro
+  escrito por un matem\'atico}.
+  \[
+  \ex x:M.(B(a)\land E(a,x))\; \mbox{equivalente a }\;B(a)\land \ex x:M.E(a,x)
+  \]
+ \item \textit{Hay un libro escrito en alem\'an por un matem\'atico que es
+  m\'as largo que \enquote{Grundlehren der Mathematik}}.
+  $$ \ex y:B.\ex x:M.\,(A(y)\land E(y,x)\land L(y,g)) $$
+ \item \textit{Si \enquote{Alicia en el pa\'{\i}s de las maravillas} es un libro
+  escrito por un matemático entonces es un libro escrito por un fil\'osofo.}
+  $$ \ex x:M.\,(B(a)\land E(a,x))\imp\ex y:F\,(B(a)\land E(a,y)) $$
+ \item \textit{No hay un libro escrito en alem\'an por un fil\'osofo.}
+  $$ \neg\ex x:B.\,(A(x)\land \ex y:F.\,E(x,y)) $$
+ \item \textit{No es el caso que cualquier libro es escrito por un
+  fil\'osofo.}
+  $$ \neg\fa x\ex y (F(y)\land E(x,y)) $$
+ \item \textit{Para cualquier libro escrito por Dogdson, 
+  \enquote{Grundlehren der Mathematik} es un libro m\'as largo escrito por 
+  Hilbert.}
+  $$ \fa x:B.\, (E(x,d)\imp E(g,h)\land L(g,x)) $$
+ \item \textit{Hay alguien que es fil\'osofo y matem\'atico y ha escrito un
+  libro en alem\'an.}
+  $$ \ex x(F(x)\land M(x)\land \ex y:B (E(y,x)\land A(y))) $$
+\ei
+
+
+\section{El Mundo de Cubos}
+Tenemos seis cubos de color amarillo, azul o verde. Un cubo puede estar
+sobre otro o en el piso. Consid\'erense los predicados $S(x,y)$
+representando que $x$ est\'a sobre $y$, $P(x)$ para $x$ está en el piso,  
+$A(x),Az(x),V(x)$ representan los colores, $L(x)$ significa que $x$ está
+libre, es decir que ning\'un cubo est\'a sobre $x$. Obsérvese que en
+el mundo hay cubos únicamente por lo que un predicado para 
+\enquote{ser cubo} es redundante.\\ Simbolizar los siguiente:
+\bi
+ \item Hay un cubo azul en el piso con un cubo amarillo sobre \'el y un
+  cubo verde sobre el amarillo. 
+  \[
+  \ex x\ex y\ex w
+  \Big(Az(x)\land A(y)\land V(w)\land P(x)\land S(y,x)\land S(w,y)\Big)
+  \]
+ \item Ning\'un cubo amarillo est\'a libre.
+  \[
+  \fa x(A(x)\imp \neg L(x))
+  \]
+ \item Hay un cubo azul libre y un cubo verde libre.
+  \[
+  \ex x\ex y\big(Az(x)\land L(x)\land V(y)\land L(y)\big)
+  \]
+ \item Cualquier cubo amarillo tiene un cubo sobre \'el.
+  \[
+  \fa x\big(A(x)\imp \ex y S(y,x)\big)
+  \]
+ \item No todos los cubos azules est\'an libres.
+  \[
+  \ex x(Az(x)\land\neg L(x))
+  \]
+ \item Cualquier cubo verde est\'a libre.
+  \[
+  \fa x\big(V(x)\imp L(x)\big)
+  \]
+ \item Todos los cubos en el piso son azules.
+  \[
+  \fa x\big(P(x)\imp Az(x)\big)
+  \]
+ \item Cualquier cubo que est\'e sobre un cubo amarillo es verde o azul.
+  \[
+  \fa x\Big(\ex y(A(y)\land S(x,y))\imp V(x)\lor Az(x)\Big)
+  \]
+ \item Hay un cubo verde sobre un cubo verde.
+  \[
+  \ex x \ex y\big(V(x)\land V(y)\land S(x,y)\big)
+  \]
+ \item Hay un cubo amarillo libre en el piso.
+  \[
+  \ex x\big(A(x)\land L(x)\land P(x)\big)
+  \]
+ \item Ning\'un cubo est\'a en el piso.
+  \[
+  \fa x\;\neg P(x)
+  \]
+ \item Hay un cubo amarillo que est\'a sobre uno azul y hay un cubo azul
+  sobre \'el.
+  \[
+ \ex x \ex y\Big(A(x)\land Az(y)\land S(x,y) \land \ex w(Az(w)\land S(w,x))\Big)
+  \]
+ \item Todos los cubos est\'an sobre algo.
+  \[
+  \fa x\ex y S(x,y)
+  \]
+\ei
+
+
+\section{Tri\'angulos, Círculos, Cuadrados}
+
+El mundo consta de una cuadricula de cualquier tamaño. Los objetos son
+c\'irculos, cuadrados o tri\'angulos y pueden ser pequeños, medianos o grandes.
+También se tienen las relaciones dadas por la posición, sur, norte, este,
+oeste y las relaciones dadas por la misma columna y el mismo renglón. Los
+predicados para las figuras son: $T(x), C(x), S(x)$ para tri\'angulo, círculo y
+cuadrado respectivamente; para tamaño tenemos $P(x),M(x),G(x)$ para pequeño,
+mediano y grande. Para la posición tenemos $Su(x,y), N(x,y), E(x,y), O(x,y)$
+por ejemplo $N(x,y)$ significa $x$ está al norte de $y$.
+Finalmente tenemos $Co(x,y), R(x,y)$ para $x$ está en la misma columna o
+renglón que $y$. 
+\bi
+ \item Hay c\'irculos medianos y cuadrados grandes
+  \[
+  \ex x(C(x)\land M(x))\land \ex y(S(y)\land G(y))
+  \]
+ \item No hay cuadrados pequeños.
+  \[
+  \fa x(S(x)\imp\neg P(x))
+  \]
+ \item Hay un tri\'angulo al sur de todos los c\'irculos
+  \[
+  \ex x\Big(T(x)\land \fa y(C(y)\imp Su(x,y))\Big)
+  \]
+ \item No hay dos tri\'angulos en el mismo renglón
+  \[
+  \neg\ex y\ex x\big(T(x)\land T(y)\land R(x,y)\big)
+  \]
+ \item Hay un círculo tal que todos los círculos al oeste de él son grandes.
+  \[
+  \ex x\Big(C(x)\land \fa y(C(y)\land O(y,x)\imp G(y))\Big)
+  \]
+ \item Ningún cuadrado está al norte de un círculo grande.
+  \[
+  \neg\ex x(S(x)\land \ex y\Big(C(y)\land G(y)\land N(x,y))\Big)
+  \]
+ \item Todos los c\'irculos medianos están al oeste de un mismo tri\'angulo 
+grande
+  \[
+  \ex x(T(x)\land G(x)\land \fa y(C(y)\land M(y)\imp O(y,x)))
+  \]
+ \item Todos los cuadrados pequeños están al sur de cualquier tríangulo.
+  \[
+  \fa x\Big(S(x)\land P(x)\imp \fa y(T(y)\imp Su(x,y))\Big)
+  \]
+ \item Si dos cuadrados están en el mismo renglón entonces cualquier tri\'angulo
+  al sur de ambos es mediano.
+  \[
+  \fa x\fa y\Big(S(x)\land S(y)\land R(x,y)\imp \fa z\big(T(z)\land 
+  Su(z,x)\land Su(z,y)\imp M(z)\big)\Big)
+  \]
+ \item No hay dos tri\'angulos medianos en la misma columna y si un
+  tri\'angulo es grande entonces hay un c\'irculo pequeño al este de él.
+  \[
+  \neg \ex x\ex y\big(T(x)\land T(y)\land Co(x,y)\big)\land
+  \fa z\Big(T(z)\land G(z)\imp \ex w(C(w)\land P(w)\land E(w,z))\Big)
+  \]
+\ei
+
+\begin{comment}
+\section{Ejercicios}
+
+\be
+\item Realizar la especificación formal acerca de las siguientes propiedades de 
+la función que verifica la pertenencia de un elemento a una lista dada. En cada 
+caso dar dos especificaciones, una funcional y otra relacional. Definir primero 
+el lenguaje a utilizar.
+\be
+ \item Ningún elemento pertenece a la lista vacía.
+ \item Si cierto elemento es la cabeza de una lista, entonces dicho elemento 
+  pertenece a esa lista.
+ \item La cabeza de una lista pertenece a dicha lista.
+ \item Si un elemento pertenece a una lista entonces o es la cabeza de esa 
+  lista o pertenece a la cola.
+ \item Si un elemento pertenece a una lista entonces pertenece a cualquier otra 
+  lista cuya cola es la lista anterior.
+ \item Si un elemento pertenece a la concatenación de dos listas entonces 
+  pertenece a alguna de estas dos listas.
+ \item Si un elemento pertenece a una lista entonces dicha lista es la 
+  concatenación de otras dos donde la segunda tiene como cabeza a dicho 
+  elemento.
+ \item Que un elemento pertenezca a la reversa de una lista equivale a que 
+  pertenezca a la lista.
+\ee
+
+\item Realizar la especificación formal de las siguientes propiedades de las 
+funciones reversa de una lista y concatenación de dos listas. En cada caso dar 
+dos especificaciones, una funcional y otra relacional. Definir primero el 
+lenguaje a utilizar.
+\be
+ \item La operación de concatenación es asociativa.
+ \item Si la concatenación de dos listas es vacía entonces ambas listas son 
+  vacías.
+ \item Si la concatenación de dos listas es una lista unitaria entonces una de 
+  dichas listas es vacía y la otra es la misma lista unitaria.
+ \item La reversa de la concatenación de dos listas es la concatenación de la 
+  reversa de la segunda lista con la reversa de la primera lista.
+ \item La reversa de la reversa de una lista es la misma lista.
+ \item Si la reversa de una lista es la misma lista entonces dicha lista es 
+  vacía o unitaria.
+\ee
+
+\item En el lenguaje de programación {\sc LISP} una expresión simbólica o 
+S-expresión es alguna de las siguientes
+\be
+\item Un símbolo.
+\item Una S-lista, donde una S-lista es una sucesión, tal vez vacía, de 
+S-expresiones, encerrada entre paréntesis.
+\ee
+Por ejemplo, las siguientes son cinco S-expresiones:
+\bc
+{\tt e,\;\;\;(),\;\;(e z),\;\;(b (a m)),\;\;(f\; (a\; ()\; )\; v\; (i\; o))}
+\ec
+%\be
+Dé una especificación formal de las S-expresiones.
+% Defina a las S-expresiones mediante un juicio $x\;{\tt SE}$. %Puede suponer 
+% \textit{únicamente} la existencia de un juicio $x\;S$ para símbolos. 
+% \item Muestre usando su definición y mediante una derivación formal que la 
+% siguiente es una S-expresión:
+% \bc
+% {\tt ((s) (a p) o)}
+% \ec 
+%\ee
+
+\item Realizar la especificación formal acerca del tipo abstracto de datos pila 
+considerando homogeneidad, es decir, suponiendo que todos los elementos en una 
+pila son del mismo tipo digamos~$A$.  En cada caso dar dos especificaciones, 
+una funcional y otra relacional. Definir primero el lenguaje a utilizar.
+\bi
+ \item Definición del tipo de datos pila: 
+ \be
+  \item La vacía es una pila (de elementos de~$A$).
+  \item El resultado de agregar un elemento de~$A$ en el tope de una pila es 
+    una pila.
+  \item Son todos.
+ \ee
+ \item Si una pila no es vacía entonces el elemento en el tope es un elemento 
+  de~$A$ 
+ \item Si una pila no es vacía entonces la pila que resulta al eliminar 
+  el elemento en el tope es una pila de elementos de $A$.
+ \item Si una pila no es vacía entonces la pila que resulta al agregar el tope 
+  de la pila dada a la pila obtenida al eliminar el tope de la pila dada es la 
+  pila dada.
+ \item La pila vacía no tiene elementos.
+ \item La pila que resulta de agregar un elemento a una pila dada tiene un 
+  elemento más que la pila dada.
+ \item Si la pila resultante de eliminar el tope de una pila dada es vacía 
+  entonces la pila dada tiene sólo un elemento.
+\ei
+
+\item Realizar una especificación formal de alguna estructura o tema de interés 
+particular. Definir primero el lenguaje a utilizar. Algunas sugerencias son:
+\be
+\item Sistemas numéricos y sus propiedades:
+\be
+\item Enteros, racionales, etc..
+\item Binarios, ternarios, etc..
+\item Propiedades de conversión entre sistemas.
+\ee
+\item Estructuras de datos y sus propiedades:
+\be
+\item Listas con el constructor {\tt snoc}
+\item Listas heterogéneas con elementos de dos tipos dados.
+\item Árboles binarios
+\item Colas, tablas, arreglos, etc.
+\item Árboles rojinegros, árboles AVL, etc..
+\item Conjuntos.
+\ee
+\item Micromundos:
+\be
+\item Extensión del micromundo de figuras a tres dimensiones.
+\item Mundo de bloques agregando un brazo de robot (reglas para que el brazo 
+mueva los bloques ( planeación en inteligencia artificial))
+\item Sistema de correo electrónico.
+\item Sistema de funcionamiento de un elevador.
+\ee
+\item Reglas de algún juego de su interés (juegos de mesa, juegos de rol, 
+ajedrez, sudoku, etc)
+\ee
+\ee
+\end{comment}
+
+%\section{Otros Ejemplos}
+
+%%\ejem{\textit{Existe un \'unico objeto con la propiedad P}. En este caso la
+%%signatura es $\Si=\{P\}$ y usaremos un lenguaje con igualdad. A veces es
+%%conveniente transformar la oraci\'on en espa\~nol en una otra que diga lo 
+%%mismo
+%%pero que tenga una forma m\'as cercana a los conectivos l\'ogicos que puede
+%%incluir variables. En
+%%nuestro caso la oraci\'on original se transforma en \textit{Existe un objeto
+%%x con la propiedad P y cualquier objeto con la propiedad P es x}. La 
+%%traducci\'on es:
+%%$$
+%%\ex x ( P(x)\land \fa y(P(y)\imp y=x))
+%%$$
+%%}
+%\bi
+%\item\textit{Una condici\'on necesaria y suficiente para que el sult\'an sea
+%fel\'{\i}z es que tenga vino, mujeres y m\'usica}.% Hacemos
+%%$\Si=\{F^{(1)},V^{(1)},M^{(1)}, Mu^{(1)},s\}$ con el significado obvio.
+%%La traducci\'on es:
+%$$
+%F(s)\iff V(s)\land M(s)\land Mu(s)
+%$$ 
+%Como se ve esta es una f\'ormula proposicional, es decir, no se
+%necesitaron cuantificadores.
+
+%\item\textit{No hay un barbero que rasura exactamente a aquellos hombres que
+%no se rasuran a si mismos.} Esto es equivalente a \textit{no existe un
+%barbero que rasura a un hombre $z$ si y s\'olo si $z$ no se rasura a si
+%mismo}. %Los predicados son $B(x),R(x,y)$ y la traducci\'on es:
+%$$
+%\neg\ex x(B(x) \land \fa z(R(x,z)\iff \neg R(z,z))) 
+%$$
+%\item Cualquiera que sea persistente puede aprender l\'ogica.
+%\[
+%\fa x(P(x)\imp L(x))
+%\]
+%\item Ning\'un guajolote vuela.
+%\[
+%\neg\ex x(G(x)\land V(x))
+%\]
+%\item No todos los pachucos bailan.
+%\[
+%\ex y(P(y)\land \neg B(y))
+%\]
+%\item Alguna rumbera baila con algun pachuco.
+%\[
+%\ex y(R(y)\land \ex z(P(z)\land B(x,y)))
+%\]
+%\ei
+
+
+
+%\item Hacer las siguientes traducciones, dando previamente una signatura 
+%adecuada.
+%\be
+
+%\item Los perros muerden a los carteros.
+%\item Existe un perro que muerde a los carteros.
+%\item Existe un cartero que es mordido por todos los perros.
+%\item Hay un perro que no muerde carteros.
+%\item Hay un cartero que no es mordido por perros.
+%\item Hay un perro que es cartero y se muerde a si mismo.
+%\ee
+%\item Tenemos seis cubos de color amarillo, azul o verde. Un cubo puede estar
+%uno sobre otro o en el piso. Considerese la signatura $\Si=\{S^{(2)},
+%A^{(1)},Az^{(1)},\allowbreak V^{(1)}, L^{(1)}, p\}$ donde $S(x,y)$ significa 
+%\enquote{x est\'a sobre y}, $A(x),Az(x),V(x)$ representan los colores, $L(x)$ 
+%significa que \enquote{x esta libre} es decir que ning\'un cubo est\'a sobre 
+%x y $p$ representa al piso. \\ Simbolizar los siguiente:
+%\be
+%\item Hay un cubo azul sobre el piso con un cubo amarillo sobre \'el y un
+%cubo verde sobre el amarillo. 
+%\item Ning\'un cubo amarillo est\'a libre.
+%\item Hay un cubo azul libre y un cubo verde y libre.
+%\item Cualquier cubo amarillo tiene un cubo sobre \'el.
+%\item No todos los cubos azules est\'an libres.
+%\item Cualquier cubo verde est\'a libre.
+%\item Todos los cubos sobre el piso son azules.
+%\item Cualquier cubo que est\'e sobre un cubo amarillo es verde o azul.
+%\item Hay un cubo verde sobre un cubo verde.
+%\item Hay un cubo amarillo libre sobre el piso.
+%\item Ning\'un cubo est\'a sobre el piso.
+%\item Hay un cubo amarillo que est\'a sobre uno azul y hay un cubo azul
+%sobre \'el.
+%\item Todos los cubos est\'an sobre algo.
+%\ee   
+
+
+\end{document}

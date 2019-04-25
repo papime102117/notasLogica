@@ -1,0 +1,1270 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage{../packageslc}
+\usepackage{../optionslc}
+
+\input{../macroslc}
+
+
+\title{Lógica de Primer Orden: Semántica de la Lógica de Primer Orden \\ 
+L\'ogica Computacional 2018-2, Nota de clase 7}
+\author{Favio Ezequiel Miranda Perea\and Araceli Liliana Reyes Cabello\and
+Lourdes Del Carmen Gonz\'alez Huesca \and Pilar Selene Linares Ar\'evalo}
+\date{\today\\ Facultad de Ciencias UNAM}
+
+\begin{document}
+
+\maketitle
+
+Una vez que hemos estudiado a detalle la sintaxis de los lenguajes de primer
+orden estudiaremos su semántica, la cual es más complicada que en
+el caso de la lógica de proposiciones debido a la expresividad de la lógica, pues contamos con la presencia de objetos de
+dos categorías ajenas pero íntimamente relacionadas, a saber la
+categoría de individuos representada sintácticamente por los términos
+y la categoría de propiedades o relaciones entre individuos,
+representada por los predicados.
+Más aún, la verdad de una fórmula
+en la lógica de primer orden no queda fija al determinar una interpretación para el lenguaje, 
+ como en el caso de las proposiciones, sino que depende de
+los valores de los términos los cuales a su vez dependen del universo
+de discurso en cuestión. Dicho universo 
+será un conjunto no vacío, al que tendremos que referirnos para
+dar significado a las fórmulas. Finalmente observamos que una fórmula
+de la lógica de primer orden no es necesariamente falsa o verdadera en un
+mundo  dado, contrario a lo que sucedía en la lógica de
+proposiciones. En particular el hecho de que una fórmula no sea verdadera no implica que sea
+falsa en general.\\
+
+
+
+% \section{\label{sec:intsem}?`Para qu� estudiar sem�ntica?}
+
+% Antes de estudiar la sem�ntica formal nos gustar�a hablar de su
+% utilidad respecto a nuestro problema fundamental,
+% decidir si el argumento con premisas $\G$ y conclusi�n $\vp$ es
+% correcto. Hasta ahora el �nico m�todo disponible en l�gica de
+% predicados es el de tableaux, tomamos el conjunto $\G\cup\{\neg\vp\}$ y
+% tratamos de hallar un tableaux cerrado en cuyo caso el argumento es
+% correcto. Pero obs�rvese que este m�todo es adecuado s�lo cuando el
+% argumento es correcto, pues en el caso de que el argumento sea falaz
+% tendriamos que mostrar que ning�n tableaux posible se cierra, tarea
+% imposible pues existen por lo general un n�mero infinito de tableaux
+% para $\G\cup\{\neg\vp\}$. Lo mismo sucede con otros m�todos
+% sint�cticos para probar correctud de argumentos que veremos m�s
+% adelante, como lo son la resoluci�n binaria y la deducci�n natural. En
+% este sentido podemos decir que estos m�todos proporcionan una
+% caracterizaci�n positiva de la l�gica al proporcionar herramientas
+% convincentes para decidir si $\G\models\vp$ pero que no son �tiles ni
+% adecuadas para mostrar si $\G\not\models\vp$. \\
+% La sem�ntica funciona de manera inversa pues proporciona un m�todo
+% simple para mostrar que $\vp$ no es consecuencia de $\G$, para lo cual
+% basta construir un modelo de $\G\cup\{\neg\vp\}$. Si bien tambi�n puede
+% probarse sem�nticamente si $\G\models\vp$ resulta m�s dificil que con
+% otros m�todos. En este sentido decimos que la sem�ntica proporciona
+% una caracterizaci�n negativa de la l�gica, mostrar $\G\not\models\vp$
+% es m�s simple que mostrar $\G\models\vp$ pues en el primer caso basta
+% construir un s�lo modelo mientras que en el segundo tenemos que
+% considerar una infinidad de modelos de $\G$ y en todos ellos debemos
+% verificar que $\vp$ se cumple.\\
+% De esta forma debe quedarnos claro que es importante estudiar ambas
+% caracterizaciones, los m�todos sint�cticos, como los tableaux,
+% resoluci�n binaria y deducci�n natural,  as� como la sem�ntica.\\
+
+% Finalmente mencionamos que el estudio de la sem�ntica tiene otras
+% aplicaciones en ciencias computacionales, por ejemplo, las sem�nticas
+% denotativas de lenguajes de programaci�n utilizan esencialmente los
+% mismos conceptos b�sicos que la sem�ntica de la l�gica de primer orden
+% que veremos aqu�.
+
+
+
+
+% \vspace{.5cm}
+
+Antes de iniciar el estudio de la semántica  formal veremos algunos ejemplos 
+de manera informal con números naturales y gráficas.
+
+
+\section{Semántica Informal para $\N$}
+
+
+Considérese el lenguaje $\L=\{P,f,g,a,b,c,d\}$ y el universo $\N$ de los números
+naturales, con el siguiente significado (interpretación) de los símbolos:
+\begin{equation}
+P =_{def} \;<\;\;\;\;\; f=_{def} \;+ \;\;\;\; g=_{def}
+\;\cdot\;\;\;\;a=_{def}2\;\;\;b=_{def}3\;\;\; c=_{def}5\;\;\;d=_{def}0
+\end{equation}
+Es decir $P$ simboliza a la relación de orden $<$, $f$ a la función suma, $g$
+a la función producto y $a,b,c,d$ son
+constantes que simbolizan a los números $2,3,5,0$ respectivamente.\\
+
+¿Cuando una fórmula del lenguaje dado es verdadera en $\N$?
+veamos algunos ejemplos:
+
+\newcommand{\fabb}{\fa\hspace{-0.18cm}\fa}
+\newcommand{\exbb}{\ex\hspace{-0.163cm}\ex}
+
+\be
+\item $P(b,c)$ significa \beqs 3<5\eeqs lo cual es verdadero en $\N$.
+\item $P(f(a,a),b)$ significa \beqs 2+2<3\eeqs lo cual es falso en $\N$.
+\item $\fa x\ex y P(x,y)$ lo cual significa\footnote{Utilizamos para los significados una mezcla de
+  relaciones, funciones y números con un lenguaje lógico informal con símbolos
+  $\fa\hspace{-0.15cm}\fa,\;\ex\hspace{-0.15cm}\ex,\;\Imp$, etcétera.}
+\beqs 
+% \fa\hspace{-0.18cm}\fa
+%   x\in\N\,\ex\hspace{-0.163cm}\ex
+%   y\in\N(x<y)
+\fabb
+  x\in\N\,\exbb
+  y\in\N(x<y)
+\eeqs
+que es verdadero en $\N$. 
+\item $\ex y\fa xP(x,y)$ significa
+\beqs\exbb y\in\N\,\fabb x\in\N\,(x<y)\eeqs
+que es falso en $\N$.
+\item $\fa x\ex yP(y,x)$ significa
+% ``$\fa x\in\N\,\ex y\in\N\,(y<x)$'' 
+\beqs
+\fabb x\in\N\,\exbb y\in\N\,(y<x)
+\eeqs
+que es falso en $\N$.
+\item $\fa x\big(x\neq d\imp\ex yP(y,x)\big)$ significa 
+%``$\fa x\in\N\,\big(x\neq 0\imp\ex y\in\N\,(y<x)\big)$''
+\beqs
+\fabb x\in\N\,\big(x\neq 0\Imp\exbb y\in\N\,(y<x)\big)
+\eeqs
+que es verdadero en $\N$.
+\item $\fa x\big(P(d,x)\imp \ex y(g(y,y)=x)\big)$ significa
+
+%``$\fa x\in\N\big(0<x\imp \ex y\in\N\,(y\cdot y=x)\big)$''
+\beqs
+\fabb x\in\N\big(0<x\Imp \exbb y\in\N\,(y\cdot y=x)\big)
+\eeqs
+que es falso en $\N$.
+\item $\fa x\ex y\big(g(g(y,y),y)=x\big)$ significa 
+%``$\fa x\in\N\,\ex y\in\N\big((y\cdot y)\cdot y=x\big)$'' 
+\beqs
+\fabb x\in\N\,\exbb y\in\N\big((y\cdot y)\cdot y=x\big) 
+\eeqs
+que es falso en $\N$.
+\item $\fa x\fa y\big(P(x,y)\imp \ex z(P(x,z)\land P(z,y))\big)$ significa 
+%``$\fa x\in\N\,\fa y\in\N\,\big(x<y\imp \ex z\in\N\,(x<z\land z<y)\big)$'' 
+\beqs
+\fabb x\in\N\,\fabb y\in\N\,\big(x<y\Imp \exbb z\in\N\,(x<z\;\&\; z<y)\big)
+\eeqs
+que es falso en $\N$.
+\ee
+
+Podemos observar que en cada una de las fórmulas anteriores fue posible decidir
+si la fórmula es falsa o verdadera, ¿Qué otra cosa tienen en común
+todas las fórmulas anteriores? \\
+
+Considérese ahora la fórmula $P(x,y)$ ¿Es esta fórmula verdadera o falsa en $\N$?,\
+Con la información dada hasta ahora resulta imposible saberlo  puesto que no conocemos de
+antemano el valor de las variables libres $x,y$. De hecho la fórmula
+puede tomar un valor de verdad distinto dependiendo del estado de las variables
+$x,y$. Por ejemplo:
+\bi
+\item En el estado $\{x\mapsto 2,\;y\mapsto 6\}$ entonces $P(x,y)$ significa $2<6$ lo cual es verdadero
+  en $\N$.
+\item En el estado $\{x\mapsto 8,\;y\mapsto 3\}$ entonces $P(x,y)$ significa $8<3$ lo cual es falso
+  en $\N$.
+\ei
+
+De lo anterior se concluye que una fórmula con variables libres NO puede
+calificarse como verdadera o falsa en general sino que su valor depende del
+valor particular que tomen las variables libres, estas fórmulas reciben una
+noción más debil de verdad llamada \emph{satisfacibilidad}. La fórmula será
+\emph{satisfacible} si algunos valores de sus variables libres la satisfacen, en cuyo caso se dice que la fórmula es
+satisfacible en o con los valores dados. Si en ciertos valores dados
+la evaluación resultante es falsa, decimos que la fórmula es no satisfacible o
+insatisfacible en o con los valores dados. %Si 
+%no hay valores posibles que
+%satisfagan a la f�rmula, es decir, si todos los valores posibles hacen
+%falso al enunciado resultante diremos que la f�rmula es no satisfacible o
+%insatisfacible. An�logamente si decimos que una f�rmula es satisfacible a secas,
+%entenderemos que hay algunos valores que la satisfacen. Finalmente observemos
+%que verdad implica satisfacibilidad, una f�rmula ser� falsa si no es
+%satisfacible en ning�n valor posible de sus variables libres.
+
+En el ejemplo anterior se tiene que $P(x,y)$ es satisfacible, en particular
+es satisfacible en el estado $\{x\mapsto 2,y\mapsto 6\}$ y en el estado $\{x\mapsto 45,
+y\mapsto 67\}$  pero no es satisfacible
+en el estado $\{x\mapsto 8,y\mapsto 3\}$ ni en el estado $\{x\mapsto 77,y\mapsto 23\}$. \\
+
+
+Veamos otros ejemplos:
+\be
+\item Sea $D(x,y)=_{def}\ex z(g(x,z)=y)$. Está fórmula significa que
+\beqs
+\exbb z\in\N\,(x\cdot z= y)
+\eeqs 
+es decir, $x$ divide a $y$ o $x|y$ en símbolos
+usuales de la teoría de números.\\
+Es claro que $D(x,y)$ es satisfacible en el estado $\{x\mapsto n,y\mapsto m\}$ si y sólo si $n|m$.
+\item La propiedad \emph{``x es par''}, $\exbb y\in\N\,(2\cdot y=x)$, está definida por la fórmula 
+\beqs
+E(x)=_{def}\ex y (g(a,y)=x)
+\eeqs 
+que es satisfacible en cualquier estado $\{x\mapsto 2n\}$ e insatisfacible
+para cualquier estado $\{x\mapsto 2n+1\}$ con $n\in\N$. 
+\item La relación \emph{``x es primo''} se define con la fórmula
+\beqs
+Pr(x)=_{def} P(e,x)\land\fa y\big(D(y,x)\imp y=e\lor y=x)\big)
+\eeqs
+donde la constante $e$ representa al $1$ y $D(y,x)$ define la relación $y|x$. La fórmula $Pr(a)$ es
+cerrada por lo tanto podemos decidir su valor de verdad: dado que $a$ significa $2$
+que es primo, entonces $Pr(a)$ es verdadera. Por otro lado $Pr(x)$ es
+insatisfacible para el estado $\{x\mapsto 9\}$ y satisfacible en el estado
+$\{x\mapsto 19\}$.
+\ee
+
+
+\section{Semántica Informal para Gráficas}
+
+
+Recordemos que una gráfica finita (grafo) consiste de un conjunto finito no vacío $V$ de vértices
+y un conjunto de aristas $E$ cuyos elementos son parejas de
+vértices $uv=vu$ si la gráfica es no dirigida o $\pt{u,v}\neq\pt{v.u}$
+si la gráfica es dirigida. Para representar
+gráfica podemos usar el siguiente lenguaje $\L=\{R^{(2)}\}$ que consta de un
+sólo símbolo de predicado binario.\\
+Dada una gráfica particular $\Ge=\pt{V,E}$ interpretamos al símbolo
+$R$ como $E$, es decir $R(x,y)$ será satisfacible en $\Ge$  en el estado
+$\{x\mapsto a,y\mapsto b\}$ si y sólo si  $a,b\in V$ son vértices tales que $ab\in E$ (o $\pt{a,b}\in E$,
+si la gráfica es dirigida)\\
+
+Sean 
+\beqs
+\Ge_1=\Big\langle\big\{a,b,c,d\big\},\big\{\pt{a,a},\pt{a,d},\pt{d,b},\pt{d,c},\pt{b,b},\pt{b,c},\pt{c,b}\big\}\Big\rangle
+\eeqs
+
+\beqs
+\Ge_2=\Big\langle\big\{1,2,3,4,5\big\},
+\big\{12,23,45,52,53
+      \big\}\Big\rangle
+\eeqs
+
+$\Ge_1$ representa a una gráfica dirigida y $\Ge_2$ a una gráfica no
+dirigida, ambas con cinco vértices. Como ayuda el lector puede dibujar las
+gráfica representadas por las interpretaciones dadas.
+
+\espc
+
+Analicemos la verdad de los siguientes enunciados en ambas gráfica:
+
+\be
+\item $\fa x R(x,x)$. La relación de adyacencia es reflexiva. Falso para $\Ge_1,\Ge_2$
+\item $\fa x \lnot R(x,x)$ La relación de adyacencia es antirreflexiva. Falso
+  para $\Ge_1$, verdadero para $\Ge_2$.
+\item $\fa x\fa y\big(R(x,y)\imp R(y,x)\big)$. La relación de adyacencia
+es simétrica. Falso para $\Ge_1$, verdadero para $\Ge_2$.
+\item $\ex x\ex y R(x,y)$. La gráfica no es discreta, es decir, hay una
+  arista. Verdadero para $\Ge_1,\Ge_2$.
+\item $\fa x\fa y R(x,y)$. Cualesquiera dos vértices son adyacentes, es
+  decir, la gráfica es completa.  Falso para $\Ge_1,\Ge_2$.
+\item $\fa x\ex y R(x,y)$.  No hay vértices aislados. Verdadero para $\Ge_1,\Ge_2$.
+\item $\ex y\fa x R(x,y)$.  Hay un vértice adyacente a todos. Falso para $\Ge_1,\Ge_2$. 
+\item $\ex x\ex y(R(x,y)\land R(y,x))$ Hay vértices incidentes en ambas direcciones. Verdadero para $\Ge_1,\Ge_2$.
+\item $\ex x\ex y\ex z(R(x,y)\land R(x,z))$ Hay un vértice incidente con al
+  menos otro vértice (puesto que la fórmula no dice que $y$ y $z$
+sean distintos). Es decir, hay un vértice cuyo grado es al menos $1$. Verdadero para $\Ge_1,\Ge_2$.
+\item $\ex x\ex y\ex z(y\neq z\land R(x,y)\land R(x,z))$. Hay un vértice
+  $x$ adyacente a vértices distintos $y,z$. Es decir, hay un vértice cuyo grado
+  es al menos dos. % De nuevo la f�rmula no dice que $z$ y $y$
+  % � $x$ y $z$ sean distintos.
+  Verdadero para $\Ge_1,\Ge_2$.
+\item $\ex x\ex y\ex z(R(x,y)\land R(y,z)\land R(z,x))$. Hay vértices $x,y,z$
+  tales que las aristas $(x,y),(y,z),(z,x)$ están presentes. Verdadero para $\Ge_1,\Ge_2$.
+\ee
+
+
+Veamos algunos ejemplos de satisfacibilidad con las siguientes fórmulas:
+
+\be
+\item $R(x,y)$. $x$ es adyacente a $y$.  Satisfacible en $\Ge_1$ en el estado $\{x,y\mapsto a,d\}$. Insatisfacible
+  en $\Ge_2$ en el estado $\{x,y\mapsto 1,5\}$.
+\item $R(x,y)\land R(x,z)$. $x$ es adyacente a $y$ y a $z$. Satisfacible en $\Ge_1$ con $\{x,y,z\mapsto d,b,c\}$
+  y con $\{x,y,z\mapsto a,a,d\}$. Satisfacible en $\Ge_2$ con $\{x,y,z\mapsto
+  2,1,3\}$. Insatisfacible en $\Ge_2$ con $\{x,y,z\mapsto 4,5,3\}$.
+\item $R(x,y)\imp R(y,x)$. Si $x$ es adyacente a $y$ entonces $y$ es adyacente
+  a $x$. Insatisfacible en $\Ge_1$ con $\{x,y\mapsto
+  d,c\}$. Satisfacible en $\Ge_1$ con $\{x,y\mapsto b,c\}$. Satisfacible en
+  $\Ge_2$ con cualquier valor de $x,y$. 
+\item $R(x,y)\imp \lnot R(y,x)$. Si $x$ es adyacente a $y$ entonces $y$ no es adyacente
+  a $x$. Satisfacible en $\Ge_2$ con $\{x,y\mapsto
+  3,3\}$. Satisfacible en $\Ge_1$ con $\{x,y\mapsto d,c\}$. Insatisfacible en
+  $\Ge_1$ con $\{x,y\mapsto b,c\}$.
+\item $R(x,y)\land R(y,z)\land x\neq y\land y\neq z\land x\neq
+  z$. $x,y,z$ son distintos y $x$ es adyacente a $y$ que es adyacente a
+  $z$. Satisfacible en $\Ge_1$ con $\{x,y,z\mapsto a,d,c\}$. Insatisfacible
+  en $\Ge_2$ con $\{x,y,z\mapsto 1,5,4\}$.
+
+\ee
+
+\section{Semántica Formal}
+
+Ya que hemos visto ejemplos en naturales y gráficas, acerca de la verdad y la
+satisfacibilidad de una fórmula. Ahora pasamos a las definiciones formales.
+
+
+\defin{Sea $\L=\Pe\cup\F\cup\C$ un lenguaje o signatura de primer orden. Una 
+  estructura o interpretación para~$\L$ es un par~$\M=\pt{M,\I}$ donde 
+  $M\neq\varnothing$ es un conjunto no vacío llamado el universo de la 
+  estructura e $\I$ es una función con dominio~$\L$ tal que:
+\bi
+\item Si $P^{(n)}\in\Pe$ entonces $\I(P)$ es una relación de $m$-argumentos
+  sobre $M$, es decir $\I(P)\inc M^n$. Alternativamente podemos definir la interpretación de $P$ como una función booleana que decide si una tupla está o no en la relación deseada, es decir, $\I(P): M^n \to Bool$.
+\item Si $f^{(n)}\in\F$ entonces $\I(f)$ es una función con dominio $M^n$ y
+  contradominio $M$, es decir\\ $\I(f):M^n\imp M$.
+\item Si $c\in\C$ entonces $\I(c)$ es un elemento de $M$, es decir~$\I(c)\in M$.
+\ei 
+Si $\M=\pt{M,\I}$ es una interpretación para $\L$ también decimos que $\M$ es una
+$\L$-interpretación o $\L$-estructura.
+}
+Dada una interpretación $\M=\pt{M,\I}$ la siguiente notación será de utilidad:
+\[
+\ba{rll}
+|\M| &\; =_{def} \;& M  \\ 
+P^\I &\; =_{def}\;& \I(P) \\
+f^\I &\; =_{def} \;& \I(f) \\ 
+c^\I  &\; =_{def} \;& \I(c) 
+\ea 
+\]
+
+
+\subsection{Implementación}
+
+Una interpretación~$\M=\pt{M,\I}$ se implementa como sigue:
+\bi
+\item El universo $M$ se implementará como una lista de un tipo dado, digamos {\tt m::[a]}. por ejemplo,
+\bi
+\item[] $M=\{1,2,3\}$ se implementa como {\tt m =[1,2,3]}
+\item[] $M=\N$ se implementa como {\tt m=[0,1,2,..]} 
+\ei 
+Se observa que esto restringe los universos en la implementación a listas 
+posiblemente infinitas, esto es natural puesto que en un lenguaje de 
+programación como {\sc Haskell} sólo es posible manejar universos
+discretos para verificar la validez de un cuantificador universal. 
+%a lista no vac�a {\tt M} de tipo {\tt [a]} para alg�n tipo dado {\tt a}.
+\item Las relaciones $R\inc M^n$ se implementarán como funciones características 
+para listas. \\
+El tipo es {\tt [a] -> Bool}. La idea es que si $R\inc M^n$ y 
+$(a_1,\ldots,a_n)\in R^\I$ y {\tt r} implementa a $R$ 
+entonces se tiene que ${\tt r\,[a_1\ldots a_n]=True}$.
+\item Las funciones $f:M^n -> M$ se implementarán como funciones de listas a 
+individuos. \\
+El tipo es {\tt [a] -> a}. La idea es que si {\tt f} implementa a $f$ entonces 
+$f(a_1,\ldots,a_n)$ corresponde a ${\tt f\,[a_1,\ldots,a_n]}$.
+\ei
+
+\newpage 
+
+Los símbolos del lenguaje se implementarán asociando a sus nombres una relación 
+o función de acuerdo a las implementaciones recien fijadas.
+\bi
+\item $\I(f)$ será una función de tipo {\tt [a] -> a}, por lo que definimos el 
+tipo de interpretaciones para símbolos de función como:
+\bc
+{\tt type IntF a = Nombre -> [a] -> a}
+\ec
+\item $\I(R)$ será una función de tipo {\tt [a] -> Bool}, por lo que definimos el tipo de interpretaciones para símbolos de función como:
+\bc
+{\tt type IntR a = Nombre -> [a] -> Bool}
+\ec
+\ei
+
+
+\section{Interpretación de términos}
+
+Las siguientes definiciones dependen todas de una $\L$-interpretación
+arbitraria pero fija $\M=\pt{M,\I}$.
+
+\defin{[Estado o Asignación] Un estado, 
+  asignación o valuación de las variables es una función $\sigma:\mathsf{Var}\imp M$.
+}
+\defin{[Estado modificado o actualizado] Sea  
+  $\sigma:\mathsf{Var}\imp M$ un estado de las variables. Dadas las
+  variables $x_1,\ldots,x_n$ y los elementos del universo $m_1,\ldots,m_n\in
+  M$ definimos el estado modificado o actualizado en $x_1,\ldots,x_n$ por
+  $m_1,\ldots,m_n$ denotado $\sigma[x_1,\ldots,x_n/m_1,\ldots,m_n]$ o 
+  $\sigma[\vx/\vec{m}\,]$ como sigue:
+\beqs
+\sigma[\vx/\vec{m}\,](y) =\left\{\ba{rl}
+\sigma(y) & \mbox{si}\; y\notin\{x_1,\ldots,x_n\} \\ \\
+m_i      & \mbox{si}\; y = x_i\;\;\;\;1\leq i\leq n 
+\ea
+\right.
+\eeqs
+%Es decir, $\sigma[\vx/\vec{m}\;]$ coincide con $\sigma$ en todas las variables
+%excepto en $x_1,\ldots,x_n$ siendo $m_i$ su valor en $x_i$.\\
+}
+Obs\'ervese que $\sigma[\vx/\vec{m}\,]$ es un estado que difiere de $\sigma$
+\'u\-ni\-ca\-men\-te en los valores de $\vx$ y que 
+la expresión $\sigma[\vx/\vec{m}\,]$ es s\'olo
+el nombre del estado, la aplicaci\'on a una variable es
+$\sigma[\vx/\vec{m}\;](y)$. Como puede observarse esta notaci\'on recuerda a una
+sustituci\'on, esto no es coincidencia, sino que los dos conceptos est\'an
+fuertemente relacionados como veremos adelante.
+
+
+\newcommand{\inu}{\mathop{\I_\sigma}}
+\defin{[Interpretación de Términos] Sea $\sigma$ un estado de las
+  variables. Definimos la función de interpretación o significado de los
+  términos con respecto a $\sigma$, $\I_\sigma:\term\imp |\M|$ como sigue:
+\[
+\ba{rcl}
+\inu(x) &\; = \; & \sigma(x) \\ \\ 
+\inu(c) &\; = \; & \I(c) \\ \\  %= c^\I \\ 
+\inu\big(f(t_1,\ldots,t_n)\big)  & \; = \; &  
+f^\I(\inu(t_1),\ldots,\inu(t_n))
+\ea
+\]
+}
+%La notaci�n que adoptaremos ser�
+%\beqs
+%\I_\sigma(t) \;\mapsto \; t^{\inu}
+%\eeqs
+%Veamos algunos ejemplos:
+
+%\coment{a remarle}
+
+%\newpage
+
+\lema{[Lema de coincidencia para términos] Sean $t\in\term$ y $\sigma_1,\sigma_2$ dos
+  estados de las variables tales que $\sigma_1(x)=\sigma_2(x)$ para toda variable $x$
+  que figura en $t$. Entonces $\I_{\sigma_1}(t)=\I_{\sigma_2}(t)$.}
+\proof Inducción sobre $t$. Ejercicio \qed
+
+\newpage
+
+Veamos ahora la relación entre los estados modificados y las sustituciones. Sup\'ongase que tenemos un t\'ermino $t$ que tiene muchas presencias de la
+variable $x$ y que queremos evaluar $t[x:=r]$ en alg\'un estado de cierta
+interpretaci\'on, para esto aplicamos la definici\'on recursiva y cada vez
+que encontramos una presencia del subt\'ermino $r$ en $t[x:=r]$
+debemos calcular el valor de $r$ en el mismo estado; esta situaci\'on es
+poco pr\'actica, pensemos por ejemplo en que $r$ es un t\'ermino complicado
+y que hay muchas presencias de $r$ en $t$. Una mejor manera de evaluar
+$t[x:=r]$ ser\'{\i}a evaluar $r$ en el estado dado $\sigma$, lo cual nos da cierto
+valor $m$ y evaluar el t\'ermino $t[x:=r]$ en el estado modificado
+$\sigma[x/m]$. El resultado ser\'a el mismo, como lo asegura el siguiente
+
+
+\lema{[Lema de sustitución para términos]Sean $r\in\term$, $\sigma$ un estado de
+  las variables, $[\vx:=\vt\;]$ una sustitución y $m_1,\ldots,m_n\in
+  M$ tales que $\inu(t_i)=m_i\;\;1\leq i\leq n$. Entonces
+\beqs
+\inu\big(r[\vx:=\vt\;]\big) = \I_{\sigma[\vx/\vec{m}\;]}(r)
+\eeqs
+}
+\proof Inducción sobre $t$. Ejercicio \qed
+
+
+\subsection{Implementación}
+
+La implementación es como sigue:
+
+\bi
+\item Estados: el tipo de estados en el universo {\tt a} es 
+\bc{\tt type Estado a = Nombre -> a}\ec
+\item Actualización de estados:
+\bc
+{\tt actEst :: Estado a -> Nombre -> a -> Estado a}
+\ec
+especificada por
+\bc
+{\tt actEst}\;$\sigma$ \enquote{x} m = $\sigma[x/m]$
+\ec
+Esta función modifica sólo una variable y puede generalizarse directamente a la modificación de una lista de variables.
+
+\item Interpretación de términos: la función de interpretación $\I_\sigma$ se implementa como
+\bc
+{\tt iTerm :: Estado a -> IntF a -> Term -> a}
+\ec
+especificada por
+\bc
+{\tt iTerm $\sigma$\;h\;t} $= \I_\sigma(t)$
+\ec
+Obsérvese que la función $h$ de la implementación juega el papel de la función $\I$ en la teoría, es decir, $f^\I$ se implementa como $h("f")$.
+\ei
+
+
+\section{Interpretación de fórmulas}
+
+Ya que tenemos definido el proceso para interpretar términos podemos definir la interpretación de las fórmulas:
+
+\defin{[Interpretación de Fórmulas] Sea $\sigma$ un estado de las
+  variables. Definimos la función de interpretación o significado de las
+  fórmulas con respecto a $\sigma$, $\I_\sigma:\form\imp\{0,1\}$ como sigue:
+\[
+\ba{lcl}
+\inu(\bot) \; = \;  0  \\ \\ 
+\inu(\top) \; = \;  1 \\ \\ 
+\inu\big(P(t_1,\ldots,t_m)\big)\; = \;1 & \;\mbox{si y sólo si}\; &
+\big(\inu(t_1),\ldots,\inu(t_m)\big)\in P^\I \\ \\
+\inu(t_1=t_2) \; = \;  1 & \;\mbox{si y sólo si}\; & \inu(t_1)=\inu(t_2) \\ \\
+\inu(\neg\vp) \; = \; 1 & \;\mbox{si y sólo si}\; & \inu(\vp)=0 \\ \\
+\inu(\vp\land\psi) \; = \;  1 & \;\mbox{si y sólo si}\; &
+\inu(\vp)=\inu(\psi)=1 \\ \\
+\inu(\vp\lor\psi) \; = \;  0 & \;\mbox{si y sólo si}\; &
+\inu(\vp)=\inu(\psi)=0 \\ \\
+\inu(\vp\imp\psi) \; = \;  0 & \;\mbox{si y sólo si}\; &
+\inu(\vp)=1\;\mbox{e}\;\inu(\psi)=0 \\ \\
+\inu(\vp\iff\psi) \; = \;  1 & \;\mbox{si y sólo si}\; &
+\inu(\vp)=\inu(\psi) \\ \\
+\inu(\fa x\vp) \; = \;  1 & \;\mbox{si y sólo si}\; &
+\I_{\sigma[x/m]}(\vp)=1\;\;\mbox{para todo}\;m\in M \\ \\
+\inu(\ex x\vp) \; = \;  1 & \;\mbox{si y sólo si}\; &
+\I_{\sigma[x/m]}(\vp)=1\;\;\mbox{para algún}\;m\in M \\ \\
+\ea
+\]
+% Si el lenguaje tuviera igualdad, agregamos:
+% \beqs
+% \inu(t=r) \; = \;  1 \;\mbox{si y s�lo si}\; 
+% \inu(t)=\inu(r) \\ \\
+% \eeqs
+Esta definición es sólo una forma moderna de la definición de satisfacción de
+Tarski de 1936, la cual es base para las semánticas denotativas de los
+lenguajes de programación.\\
+%Si para una f�rmula $\vp$ se tiene que $\inu(\vp)=1$ decimos que $\vp$ es
+%satisfacible en la interpretaci�n $\M$ en el estado $\sigma$. 
+}
+
+Obsérvese que todas las definiciones anteriores dependen del lenguaje $\L$ y
+de la $\L$-interpretación particular $\M$. Si en dado caso tuvieramos que
+trabajar con más de una interpretación a la vez debemos indicar cada función
+de interpretación como $\I_\sigma^\M$ dado que $\I_\sigma$ no bastaría para
+distinguir entre las distintas interpretaciones.\\
+
+
+
+Análogamente al caso de términos se cumplen los lemas de coincidencia y
+sustitución
+
+\lema{[Lema de coincidencia para fórmulas] Sean $\vp$ una fórmula y 
+$\sigma_1,\sigma_2$ dos estados de las variables tales que 
+$\sigma_1(x)=\sigma_2(x)$ para toda variable
+$x\in FV(\vp)$. Entonces $\I_{\sigma_1}(\vp)=\I_{\sigma_2}(\vp)$.
+}
+\proof
+Inducción sobre $\vp$. Ejercicio
+\qed
+
+
+
+El siguiente lema relaciona la noción sintáctica de
+sustitución con la noción semántica de estado modificado
+
+
+\lema{[Lema de sustitución para fórmulas] Sean $\vp\in\form$, $\sigma$ un estado 
+  de las variables, \\$[\vx:=\vt\;]$ una sustitución y $m_1,\ldots,m_n\in M$ 
+  tales que $m_i=\inu(t_i)\;\;1\leq i\leq n$. Entonces
+\[
+\inu\big(\vp[\vx:=\vt\;]\big) = \I_{\sigma[\vx/\vec{m}\;]}(\vp) 
+\]
+}
+\proof
+Inducción sobre $\vp$. Ejercicio
+\qed
+
+\espc
+
+
+
+\subsection{Implementación}
+
+La implementación es como sigue:
+
+\bi
+% \item Estados: el tipo de estados en el universo {\tt a} es \bc{\tt type Estado a = Nombre -> a}\ec
+% \item Actualizaci�n de estados:
+% \bc
+% {\tt modEst :: Estado a -> Nombre -> a -> Estado a}
+% \ec
+% especificada por
+% \bc
+% {\tt modEst}\;$\sigma$ ``x'' m = $\sigma[x/m]$
+% \ec
+% Esta funci�n modifica s�lo una variable y puede generalizarse directamente a la modificaci�n de una lista de variables.
+
+\item Interpretación de fórmulas: la función de interpretación $\I_\sigma$ se implementa como
+\bc
+{\tt iForm :: Eq a => [a] -> Estado a -> IntF a -> IntR a -> Form -> Bool}
+\ec
+especificada por
+\bc
+{\tt iForm $\sigma\;h\;\vp$} $= \I_\sigma(\vp)$
+\ec
+Obsérvese que la función $h$ de la implementación juega el papel de la función $\I$ en la teoría, es decir, $R^\I$ se implementa como $h("R")$.
+\ei
+
+
+\subsection{Verdad}
+
+\defin{[Satisfacibilidad y Verdad] Sean $\vp$ una fórmula y $\M=\pt{M,\I}$ una 
+interpretación. Entonces
+\bi
+\item $\vp$ es
+  satisfacible en $\M$ si existe un
+  estado de las variables $\sigma$ tal que $\inu(\vp)=1$, lo cual suele
+  denotarse con $\M\models\vp[\sigma]$ o con $\M\models_\sigma\vp$.  
+\item $\vp$ es verdadera
+  en $\M$ si para todo estado de las variables $\sigma$  se tiene $\inu(\vp)=1$,
+  es decir, si $\vp$ es satisfacible en $\M$ en todos los estados posibles. \\
+  En tal caso también decimos que $\M$ es un modelo de $\vp$ lo cual se
+  denotará con $\M\models\vp$.
+\ei
+}
+
+
+Las definiciones anteriores aplican también para conjuntos de fórmulas, por 
+ejemplo~$\M\models\G$ denota el hecho de que $\G$ tiene un modelo, y  
+%$\inu(\G)=1$  
+$\M\models_\sigma \G$ que todas las fórmulas de $\G$ se satisfacen
+en $\M$ en el estado~$\sigma$.
+
+
+\subsection{Implementación}
+
+\bi
+\item Se deja como ejercicio implementar la función {\tt satForm} que verifican la satisfacibilidad de una fórmula en una interpretación dada.
+\item ¿Será posible implementar una función {\tt verdForm} que verifique si una fórmula es verdadera en una interpretación dada? 
+\ei
+% \bi
+% \item {\tt satisf :: Eq a => [a] -> Estado a -> IntF a -> IntR a -> Form -> Bool} 
+% \ei
+
+\subsection{Falsedad}
+
+De acuerdo a lo aprendido en lógica proposicional una fórmula $\vp$ es falsa
+si y sólo si su negación es verdadera, por lo que damos la siguiente
+
+\defin{Sean $\M=\pt{M,\I}$ una interpretación y $\vp$ una fórmula. Decimos que 
+$\vp$ es falsa en $\M$ si y sólo si $\M\models\neg\vp$. Es decir $\vp$ es falsa 
+si y sólo si su negación $\neg\vp$ es verdadera.
+}
+
+Con la noción de falsedad recien dada hay que tener cuidado. En la lógica
+proposicional las nociones de ser falsa y no ser verdadera coinciden.  Si una 
+fórmula $\vp$ es falsa en una interpretación~$\I$ entonces $\I(\vp)=0$ lo 
+cual sucede si y sólo si $\I(\vp)\neq 1$ es decir, si y sólo si $\vp$ no es 
+verdadera en~$\I$. \\
+Por otro lado, en la lógica de predicados tal equivalencia se pierde, puesto que 
+si $\vp$ no es verdadera (es decir, si~$\M\not\models\vp$), entonces, de 
+acuerdo a la definición de verdad, existe un estado~$\sigma$ tal que 
+$\M\not\models_\sigma\vp$, es decir $\I_\sigma(\vp)=0$ o bien $\vp$ es 
+insatisfacible en el estado~$\sigma$.\\
+Por lo tanto una fórmula no verdadera es  aquella tal que es insatisfacible en 
+algún estado de sus variables, o bien tal que su negación es satisfacible en 
+algún estado de sus variables. Sin embargo, para poder afirmar que  $\vp$ es 
+falsa, por definición tendríamos que mostrar que $\M\models\neg\vp$, es decir 
+que~$\neg\vp$ es satisfacible en \textbf{todos} los estados posibles. Por lo 
+tanto la noción de falsedad es más fuerte que la noción de no ser verdadera.\\
+En resumen, si una fórmula~$\vp$ no es verdadera, no tenemos derecho a concluir 
+que $\vp$ es falsa.
+
+\ejem{Sean $\L=\{P^{(1)}\},\;\M=\langle \mathbb{N},\I\rangle$ donde $P^\I$ es la
+propiedad ``ser par''. \\ T\'omense dos estados~$\sigma$ y $\sigma'$ con 
+$\sigma(x)=3$ y $\sigma'(x)=8$ entonces $\M\not\models\vp$ puesto que 
+$\inu(\vp)=0$ ($3$ no es par) y además no se cumple $\M\models\neg\vp$ puesto 
+que $\I_{\sigma'}(\vp)=1$ ($8$ es par).
+}
+
+% Otro error com\'un sucede con la negaci\'on, ya mencionamos que si se tiene 
+% que $\M\not\models\vp$ (es decir que $\vp$ no es verdadera en $\M$) entonces 
+% no se puede concluir que
+% $\M\models\neg\vp$ (es decir que $\vp$ es falsa en $\M$), a menos que $\vp$
+% sea un enunciado. La misma f\'ormula $\vp$ del ejemplo anterior sirve
+% como contraejemplo, pues el hecho de que el valor de $x$ no sea siempre par no
+% implica que siempre sea impar. Tomense estados $\sigma,\sigma'$ con $\sigma(x)=3$ y
+% $\sigma'(x)=8$ entonces $\M\not\models\vp$ puesto que $\inu(\vp)=0$ ($3$
+% no es par) y adem�s no se cumple $\M\models\neg\vp$ puesto que
+% $\I_{\sigma'}(\vp)=1$ ($8$ es par).
+% %decir $\ag\not\models\neg\vp[s']$.\\
+
+\section{Propiedades de la noción de verdad}
+
+Como ya vimos con el caso de la negación, la relaci\'on de verdad en lógica de 
+predicados no tiene las mismas propiedades que su contraparte en la lógica 
+proposicional, propiedades que sí hereda la relación de satisfacibilidad. Esta 
+situación se debe a que la relaci\'on de verdad involucra una cuantificaci\'on 
+impl\'icita de las variables libres de la f\'ormula~$\vp$. \\
+Debemos insistir en esto ya que es error com\'un: aplicar ciertas propiedades 
+de la relaci\'on de satisfacibilidad a la relación de verdad lo cual resulta 
+incorrecto, como en el siguiente ejemplo.
+
+\ejem{Sean $\L=\{P^{(1)},Q^{(1)}\},\;\M=\langle \mathbb{N},\I\rangle$ 
+donde $P^\I$ es la propiedad \enquote{ser par} y $Q^\I$ es la
+propiedad \enquote{ser impar}. \\
+Entonces $\M\models P(x)\lor Q(x)$ puesto que cualquier n\'umero natural es
+par o es impar. \\
+Sin embargo no se cumple que $\M\models P(x)$ ni que $\M\models Q(x)$. Puesto 
+que el valor de~$x$ no puede ser siempre par o siempre impar, todo depende del 
+estado de las variables. 
+}
+
+De este ejemplo podemos concluir que si una disyunción es verdadera en $\M$ 
+entonces no necesariamente lo es alguna de sus componentes o subf\'ormulas.
+Es decir, $\M\models \vp\lor\psi$ no implica que $\M\models\vp$ o 
+$\M\models\psi$, propiedad que sí era válida en la lógica de proposiciones y 
+sigue siendo válida para la noción de satisfacibilidad.\\
+
+
+\newpage
+
+Veamos ahora algunas propiedades de la relaci\'on de verdad.
+
+\prop{Sean $\M$ una $\L$-interpretaci\'on y $\vp,\psi$ f\'ormulas. Entonces
+\bi
+\item Si $\M\models\vp$ entonces $\M\not\models\neg\vp$.
+\item Si $\M\models\vp\imp\psi$ y $\M\models\vp$ entonces
+  $\M\models\psi$.
+\item Si $\M\models\vp$ entonces $\M\models\vp\lor\psi$.
+  \item $\M\models\vp\land\psi$ si y sólo si $\M\models\vp$ y $\M\models\psi$.
+\item $\M\models\vp\;\mbox{si y sólo si}\;\M\models\fa\vp.$ donde
+  $\fa\vp$ denota a la cerradura universal de $\vp$, es decir a la
+  fórmula obtenida al cuantificar universalmente todas las variables
+  libres de $\vp$.
+  
+\ei
+}
+\proof Ejercicio \qed
+
+\espc
+
+La última propiedad es de gran importancia y nos dice que para mostrar que una
+fórmula es verdadera basta mostrar que su cerradura universal lo es, pero
+obsérvese que la cerradura universal de una fórmula es un enunciado y por lo
+tanto razonar sobre su verdad es más simple puesto que los enunciados se comportan de la misma manera que las fórmulas proposicionales como lo asegura la siguiente 
+% su valor de verdad es m�s f�cil de obtener dado que no es necesario el
+% uso de estados particulares. 
+
+\prop{Sean $\vp$ un enunciado y $\M=\pt{M,\I}$ una interpretación. Entonces se cumple una y sólo una de las
+siguientes condiciones:
+\be
+\item $\M\models \vp$, es decir, $\vp$ es verdadero en $\M$.
+\item $\M\models\neg\vp$, es decir, $\vp$ es falso en $\M$. %$\neg\vp$ es verdadero en $\M$. %para todo estado $s:VAR\imp |\ag|$.
+\ee
+}
+\proof
+Esto es consecuencia del lema de coincidencia para f\'ormulas:\\
+Sea $\sigma$ un estado cualquiera. Si $\inu(\vp)=1$ entonces, como $\vp$ no 
+tiene variables libres, cualquier otro estado~$\sigma'$ coincide con $\sigma$ en
+$FV(\vp)=\varnothing$. Por lo tanto por el lema de coincidencia $\I_{\sigma'}(\vp)=1$ y así se cumple que $\I_\sigma(\vp)=1$ para cualquier estado $\sigma$. De aquí que se cumpla el caso
+1. Por otra parte, si $\inu(\vp)=0$ entonces $\inu(\neg\vp)=1$ y se procede de igual forma para
+obtener que $\neg\vp$ es verdadero, es decir que $\vp$ es falso.
+\qed
+
+
+
+\cor{Si $\vp$ es un enunciado entonces $\vp$ es falso si y sólo si $\vp$ es no verdadero en $\M$
+}
+  
+
+\section{Modelos}
+
+Ya mencionamos que un modelo para una fórmula~$\vp$ es una 
+interpretación~$\M=\pt{M,\I}$ tal que $\M\models\vp$, es decir tal que
+$\inu(\vp)$ para cualquier estado~$\sigma$ y que si bien una fórmula
+cualquiera no necesariamente tiene un modelo, es decir, no
+necesariamente es verdadera o falsa, esta propiedad sí se cumple para
+los enunciados, puesto que estos no tienen variables libres que
+cambien de valor dependiendo del estado.\\
+
+Uno de los problemas fundamentales en l\'ogica es la búsqueda de modelos de
+un conjunto dado de fórmulas~$\G$. Este problema tiene importancia desde el 
+punto de vista puramente te\'orico, al buscar y clasificar modelos de un 
+conjunto de fórmulas en especial y estudiar como son estos modelos entre si,  
+así como desde el punto de vista computacional donde el objetivo principal es 
+verificar la verdad de una especificación en un modelo dado o bien la existencia 
+de modelos para especificaciones dadas. \\
+El área de las ciencia de la computación conocida como verificación de 
+modelos~\footnote{Model checking} trata de mecanizar la verificación y 
+construcción de modelos, situaci\'on que posible en ciertos casos, aunque 
+imposible en general. La rama de la l\'ogica matemática encargada de estos 
+tópicos se llama \emph{Teoría de Modelos}.
+
+\espc
+
+A continuación damos algunos ejemplos sencillos de construcción de modelos
+para un conjunto de fórmulas dado.
+
+\ejem{Sea $\G=\{P(b),Q(b),R(b),\ex x(P(x)\land \neg(Q(x)\lor R(x)),\;\fa x
+(R(x)\allowbreak\imp P(x))\}$.\\
+Queremos ver si $\G$ tiene un modelo.\\
+En este caso lo m\'as f\'acil es ir construyendo un modelo para cada
+f\'ormula de $\G$, si logramos que todas las f\'ormulas de $\G$ sean
+verdaderas al mismo tiempo entonces habremos construido un modelo para $\G$.
+%Un modelo de $\G$ tiene que ser una estructura de la forma $\M=\langle
+%\G,P^\I,Q^\I,R^\I,b^\I \rangle$.
+Analicemos cada f\'ormula de $\G$.
+\be
+\item $P(b)$. Para que $\M\models P(b)$ se debe cumplir que $b^\I\in
+P^\I$. As\'{\i} que al menos debemos tener $P^\I=\{b^\I\}$
+\item $Q(b)$. Para que $\M\models Q(b)$ se debe cumplir que $b^\I\in
+Q^\I$, as\'{\i} que basta $Q^\I=\{b^\I\}$ 
+\item $R(b)$. Para que $\M\models Q(b)$ se debe cumplir que $b^\I\in
+R^\I$ por lo que basta con $R=\{b^\I\}$.
+\item $\ex x(P(x)\land \neg(Q(x)\lor R(x))$. Es decir, hay un elemento de
+$|\M|$ tal que cumple $P$ y no cumple $Q$ ni $R$. Claramente este elemento
+no puede ser $b^\I$ por lo que $P^\I$ debe tener al menos otro elemento,
+digamos $P^\I=\{b^\I, m\}$.
+\item $\fa x (R(x)\allowbreak\imp P(x))$. Debemos tener que todo elemento
+de $\G$ que cumple $R^\I$, debe cumplir $P^\I$, pero de acuerdo a como definimos
+$R^\I$ esto ya se cumple pues $b^\I\in R^\I$ y $b^\I\in P^\I$. 
+\ee
+De manera que $P^\I=\{b^\I, m\}$ y $Q^\I=\{b^\I\}=R^\I$ y para
+que el modelo resulte m\'as natural podemos tomar $M=\{0,1\},\;b^\I=0$ y
+$m=1$, con lo que queda $\M=\pt{\{0,1\},\I}$ con
+$P^\I=\{0,1\}, Q^\I=\{0\}=R^\I, b^\I=0$. 
+}
+Veamos otro ejemplo.
+\ejem{Sea $\G=\{\ex x P(x)\land\ex x Q(x),\;
+\neg\ex x(P(x)\land Q(x)),\;
+\fa x\neg R(x,x),\;\allowbreak
+\fa x\fa y( R(x,y)\imp R(y,x)),\;\\
+\fa x(P(x)\imp \ex y(Q(y)\land R(x,y))),\;
+\fa x(Q(x)\imp \ex y(Q(y)\allowbreak\land R(x,y)))
+\}$
+Queremos hallar un modelo de $\G$, analicemos cada f\'ormula:
+\be
+\item $\ex x P(x)\land\ex x Q(x)$. Es decir, debe existir $a_1\in |\M|$
+tal que $P^\I(a_1)$ y adem\'as debe existir $a_2\in |\M|$ tal que
+$Q^\I(a_2)$. Obs\'ervese que podriamos tener $a_1=a_2$.
+\item $\neg\ex x(P(x)\land Q(x))$. Est\'a f\'ormula indica que no hay un
+individuo que cumpla $P^\I$ y $Q^\I$, de manera que los individuos
+encontrados en (1) deben ser diferentes.
+\item $\fa x\neg R(x,x)$. Esto es la relaci\'on $R^\I$ es antireflexiva,
+por lo que los pares $(a,a)$ no pueden pertenecer a $R^\I$. Obs\'ervese
+que esto ya se cumple pues hasta ahora $R^\I=\vacio$, es decir, a\'un no
+existe un par en la relaci\'on $R^\I$.
+\item $\fa x\fa y( R(x,y)\imp R(y,x))$. Esta f\'ormula indica que la
+relaci\'on $R^\I$ es sim\'etrica pero todavia no se exige que haya un par
+relacionado por lo que aún tenemos $R^\I=\vacio$
+\item $\fa x(P(x)\imp \ex y(Q(y)\land R(x,y)))$. Esto significa que para cada
+elemento $a$ que cumpla $P^\I$ debe existir un elemento $b$ que cumpla
+$Q^\I$ de manera que el par $(a,b)$ est\'e en la relaci\'on $R^\I$. Como en
+(1) obtuvimos que $P^\I(a_1)$ entonces debe existir $b\in |\M|$ tal que
+$Q^\I(b)$ y $R^\I(a_1,b)$. Obs\'ervese que podemos tomar $b=a_2$,
+adem\'as, por (4), tambi\'en debemos tener $R^\I(a_2,a_1)$.
+
+\item $\fa x(Q(x)\imp \ex y(Q(y)\land R(x,y)))$. Est\'a f\'ormula es
+similar a la anterior. Como tenemos que $Q^\I(a_2)$, por (1), entonces debe existir
+$a_3\in |\M|$ tal que $Q^\I(a_3)$ y $R^\I(a_2,a_3)$, adem\'as por (3) tenemos que
+$a_3\neq a_2$ y por (2), $a_3\neq a_1$. Finalmente tambi\'en debemos tener
+que $R^\I(a_3,a_2)$ para que se cumpla (4).
+\ee
+De manera que las interpretaciones pueden quedar como sigue:
+\bi
+\item[] $|\M|=\{1,2,3\}$
+\item[] $P^\I=\{1\}$
+\item[] $Q^\I=\{2,3\}$
+\item[] $R^\I=\{(1,2),(2,1),(2,3),(3,2)\}$
+\ei
+}
+
+
+\subsection{Implementación}
+
+¿Será posible implementar la función {\tt esModelo} que verifica si una interpretación es modelo de un  conjunto (lista) dado de fórmulas $\G$?
+
+
+
+\section{Validez Universal} 
+
+El concepto de tautología en lógica proposicional tiene su contraparte
+en lógica de predicados mediante el concepto de validez universal. 
+
+
+
+\defin{[Validez universal] Decimos que una fórmula~$\vp$ es universalmente 
+  válida (o simplemente válida) si para toda interpretación~$\M$ se cumple que 
+  $\M\models\vp$, es decir, si $\vp$ es verdadera en cualquier interpretación 
+  posible, lo cual se denota con $\models\vp$.
+}
+Como consecuencia del lema de sustitución podemos mostrar la validez universal
+de ciertas fórmulas. Veamos un ejemplo.
+
+\prop{Sean $\M$ una interpretación, $\vp$ una fórmula, $t$ un
+  término y $\sigma$ un estado de las variables. Entonces $\inu(\fa
+  x\vp\imp \vp[x:=t])=1$. En otras palabras, la fórmula $\fa x\vp\imp
+  \vp[x:=t]$ es universalmente válida.
+  }
+  \proof
+  Si $\inu(\fa x\vp)=0$ terminamos no hay nada que probar pues en tal caso la
+  implicación $\fa x\vp\imp\vp[x:=t]$ se satisface. \\
+  Supongamos entonces que $\inu(\fa x\vp)=1$. Queremos demostrar que 
+  $\inu(\vp[x:=t])=1$, lo cual, por el lema de sustitución equivale a 
+  $\I_{\sigma[x/m]}(\vp)=1$ con $m=\inu(t)$, pero esto es consecuencia de la 
+  definición de $\inu(\fa x\vp)=1$.
+  \qed
+
+  \espc
+
+\noindent Análogamente dejamos como ejercicio mostrar que 
+$$ \models \vp[x:=t]\imp \ex x\vp $$
+
+La noción de validez universal es análoga a la noción de tautología en lógica proposicional. De hecho toda fórmula cuyo esqueleto proposicional es una tautología, resulta ser una fórmula universalmente válida. 
+Por ejemplo sucede que 
+$\models\fa x(P(x)\imp P(x)\lor Q(x,y))$  puesto que en lógica proposicional se tiene que $\models P\imp P\lor Q$.
+
+
+\newpage
+
+
+\noindent Veamos otros ejemplos de formulas universalmente válidas.
+
+
+\ejem{$\models\neg\ex x \vp\iff\fa x\neg \vp$. \\
+Sea $\M$ una interpretaci\'on, veamos que $\M\models\neg\ex x
+\vp\iff\fa x\neg \vp$. Sea $\sigma$ un estado de las variables, hay 2 casos:
+\bi
+\item $\inu(\neg\ex x\vp)=1$. Esto es equivalente con $\inu(\ex x\vp)=0$
+cuya definición es que no existe $m\in |\M|$ tal que $\I_{\sigma[x/m]}(\vp)=1$,
+es decir,  para todo $m\in |\M|,\;\I_{\sigma[x/m]}(\vp)=0$ o  equivalentemente
+para todo $m\in |\M|,\;\I_{\sigma[x/m]}(\neg\vp)=1$ pero esto significa que $\inu(\fa x\neg\vp)=1$.
+\item $\inu(\neg\ex x\vp)=0$. Es decir, $\inu(\ex x\vp)=1$ syss
+existe $m\in |\M|$ tal que $\I_{\sigma[x/m]}(\vp)=1$
+syss existe $m\in |\M|$ tal que $\I_{\sigma[x/m]}(\neg\vp)=0$
+syss no para todo $m\in |\M|,\;\I_{\sigma[x/m]}(\neg\vp)=1$
+syss $\inu(\fa x\neg\vp)=0$.
+\ei
+Por lo tanto en cualquier caso se tiene que %$\M\models_\sigma\neg\ex x \vp$ syss
+                                %$\M\models_\sigma\fax\neg \vp$. 
+$\I_\sigma(\neg\ex x\vp)=\I_\sigma(\fa x\neg\vp)$ es decir, $\I_\sigma(\neg\ex
+x\vp\iff\fa x\neg\vp)=1$. Por lo tanto $\M\models\neg\ex x\vp\iff\fa x\neg
+\vp$. Pero como $\M$ era una interpretación arbitraria, se tiene que $\models\neg\ex x\vp\iff\fa x\neg \vp$.
+}
+
+\ejem{Vamos a demostrar la existencia del dios Baco quién tiene la
+  propiedad de que si él bebe entonces todos beben. Es decir,
+  mostraremos que $\models\ex x(B(x)\imp\fa y B(y))$.\\
+Sea $\M$ una interpretaci\'on y $\sigma$ un estado de las variables,
+veamos que $\inu\big(\ex x(B(x)\imp\fa y B(y))\big)=1$, es decir, $\I_{\sigma[x/m]}\big(B(x)\imp\fa y B(y)\big)=1$
+ para algún $m\in |\M|$. Tenemos dos casos:
+\bi
+\item $B^\I=|\M|$. Es decir, todos los individuos del universo cumplen $B$. En
+  este caso, como $m\in B^\I$ para todo $m\in |\M|$, se tiene que
+  $\I_{\sigma[y/m]}(B(y))=1$ para todo $m\in |\M|$. Por lo tanto $\inu(\fa y
+  B(y))=1$, en particular puesto que $x\notin FV(\fa yB(y))$, por el lema de coincidencia para fórmulas,para
+cualquier $m\in |\M|$ se tiene que $\I_{\sigma[x/m]}(\fa y B(y))=1$. 
+Así que $\I_{\sigma[x/m]}\big(B(x)\imp\fa y B(y)\big)=1$. %$\M\models(B(x)\imp\fa y B(y))[s(x/b)]$.
+\item $B^\I\neq |\M|$. Es decir, al menos un individuo del universo no cumple
+  $B$. Sea $m\in |\M|$ tal que $m\notin B^\I$, es decir
+$\I_{\sigma[x/m]}(B(x))=0$, en tal caso $\I_{\sigma[x/m]}\big(B(x)\imp\fa y
+B(y)\big)=1$ pues el antecedente de la implicación se evalua a $0$.
+\ei  
+}
+
+% Es por f\'ormulas como la anterior que en una especificaci�n formal no debe usarse el existencial con la
+% implicaci\'on, puesto que las especificaciones vienen de situaciones reales
+% que queremos modelar y en tales casos el existencial $\ex x\vp$ es
+% verdadero si y s�lo si existe algun testigo $\vp(t)$ que lo haga verdadero,
+% pero en f�rmulas como la reci�n analizada el
+% existencial se cumple a\'un cuando no exista un individuo que sea testigo
+% de ello.
+% \\
+% Finalmente mencionamos que toda tautologia de la l�gica de
+% proposiciones es una f�rmula universalmente v�lida. La afirmaci�n
+% contraria es claramente falsa al haber f�rmulas v�lidas con
+% cuantificaciones como las anteriores.\\
+
+
+\section{Equivalencia Lógica}
+
+Un concepto de gran importancia que depende de la validez universal es el
+de f\'ormulas l\'ogicamente equivalentes.
+
+\defin{Sean $\vp,\psi$ f\'ormulas. Decimos que $\vp$ es \emph{l\'ogicamente
+equivalente} a $\psi$, denotado con $\vp\equiv\psi$, si y sólo si
+$\models\vp\iff\psi$, es decir si y sólo si la fórmula $\vp\iff\psi$ es universalmente válida. 
+}
+
+Las siguientes equivalencias l\'ogicas ser\'an
+de utilidad m\'as adelante.
+\be
+%\item Doble Negaci\'on: $\neg\neg\vp\equiv\vp$.
+%\item De Morgan: $\neg(\vp\lor\psi)\equiv \neg\vp\land\neg\psi$.
+%\item De Morgan: $\neg(\vp\land\psi)\equiv \neg\vp\lor\neg\psi$.
+%\item $\neg(\vp\imp\psi)\equiv\vp\land\neg\psi$
+%\item $\neg(\vp\iff\psi)\equiv\neg\vp\iff\psi\equiv\vp\iff\neg\psi$.
+\item Negación de cuantificaciones (Leyes de De Morgan generalizadas):
+  \be
+\item $\neg\fa x \vp\equiv\ex x\neg \vp$
+\item $\neg\ex x \vp\equiv\fa x\neg \vp$
+  \ee
+\item Eliminaci\'on de cuantificaciones m\'ultiples.\index{eliminaci\'on!del
+cuantificador m\'ultiple} 
+\be
+\item$\fa x\fa x\vp\equiv\fa x\vp$.
+\item $\ex x\ex x\vp\equiv\ex x\vp$.
+\ee
+\item Renombre de variables. Si $y$ no figura libre en $\vp$
+entonces:\index{renombre de variables}
+\be
+\item $\fa x\vp\equiv\fa y(\vp[x:=y])$.
+\item $\ex x\vp\equiv\ex y(\vp[x:=y])$.
+\ee
+\item Eliminaci\'on de cuantificaciones vacuas. Si $x$ no figura libre en
+$\vp$ entonces:\index{eliminaci\'on!del cuantificador vacuo}
+\be
+\item $\fa x\vp\equiv\vp$.
+\item $\ex x\vp\equiv\vp$.
+\ee
+\ee
+
+%\prop{(Eliminaci\'on de la Implicaci\'on y de la Equivalencia)\\
+%Se cumplen las siguientes equivalencias l\'ogicas.
+%\be
+%\item $\vp\imp\psi\equiv\neg\vp\lor\psi$.
+%\item $\vp\imp\psi\equiv\neg(\vp\land\neg\psi)$.
+%\item $\vp\iff\psi\equiv (\vp\imp\psi)\land (\psi\imp\vp)$.
+%\item $\vp\iff\psi\equiv (\vp\land \psi)\lor (\neg \vp\land\neg\psi)$.
+%\ee
+%\label{elimp}
+%\index{eliminaci\'on!de la implicaci\'on}
+%\index{eliminaci\'on!de la equivalencia}
+%}
+%\proof
+%Se deja como ejercicio al lector.
+%\qed
+%\prop{(Eliminaci\'on de un cuantificador).
+%\be
+%\item $\fa x\vp\equiv\neg\ex x\neg\vp$.
+%\item $\ex x\vp\equiv\neg\fa x\neg\vp$.
+%\ee
+
+%\label{elimcu}
+%\index{eliminaci\'on!de un cuantificador}
+%}
+%\proof
+%Ver el ejercicio 2.4.\ref{ejerelcu}
+%\qed
+%\prop{(Conmutatividad, Asociatividad y Distributividad)\\
+%\be
+%\item $\vp\lor\psi\equiv\psi\lor\vp$.
+%\item $\vp\land\psi\equiv\psi\land\vp$.
+%\item $\vp\lor(\psi\lor\chi)\equiv(\vp\lor\psi)\lor\chi$.
+%\item $\vp\land(\psi\land\chi)\equiv(\vp\land\psi)\land\chi$.
+%\item $\vp\lor(\psi\land\chi)\equiv(\vp\lor\psi)\land(\vp\lor\chi)$.
+%\item $\vp\land(\psi\lor\chi)\equiv(\vp\land\psi)\lor(\vp\land\chi)$.
+%\ee
+%\label{coasdi}
+%\index{leyes!de conmutatividad}
+%\index{leyes!de asociatividad}
+%\index{leyes!de distributividad}
+%}
+%\proof
+%Ver el ejercicio 2.4.\ref{ejcoasdi}.
+%\qed
+
+\section{Consecuencia Lógica}
+
+La noción de argumento correcto se formaliza en la lógica de predicados mediante 
+la noción de consecuencia lógica cuya definición es la misma que para lógica de 
+proposiciones y recordamos ahora.
+%En esta secci\'on formalizaremos uno de los conceptos m\'as importantes de
+%la l\'ogica tradicional, que es el concepto de argumento correcto, concepto
+%que aparece en matem\'aticas en diversas ocasiones, por ejemplo, cualquier
+%de\-mos\-tra\-ci\'on tiene que ser un argumento correcto. De hecho para muchos la
+%l\'ogica es el estudio de m\'etodos y patrones de razonamiento en especial
+%del razonamiento que puede expresarse en forma de argumento. Para nuestros
+%prop\'ositos un \index{argumento} consiste de una serie de afirmaciones
+%llamados \emph{premisas}\index{argumento!premisas del}
+% y una afirmaci\'on llamada
+%\emph{conclusi\'on}\index{argumento!conclusi\'on del};
+%un argumento es \emph{correcto}\index{argumento!correcto} si siempre que se suponen sus premisas
+%verdaderas, se puede demostrar que su conclusi\'on tambi\'en es
+%verdadera. Nosotros ya tenemos una noci\'on formal de verdad, pero a\'un
+%necesitamos una definici\'on formal de argumento correcto, cosa que
+%lograremos en esta secci\'on.
+
+
+\defin{Sean $\G$ un conjunto de f\'ormulas y $\vp$ una f\'ormula. Decimos que
+$\vp$ es \emph{consecuencia l\'ogica} de $\G$, denotado con
+$\G\models\vp$, si y sólo si todo modelo de $\G$ es un modelo de $\vp$. \\
+Es decir, si y sólo si para toda interpretaci\'on $\M$, si $\M\models \G$ 
+entonces $\M\models\vp$.
+Si $\G\models\vp$ tambien decimos que $\G$ \emph{implica l\'ogicamente} a $\vp$.
+\index{consecuencia l\'ogica}
+}
+  
+\noindent Las siguientes observaciones son importantes:
+\be
+\item Al igual que en lógica proposicional el símbolo $\models$ está
+  sobrecargado y se usa para las relaciones \emph{``ser modelo de''} y
+  \emph{``ser consecuencia lógica de''}.
+\item Al no cambiar la definición de consecuencia lógica las
+  propiedades de ésta siguen siendo válidas.
+En particular el argumento con premisas $\G=\{\vp_1,\ldots,\vp_n\}$ y
+conclusión $\vp$, es correcto si y sólo si $\G\models\vp$.
+\ee
+% Como es usual en l\'ogica utilizamos el s\'{\i}mbolo $\models$ para
+% denotar dos conceptos distintos:
+% \be
+% \item La relaci\'on ``ser modelo de'' entre interpretaciones y f\'ormulas,
+% $\M\models\vp$.
+% \item La relaci\'on ``ser consecuencia l\'ogica de'' entre conjuntos de
+% f\'ormulas y f\'ormulas, $\G\models\vp$ 
+% \ee
+% Esto no debe causar confusiones, cuando a la izquierda del s\'{\i}mbolo
+% $\models$ se encuentra una interpretaci\'on estamos hablando de la primera
+% relaci\'on, en cambio, si encontramos un conjunto de f\'ormulas, nos
+% referimos a la segunda relaci\'on.
+% \item Si $\G=\{\psi\}$ entonces escribimos $\psi\models\vp$ en lugar de 
+% $\{\psi\}\models\vp$, lo mismo sucede con $\psi_1,\ldots,\psi_n\models\vp$.
+
+% La idea intuitiva de argumento correcto queda plasmada en el
+% concepto formal de consecuencia l\'ogica. Un argumento con premisas
+% $\vp_1,\ldots, \vp_n$ y conclusi\'on $\psi$ es correcto si y s\'olo si
+% $\vp_1,\ldots, \vp_n\models \psi$, es decir si la conclusi\'on $\psi$ es
+% consecuencia l\'ogica del conjunto de premisas $\{\vp_1,\ldots,
+% \vp_n\}$.\\
+
+
+% Ya mencionamos en la secci�n \ref{sec:intsem} que probar la correctud
+% de un argumento sem�nticamente es complicado. Sin embargo no queremos
+% dejar el tema sin ver al menos un ejemplo.
+
+\noindent Veamos un ejemplo sencillo.
+
+\ejem{Vamos a demostrar la correctud del siguiente argumento:
+\bc
+\textit{Si sabemos que todos los gatos maullan y que\\ Cleofas es un gato
+entonces es correcto concluir que Cleofas maulla.}
+\ec
+Las premisas se formalizan como $\{\fa x(G(x)\imp M(x)),\; G(c)\}$ y la 
+conclusi\'on~$M(c)$. \\
+Entonces demostraremos que:
+$$ \{\fa x(G(x)\imp M(x)),\; G(c)\}\models M(c) $$
+Sea $\M$ un modelo de $\{\fa x(G(x)\imp M(x)),\; G(c)\}$, es decir,
+$\M\models\fa x(G(x)\imp M(x))$ y $\M\models G(c)$, veamos que
+$\M\models M(c)$. \\
+Para lo anterior, consideramos a $\sigma$ un estado (cualquiera) de las 
+variables. Por hip\'otesis tenemos que 
+para toda $m\in |\M|$, se cumple que $\I_{\sigma[x/m]}(G(x)\imp M(x))=1$ al 
+igual que~$\inu(G(c))=1$. \\
+En particular para el objeto~$c^\I$ se cumple que
+$\I_{\sigma[x/c^\I]}(G(x)\imp M(x))=1$, es decir, por el lema de sustitución se 
+tiene $\inu(G(c)\imp M(c))=1$. De esto y dado que $\inu(G(c))=1$, se 
+concluye por definici\'on que~$\inu(M(c))=1$ .\\
+%se cumple $G^\I(c^\I)$, adem\'as se
+%tiene que $\M\not\models G(x)[s(x/c^\M)]$ o $\M\models M(x)[s(x/c^\M)]$.
+%Por lo tanto $\M\models M(x)[s(x/c^\M)]$, es decir, $M^\M(c^\M)$, o
+Por lo tanto, como $\sigma$ era arbitrario, concluimos que~$\M\models M(c)$. 
+De manera que en efecto, \textit{Cleofas maulla}.
+}
+
+
+
+Finalmente queremos mencionar que la formalizaci\'on de un criterio
+para decidir la correctud de argumentos no es la \'unica raz\'on por
+la que la consecuencia l\'ogica juega un papel central en la l\'ogica. 
+En general, obtener las consecuencias l\'ogicas de un conjunto~$\G$ significa 
+intuitivamente extraer conocimiento que estaba impl\'icito en~$\G$, problema 
+de gran importancia en ciencias de la computaci\'on, cuya aplicaci\'on m\'as 
+cercana resulta ser la programaci\'on l\'ogica.
+
+
+La extracci\'on de conocimiento a partir de un conjunto de hechos~$\G$ puede
+resultar muy simple o sumamente complicada, los casos simples llevan a
+cierta automatizaci\'on del proceso de extracci\'on de conocimiento
+mediante diversas t\'ecnicas como la programaci\'on l\'ogica o el
+razonamiento automatizado. 
+
+% Para terminar veamos algunas propiedades de la consecuencia l\'ogica.
+
+% \prop{Se cumplen las siguientes propiedades.
+% \be
+% \item Si $\vp\in \G$ entonces $\G\models\vp$.
+% \item Insatisfacibilidad implica trivialidad.
+% Si $\{\vp,\neg\vp\}\inc\G$ entonces $\G\models\psi$ para toda f\'ormula
+% $\psi$.
+% \item Monoton\'{\i}a. Si $\G\models\vp$ y $\G\subseteq \Delta$ entonces $\Delta\models\vp$.
+% \item Preservaci\'on del Modus Ponens. Si
+% $\G\models\vp\imp\psi$ y $\G\models\vp$ entonces $\G\models\psi$.
+% \item Versi\'on Sem\'antica del Teorema de la Deducci\'on. 
+% $\G\models\vp\imp\psi$ syss $\G,\vp\models\psi$.
+% \item Principio de refutaci�n. $\G\models\vp$ si y s�lo si
+%   $\G\cup\{\neg\vp\}$ no tiene modelo.
+% \item $\G\models\vp$ si y s�lo si $\fa \G\models\fa\vp$ ($\;\fa\G$,
+%   denota al conjunto de cerraduras universales de f�rmulas de $\G\;$).
+% Este hecho muestra que en el proceso de extracci\'on de conocimiento el
+% conjunto de hip\'otesis y la f\'ormula que se desea concluir pueden
+% pensarse implicitamente cuantificados universalmente, esto ser\'a de gran
+% importancia para la programaci\'on l\'ogica.
+%   \ee
+% \label{proconlog}
+% }
+% \proof Ejercicio.
+
+%\be
+%\item Sea $M=\{\vp,\neg\vp\}$ es claro que $M$ no tiene un modelo de manera
+%que la condici\'on ``todo modelo de $M$ es modelo de $\psi$ se cumple por
+%vacuidad al no tener $M$ un modelo. Por lo tanto $M\models\psi$.
+%\item Tenemos que mostrar que $N\models\vp$. Sea $\M$ un modelo de $N$,
+%como $M\subseteq N$ entonces $\M$ es tambi\'en modelo de $M$ y como $M\models\vp$
+%entonces tenemos que $\M\models\psi.\;\;\therefore N\models\vp$.
+%\item Sea $\M$ un modelo de $M$. Por hip\'otesis se tiene que
+%$\M\models\vp\imp\psi$ y $\M\models\vp$, por lo que mediante la
+%proposici\'on \ref{propmp} concluimos que $\M\models\psi$. Por lo tanto
+%$M\models\psi$.
+%\item
+%\ida Supongamos que $M\models\vp\imp\psi$ y sea $\M$ un modelo de $M,\vp$.
+%Como $\M$ es modelo de $M$ entonces $\M\models \vp\imp\psi$ y adem\'as
+%$\M\models\vp$. As\'{\i} que por la proposici\'on \ref{propmp} concluimos
+%que $\M\models\psi.\;\;\therefore M,\vp\models\psi$.\\
+%\regr Supongamos que $M,\vp\models\psi$ y sea $\M$ un modelo de $M$. Si
+%$\M\not\models\vp$ entonces, por definici\'on tenemos que
+%$\M\models\vp\imp\psi$, en caso contrario $\M\models\vp$, por lo que
+%$\M$ es modelo de $M,\vp$ as\'{\i} que por hip\'otesis concluimos que
+%$\M\models\psi$ de donde se siguee que $\M\models\vp\imp\psi$. 
+%Por lo tanto en cualquier caso $\M$ resulta ser modelo
+%de $\vp\imp\psi$, es decir, $M\models\vp\imp\psi$.
+%\ee
+
+%\qed
+
+
+%Mediante los casos dificiles han llevado a investigar en general si siempre
+%es posible, dada una base de conocimiento $M$ y una f\'ormula $\vp$
+%contestar a la pregunta ?` $M\models\vp$ ?. Pregunta que contestaremos en
+%la secci\'on \ref{secprobdec}.  
+
+
+\section{Indecidibilidad de la lógica de predicados}
+
+
+Las secciones de validez universal, equivalencia lógica y consecuencia lógica no 
+incluyen una subsección acerca de la implementación debido a que estos problemas 
+son \textbf{indecidibles}, es decir, no existe un algoritmo para poder decidir 
+el problema en general. Enunciamos aquí estos famosos resultados.
+
+\teo{[Teorema de Indecidibilidad de Church] El problema de validez universal es 
+indecidible. Es decir, no puede existir un algoritmo que reciba un enunciado 
+$\vp$ como entrada y decida si $\models\vp$.
+}
+\proof
+Las demostraciones usuales reducen este problema al problema de la detención en máquinas de Turing o bien al problema de correspondencia de Post, ambos indecidibles.
+\qed
+
+\cor{La equivalencia lógica es indecidible. Es decir, no puede existir un algoritmo que reciba como entrada dos fórmulas $\vp$ y $\psi$ y decida si $\vp\equiv\psi$.}
+\proof{Basta observar que $\models\vp$ syss $\vp\equiv\top$ por lo que cualquier algoritmo que decidiera la equivalencia lógica podría decidir la validez universal.}
+
+
+\cor{La consecuencia lógica es indecidible. Es decir, no puede existir un algoritmo que reciba como entrada un conjunto finito de fórmulas $\G$ y una fórmula $\vp$ y decida si $\G\models\vp$.}
+\proof
+Basta observar que si $\G=\{\vp_1,\ldots,\vp_n\}$ entonces 
+\bc
+$\G\models\vp$ si y sólo si $\models \vp_1\land\ldots\land\vp_n\to\vp$
+\ec
+\qed
+
+\cor{Es indecidible si una fórmula es satisfacible. Es decir, dada una fórmula $\vp$ no existe un algoritmo que decida si existe un modelo $\M$ y un estado $\sigma$ tal que $\M\models_\sigma\vp$.}
+\proof
+Obsérvese que $\M\models_\sigma\vp$ syss $\not\models\neg\vp$. Por lo tanto también se cumple que $\M\not\models_\sigma\neg\vp$ syss $\models\vp$. 
+Por lo que si $\A$ fuera un algoritmo para decidir satisfacibilidad entonces bastaría darle como entrada $\neg\vp$ y en caso de que $\A(\neg\vp)$ devolviera {\tt false}, entonces se decidiría que $\models\vp$.
+\qed
+
+
+
+\end{document}

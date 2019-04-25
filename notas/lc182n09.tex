@@ -1,0 +1,458 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage{../packageslc}
+\usepackage{../optionslc}
+
+\input{../macroslc}
+
+
+\title{Unificaci\'on de t\'erminos \\
+L\'ogica Computacional 2018-2, Nota de clase 9}
+\author{Favio Ezequiel Miranda Perea\and Araceli Liliana Reyes Cabello\and
+Lourdes Del Carmen Gonz\'alez Huesca \and Pilar Selene Linares Ar\'evalo}
+\date{\today\\ Facultad de Ciencias UNAM}
+
+\begin{document}
+
+\maketitle
+La regla de resolución binaria de Robinson, que veremos más adelante, 
+proporciona un método más para decidir la correctud de un argumento formalizado 
+en lógica de predicados. 
+% En esta nota veremos los conceptos básicos del método
+% de resolución binaria en lógica de predicados.
+
+Si bien la idea del método de prueba es la misma que en la lógica 
+proposicional, es decir llegar a la cláusula vacía para mostrar que un argumento 
+es correcto o que una fórmula es válida, en lógica de predicados el método se 
+complica debido a la presencia de variables, por ejemplo: a diferencia de las 
+literales $p,\neg p$ en lógica proposicional, las literales $Pax, \neg Pzb$ no 
+pueden resolverse aunque tengan el mismo símbolo de predicado, pues no son 
+contrarias estrictamente. 
+Sin embargo, como veremos después,  podemos aplicar la sustitución $\sigma=[x,z:=b,a]$ a las fórmulas $ Pax$ y $\neg Pzb$, 
+obteniendo como resultado $Pab$ y $\neg Pab$ que sí son literales contrarias. 
+Por lo tanto la búsqueda y uso de sustituciones que permitan obtener literales 
+contrarias será de primordial importancia para usar resolución en lógica de 
+predicados. Esta clase de sustituciones se conocen como \textbf{unificadores} y 
+en esta nota veremos c\'omo es posible hallarlos algorítmicamente.
+
+
+\section{Sustituciones}
+
+El concepto de sustitución usado hasta ahora ha sido informal, en adelante 
+necesitamos una definición formal discutida a continuación.
+
+\defin{Una sustitución en un lenguaje de predicados es una función recursiva
+$\sigma: Term \imp Term$ con la propiedad de que $\sigma(x)=x$ para casi
+todas las variables. Es decir $\sigma(x_i)\neq x_i$ únicamente para un número
+finito de variables~$x_i$ con $1\leq i\leq n$. 
+Esto se conoce en matemáticas como la propiedad de que una función tenga 
+soporte finito, siendo el soporte de $\sigma$ el conjunto de variables~$x_i$ 
+con $\sigma(x_i)\neq x_i$.
+}
+Obsérvese que una sustitución~$\sigma$ queda completamente determinada mediante 
+su soporte (finito), si éste es $x_1,\ldots,x_n$ con $\sigma(x_i)=t_i$ entonces
+la sustitución se denotará con
+$$ \sigma = [x_1:= t_1,\;x_2:=t_2,\;\ldots,\;x_n:=t_n] $$
+%[x_1,x_2,\ldots,x_n:=t_1,t_2,\ldots,t_n]
+o de manera más breve $\sigma=[\vx:=\vt\,]$. \\
+
+
+La composición de sustituciones se define como una composición de funciones de 
+donde se ha tomado la siguiente caracterización por motivos de implementación:
+\prop{Sean $\sigma=[x_1:= t_1,\;\ldots,\;x_n:=t_n]$  y 
+%[x_1,\ldots,x_n:=t_1,\ldots,t_n]$, 
+$\tau=[y_1:=s_1,\;\ldots,\;y_m:=s_m]$ dos sustituciones.
+La composición, denotada $\sigma\circ\tau$ o simplemente $\sigma\tau$, es una 
+sustitución definida por:
+\[
+\sigma\tau = [z_1:=t_1\tau,\;\ldots,\;z_k:=t_k\tau,\,w_1:=r_1,\;\ldots,w_l:=r_l]
+% [z_1,\ldots,z_k,w_1,\ldots,w_l  :=  t_1\tau,\ldots,t_k\tau,\,r_1,\ldots,r_l]
+\]
+donde $k\leq n,l\leq m$, las variables~$z_i$ son exactamente aquellas $x_p$ 
+tales que $x_p\neq t_p\tau$, y los pares $w_j:=r_j$ son aquellos pares 
+$y_q:=s_q$ tales que $y_q\notin\{x_1,\ldots,x_n\}$
+% no incluidas en $x_1,\ldots,x_n$. 
+}
+\proof
+Ejercicio
+\qed
+
+\prop{La composición de sustituciones es asociativa, es decir, si
+  $\sigma,\;\rho$ y $\tau$ son tres sustituciones entonces 
+  $(\sigma\rho)\tau=\sigma(\rho\tau)$.
+}
+\proof
+Ejercicio
+\qed
+
+\ejem{Sean  % $\sigma=[x,y:=f(y),w],\;\rho=[x,z:=g(w),b],
+% \;\tau=[y,w,v:=b,f(c),w]$
+\[
+\sigma=[x:=f(y),\;y:=w]\qquad \rho=[x:=g(w),\;z:=b]\qquad  
+\tau=[y:=b,\;w:=f(c),\;v:=w]
+\]
+Entonces
+\[
+\ba{rll}
+\sigma\rho & = & [x:=f(y),\;y:=w,\;z:=b]\\ \\ %[x,y,z:=f(y),w,b]. \\ \\
+\rho\tau & = & [x:=g(f(c)),\;z:=b,\;y:=b,\;w:=f(c),\;v:=w]\\ \\ 
+%[x,y,z:=f(y),w,b]. 
+\\ 
+(\sigma\rho)\tau & = & [x:=f(b),\;y:=f(c),\;z:=b,\;w:=f(c),\;v:=w] \\ \\ 
+%[x,y,z,w,v:=f(b),f(c),b,f(c),w].
+\sigma(\rho\tau) & = & [x:=f(b),\;y:=f(c),\;z:=b,\;w:=f(c),\;v:=w]
+\ea
+\]
+}
+
+
+\section{Unificaci\'on}
+
+El proceso de unificaci\'on consiste en encontrar, dado un conjunto de 
+literales o t\'erminos $W$, una sustitución~$\sigma$ de tal forma que el 
+conjunto resultante $W\sigma$ conste de un solo elemento. \\
+En adici\'on a sus aplicaciones en programaci\'on l\'ogica, la
+unificaci\'on tambi\'en es importante para los sistemas de reescritura de
+t\'erminos, el razonamiento autom\'atizado y los sistemas de tipos.
+A continuación estudiamos el caso general así como un algoritmo de unificación.
+
+\defin{Sea $W$ un conjunto no vac\'{\i}o de términos. Un unificador
+de $W$ es una sustitución~$\sigma$ tal que $|W\sigma|=1$, es decir
+tal que el conjunto $W\sigma$ resultante de aplicar $\sigma$ a todos los 
+elementos de $W$ consta de un mismo elemento. Si $W$ tiene un
+unificador decimos que $W$ es unificable.
+\index{unificador}\index{conjunto!unificable}
+}
+
+
+\ejem{Sea $W=\{g(x,f(y)),g(x,f(x)),g(u,v)\}$ un conjunto de términos, entonces 
+la sustituci\'on~$\sigma=[x:=a,\,\allowbreak y:=a,\,u:=a,\,v:=f(a)\}$ es un 
+unificador de $W$ ya que $W\sigma=\{g(a,f(a))\}$
+}
+
+Un conjunto de términos puede tener una infinidad de unificadores o
+ninguno, dado un conjunto finito de f\'ormulas $W$, es decidible mediante
+un algoritmo si $W$ es unificable o no; si $W$ es
+unificable el algoritmo proporciona un unificador llamado
+\textbf{unificador m\'as general}.\index{unificador!m\'as general}
+
+\defin{Un unificador~$\sigma$ de un conjunto de términos~$W$, se
+llama unificador m\'as general (\textbf{umg}) si para cada unificador $\tau$ de 
+$W$, existe una sustituci\'on~$\vartheta$, tal que $\sigma\vartheta=\tau$.
+\label{defiumg}
+}
+La importancia de los unificadores m\'as generales es que nos permiten
+representar de manera finita un n\'umero infinito de sustituciones.
+% de manera que no estamos restringidos a razonar solamente sobre dominios
+% finitos. 
+
+\ejem{Sean $W=\{fgaxgyb,fzguv\}$ con $f^{(2)},\;g^{(2)}$ y
+$$ \tau=[x:=a, z:=gaa, y:=u,v:=b] \qquad \sigma=[z:=gax,y:=u,v:=b].$$
+Entonces $\tau$ y $\sigma$ son unificadores de $W$ y es fácil ver que $\sigma$ 
+resulta ser el \textbf{umg} y en particular si $\vartheta=[x:=a]$ entonces 
+$\sigma\vartheta=\tau$. 
+}
+
+\vspace*{20pt}
+
+Antes de discutir un algoritmo de unificación es conveniente hacer un 
+an\'alisis intuitivo del problema. Basta analizar un conjunto de dos
+términos digamos $W=\{t_1,t_2\}$, queremos ver si el
+conjunto $W$ es unificable. 
+Hay que analizar varios casos:
+\be
+ \item Los términos $t_1$ y $t_2$ son constantes. \\
+  En este caso $t_i\sigma=t_i$ para cualquier sustituci\'on $\sigma$, de manera 
+  que $W$ ser\'a unificable si y sólo si $t_1=t_2$.
+ \item Alguno de los términos es una variable. \\
+  Supongamos que $t_1=x$, entonces si $x$ figura en $t_2$ entonces $W$ no es 
+  unificable, en caso contrario $\sigma=[x:=t_2]$ unifica a $W$. 
+ \item $t_1$ y $t_2$ son términos funcionales. \\
+  En este caso $W$ es unificable si y sólo si se cumplen las siguientes dos 
+  condiciones:
+  \bi
+   \item Los símbolos principales (es decir los primeros de izquierda a 
+    derecha), de $t_1$ y $t_2$ son el mismo.  
+   \item Cada par correspondiente de subexpresiones de $t_1$ y $t_2$ deben ser
+    unificables. 
+  \ei
+\ee
+
+\ejem{Considerando los mismos s\'imbolos de funci\'on que el ejemplo anterior, 
+tenemos los siguientes ejemplos:
+\begin{itemize}
+ \item El conjunto $\{c,d\}$ no es unificable pues consta de dos 
+constantes diferentes. 
+ \item El conjunto $\{x,fy\}$ es unificable mediante $\sigma=[x:=fy]$.
+ \item El conjunto $\{gxw, hya\}$ no es unificable pues $g$ y $h$ son símbolos 
+distintos.
+ \item El conjunto $\{fxgyw, fagbhw\}$ no es unificable pues los subtérminos 
+$w$ y $hw$ no son unificables.
+\end{itemize}
+}
+
+% La siguiente definición es indispensable para el algoritmo de unificación.
+
+% \defin{Sea $W\neq\varnothing$ un conjunto de expresiones. Definimos el
+% conjunto discorde de\index{conjunto!discorde} $W$ como sigue:
+% localizar la posici\'on del primer s\'{\i}mbolo, es decir, el s\'{\i}mbolo
+% m\'as a la izquierda en el que al menos dos expresiones de $W$ difieren y
+% extraer de cada expresi\'on de $W$ la subexpresi\'on que inicia en esta
+% posici\'on; el conjunto $D_W$ de dichas subexpresiones es el conjunto
+% discorde de $W$.
+% }
+% \ejem{Si $W=\{f(x,y),g(a)\}$ entonces $D_W=W$.\\
+% Si $W=\{P(x,f(y)),P(x,f(a)),P(x,f(h(y)))\}$ entonces $D_W=\{y,a,h(y)\}$.
+% }
+% A continuación presentamos un algoritmo de unificaci\'on \emph{AU} y algunos 
+% ejemplos
+% utiliz\'andolo:
+% %\newpage
+% %\begin{algorithmic}
+% %\REQUIRE $k=0,\;\sigma_0=\emptyset$
+% %\WHILE{$W\sigma_k$ no sea unitario}
+% %\STATE Hallar el conjunto discorde $D_k$ de $W\sigma_k$
+% %\IF{existen $v,t\in D_k$ tales que $v$ no figura en $t$}
+% %\STATE $\sigma_{k+1}:=\sigma_k\circ[v:=t]$
+% %\STATE $k := k+1$ 
+% %\ELSE
+% %\STATE write('$W$ no es unificable')
+% %\STATE \textbf{halt}
+% %\ENDIF
+% %\ENDWHILE
+% %\ENSURE $\sigma_k$ es umg de $W$ \'o $W$ no es unificable. 
+% %\end{algorithmic}
+
+% \begin{alltt}
+% Precondicion: k=0, \(\sigma\sb{0}\)=[]
+
+% Mientras \(W\sigma\sb{k}\) no sea unitario hacer:
+%    Hallar el conjunto discorde \(D\sb{k}\) de \(W\sigma\sb{k}\)
+%    Si existen \(v,t\in D\sb{k}\) tales que \(v\) no figura en \(t\)
+%    Entonces \(\sigma\sb{k+1}:=\sigma\sb{k}\circ[v:=t]\)
+%             \(k := k+1\)
+%    Sino ('\(W\) no es unificable')
+
+% Postcondicion: \(\sigma\sb{k}\) es umg de \(W\) o \(W\) no es unificable. 
+% \end{alltt}
+
+% \ejem{Sea $W=\{P(f(a),g(x)),\;P(y,y)\}$. Tomamos el primer conjunto
+% discorde $D_0=\{f(a),y\}$. Como $y$ no figura en $f(a)$ hacemos
+% $\sigma_1=[y:=f(a)]$. $W\sigma_1=\{P(f(a),g(x),\;P(f(a),f(a))\}$. Como 
+% $W\sigma_1$
+% no es unitario obtenemos $D_1=\{g(x),f(a)\}$ y dado que en $D_1$ no hay
+% variables el algoritmo termina reportanto que $W$ no es unificable.
+% }
+% \ejem{Sea $W=\{f(a,x,h(g(z))),\; f(z,h(y),h(y))\}$. Veamos las iteraciones
+% del algoritmo en la siguiente tabla:\begin{center}
+% \begin{tabular}{ll}
+% Sustituci\'on & Conjunto Discorde \\
+% $\sigma_0=\varnothing$ & $D_0=\{a,z\}$  \\
+% $\sigma_1=[z:=a]$ & $D_1=\{x,h(y)\}$\\
+% $\sigma_2=[x:=h(y),z:=a]$ & $D_2=\{g(a),y\}$\\
+% $\sigma_3=[x:=h(g(a)),y:=g(a),z:=a]$ & \\
+% \end{tabular}\end{center}
+% $\sigma_3$ es un umg de $W$.  
+% }
+% Veamos por \'ultimo un ejemplo con tres expresiones.
+% \ejem{Sea $W=\{Q(x,a,z),Q(y,a,h(y)),Q(x,a,h(g(b)))\}$. Las iteraciones son
+% las siguientes:\begin{center}
+% \begin{tabular}{ll}
+% Sustituci\'on & Conjunto Discorde \\
+% $\sigma_0=\varnothing$ & $D_0=\{x,y\}$  \\
+% $\sigma_1=[y:=x]$ & $D_1=\{z,h(x)\}$\\
+% $\sigma_2=[y:=x, z:=h(x)]$ & $D_2=\{x,g(b)\}$\\
+% $\sigma_3=[x:=g(b),y:=g(b),z:=h(g(b))]$ & \\
+% \end{tabular}\end{center}
+% $\sigma_3$ es un umg de $W$.Este ejemplo tambi\'en muestra el caracter no
+% determinista del algoritmo, ya que la sustituci\'on $x/y$ tambi\'en pudo
+% ser usada para $\sigma_1$. 
+% }
+
+% Para terminar enunciamos el teorema de correctud total del algoritmo $AU$.
+
+% \teo{[Correctud total de $AU$]
+% Dado un conjunto finito de expresiones $W$, el algoritmo $AU$ termina,
+% dando como resultado el mensaje '$W$ no es unificable', en el caso en que
+% $W$ no sea unificable, y un umg de $W$ en el caso en que $W$ sea unificable. 
+% }
+
+
+Para el caso general en que $W=\{t_1,\ldots,t_n\}$ el unificador se obtiene 
+aplicando recursivamente el caso para dos términos como sigue:
+\bi
+\item Hallar $\mu$ \textbf{umg} de $t_1,t_2$.
+\item Hallar $\nu$ unificador de $\{t_2\mu,t_3\mu_1,\ldots,t_n\mu\}$.
+\item El unificador de $W$ es la composición $\nu\mu$.
+\ei
+
+\subsection{El algoritmo de unificación de Martelli-Montanari}
+
+A continuación se describe el algoritmo de unificación de 
+Martelli-Montanari~\footnote{``An efficient unification algorithm'', ACM Trans. 
+Prog. Lang. and Systems vol. 4, 1982, p.p. 258-282}:
+
+\bi
+\item[] \textbf{Entrada}: un conjunto de ecuaciones 
+$\{s_1=r_1,\ldots,s_k=r_k\}$ tales que 
+se desea unificar simult\'aneamente $s_i$ con $r_i$ para $1\leq i\leq k$.
+\item[] \textbf{Salida}: un unificador más general $\mu$ tal que 
+$s_i\mu=r_i\mu$ para toda $1\leq i\leq n$.
+\ei
+
+Para unificar un conjunto de términos:
+\bi
+\item se colocan como ecuaciones las expresiones a unificar
+\item escoger una de ellas de manera \textit{no determin\'istica} que tenga la 
+forma de alguna de las siguientes opciones 
+y realizar la acci\'on correspondiente:
+\bc
+\begin{tabular}{lc|c|c}
+& Nombre de la regla &  $t_1 = t_2 $ &  Acci\'on\\\hline
+{\sc [Desc]} & Descomposición &  $fs_1\dots s_n = ft_1\dots t_n$ 
+  & \small{sustituir por  $\{s_i = t_i\}$} \\
+{\sc [DFalla]} & Desc. fallida & 
+  $fs_1\dots s_n=gt_1\dots t_n\text{ donde } g\neq f$  
+  & \small{falla}\\
+{\sc [Elim]} & Eliminación &  $x = x$ & \small{eliminar} \\
+{\sc [Swap]} & Intercambio & 
+  $t = x \text{ donde } t \text{ no es una variable }$
+  & \small{sustituir por $x=t$}\\
+%x = t$ donde $x$ no figura en $t$ pero  &  aplicar la sustituci\'on $[x:=t]$\\
+{\sc [Sust]} & Sustitución &  $x = t \text{ donde } x \text{ no figura en } t$  
+  &  \small{eliminar $x=t$ y }\\ 
+  & & & \small{aplicar la sustituci\'on $[x:=t]$}\\ %x$ aparece en las dem\'as 
+  & & & \small{a las ecuaciones restantes }\\
+{\sc [SFalla]} & Sust. fallida & 
+  $x = t \text{ donde } x \text{ figura en } t \text{ y } x\neq t$ 
+  & \small{falla}
+\end{tabular}
+\ec
+
+\item el algoritmo termina cuando no se puede llevar a cabo alguna acci\'on 
+o cuando falla. \\
+En caso de \'exito se obtiene el conjunto vacío de ecuaciones 
+y el unificador m\'as general se obtiene al componer todas las sustituciones 
+usadas por la regla de sustitución en el orden en que se generaron.
+\ei
+
+\paragraph{Observaciones:} El caso en que se deba unificar a dos constantes 
+iguales $a$, se genera la ecuación $a=a$ que por la regla de descomposición se 
+sustituye por el conjunto vacío de ecuaciones dado que constantes se 
+consideran funciones sin argumentos, as\'i cualquier ecuación de la forma 
+$a=a$ se elimina. 
+En el caso de una ecuación~$a=b$ (con dos constantes distintas) falla por la 
+regla de descomposición fallida.
+
+\begin{Ejemplo}
+  Sean $f^{(2)},g^{(1)},h^{(2)}$ y $W=\{fgxhxu,\;fzhfyyz\}$. Mostramos el 
+proceso de ejecución del algoritmo de manera similar al razonamiento de 
+verificación de correctud de argumentos por interpretaciones.\\
+\begin{tabular}{rcl}
+ 1.& $\{fgxhxu=fzhfyyz\}$ &  Entrada \\
+ 2.& $\{gx=z,\;hxu=hfyyz\}$ & {\sc Desc},1 \\
+ 3.& $\{z=gx,\;hxu=hfyyz\}$ & {\sc Swap},2 \\
+ 4.& $\{hxu=hfyygx\}$ & {\sc Sust},3, $[z:=gx]$ \\
+ 5.& $\{\;x=fyy,\;u=gx\}$ & {\sc Desc},4  \\
+ 6.& $\{u=gfyy\}$& {\sc Desc},5, $[x:=fyy]$  \\
+ 7.& $\vacio$ &{\sc Desc},6, $[u:=gfyy]$ 
+\end{tabular}
+
+El unificador se obtiene al componer las sustituciones utilizadas desde el 
+inicio:
+\[
+\ba{rll}
+\mu & = & [z:=gx][x:=fyy][u:=gfyy]\\
+    & = & [z:=gfyy,x:=fyy][u:=gfyy]\\
+    & = & [z:=gfyy,x:=fyy,u:=gfyy]
+\ea
+\]
+\end{Ejemplo}
+
+\noindent Veamos ahora un ejemplo de un conjunto no unificable:
+\begin{Ejemplo}
+  Sean $f^{(3)},g^{(1)}$ y $W=\{fxyx,\;fygxx\}$.
+  
+\begin{tabular}{rcl}
+ 1.& $\{fxyx=fygxx\}$ & Entrada\\ 
+ 2.& $\{x=y,\;y=gx,\;x=x\}$ & {\sc Desc},1 \\
+ 3.& $\{x=y,\;y=gx\}$  & {\sc Elim},2\\
+ 4.& $\{y=gy\}$ &{\sc Sust},3, $[x:=y]$ \\
+ 5.& $\verb! X!$ &{\sc SFalla},4 
+\end{tabular}
+\end{Ejemplo}
+
+Para terminar enunciamos el teorema de correctud total del algoritmo.
+
+\teo{[Correctud total del algoritmo de Martelli-Montanari]
+Dado un conjunto finito de expresiones~$W$, el algoritmo MM termina,
+dando como resultado el mensaje ``$W$ no es unificable'', en el caso en que
+$W$ no sea unificable, y un unificador más general~$\mu$ de $W$ en el caso en 
+que $W$ sea unificable. 
+}
+
+
+\subsection{Unificación de literales}
+
+El algoritmo de unificación puede generalizarse para unificar literales de 
+manera sencilla simplemente adaptando las reglas de descomposición y 
+descomposición fallida considerando los casos para símbolos de predicado de 
+manera análoga a los símbolos de función.
+
+Como ejemplo se deja al lector unificar el siguiente conjunto
+
+\[
+W=\{Qxaz,Qyahy,Qxahgb\}
+\]
+
+
+\section{Implementación del algoritmo de unificación}
+
+La implementación del algoritmo se sirve de la implementación previa de 
+términos y sustituciones dada en la nota de clase 4. 
+Implementamos primero el caso particular en que la entrada del algoritmo es una 
+única ecuación $t_1=t_2$ mediante la función \verb! unifica! descrita abajo.\\
+Las funciones a implementar son:
+\bi
+%\item \verb! subId:: Subst!, la sustitución identidad o vacía
+\item \verb! simpSus:: Subst -> Subst! que dada una sustitución elimina de ella 
+los pares con componentes iguales correspondientes a sustituciones de la forma 
+$x:=x$
+\item \verb! compSus:: Subst -> Subst ->Subst! que dadas dos sustituciones 
+devuelve su composición
+\item \verb! unifica :: Term -> Term -> [Subst]! que dados dos términos 
+devuelva 
+una lista de sustituciones de tal forma que
+\bi
+\item Si $t_1,t_2$ no son unificables la lista es vacía
+\item Si sí lo son la lista contiene como único elemento al unificador 
+correspondiente.
+\ei
+Para el caso en que $t_1,t_2 $  sean términos funcionales se necesitará una 
+función \\
+\verb! unificaListas :: [Term] -> [Term] -> [Subst]!
+que unifique dos listas de términos de la misma longitud componente a 
+componente. Es decir, 
+\verb!unificaListas [s1,..,sk] [r1,..,rk]! devuelve la lista $[\mu]$ con un 
+unificador $\mu$ tal que $s_j\mu=r_j\mu$ para toda $1\leq j\leq k$. En 
+cualquier otro caso esta función devuelve la lista vacía. 
+\item \verb! unificaConj :: [Term] -> [Subst]! que implementa el caso general 
+para unificar un conjunto (lista) $W=\{t_1,\ldots,t_n\}$.%  se implementa con 
+una función 
+\item \verb! unificaLit :: Form -> Form -> [Subst]! que unifique dos literales.
+% que devuelve la lista unitaria con un unificador de $W$ o bien la lista 
+% vacía. La idea es iterar la función \verb! unifica} adecuadamente.
+
+% \item Tipo para variables: usamos simplemente un alias para términos por 
+% cuestión pragmática
+% \bi
+% \item[] \verb! type Var = Term!
+% \ei
+%  teniendo en cuenta que en caso de que se espere algo de tipo \verb! 
+% Variable!
+% debe ser un término de la forma \verb! V x!
+% \item Tipo para sustituciones: son listas de pares de variables y términos
+% \bi
+% \item[] \verb! type Sust = [(Var,Term)]!
+% \ei
+\ei
+\end{document}
