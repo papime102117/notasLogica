@@ -1,0 +1,694 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage{../packageslc}
+\usepackage{../optionslc}
+
+\input{../macroslc}
+
+
+\title{Lógica de Primer Orden: Introducción y Sintaxis \\ 
+L\'ogica Computacional 2018-2, Nota de clase 4}
+\author{Favio Ezequiel Miranda Perea\and Araceli Liliana Reyes Cabello\and
+Lourdes Del Carmen Gonz\'alez Huesca \and Pilar Selene Linares Ar\'evalo}
+\date{\today\\ Facultad de Ciencias UNAM}
+
+
+\begin{document}
+
+\maketitle
+
+\section{Introducción}
+
+La lógica ha sido estudiada desde los tiempos de Aristóteles. En sus inicios
+se dedicó a fundamentar de manera sólida el análisis del razonamiento
+humano, formalizando las \enquote{leyes del pensamiento}, es decir, las 
+nociones de argumento válido o inválido. 
+Aristóteles aisló principios lógicos llamados
+\emph{silogismos} los cuales fueron utilizados para analizar y verificar
+argumentos hasta la edad media por lógicos como Peter Abelard o Guillermo de 
+Ockham.\\
+
+En el siglo 19 George Boole y otros desarrollaron versiones algebráicas de la
+lógica debido a las limitaciones de la teoría del silogismo para manejar
+relaciones binarias, por ejemplo \enquote{x es hijo de y}. 
+Esto dio nacimiento a la lógica algebraica, formalismo que aun existe aunque ha 
+perdido popularidad.\\
+
+Al final del siglo 19 Gottlob Frege desarrollo la lógica cuantificada
+sentando así los cimientos de gran parte de la lógica moderna, aún cuando
+Bertrand Russell le mostró que su sistema era inconsistente. Al mismo tiempo
+Charles S. Pierce de manera independiente, propuso una lógica similar.\\
+
+La \emph{paradoja de Russell} generó una crisis en los fundamentos de la
+matemática la cual se resolvío al inicio del siglo XX usando la lógica de
+primer orden, la cual funge hasta la actualidad como un fundamento
+de las matemáticas modernas.
+Debido a su gran poder, la lógica de primer orden también tiene grandes
+limitaciones que fueron descubiertas en los años 1930 por Kurt Gödel,
+Alan Turing y Alonzo Church, entre otros. Gödel dio un sistema
+deductivo completo y correcto para la lógica de primer orden, Alfred Tarski
+le dio la semántica formal que estudiaremos y que es la base para el estudio
+de las semánticas denotacionales de los actuales lenguajes de programación y
+Gerhard Gentzen y otros desarrollarón la teoría de la demostración. A partir de
+este punto la lógica de primer orden toma su forma actual.\\
+
+Durante la siguiente parte del curso nos dedicaremos a estudiar los siguientes 
+aspectos de la lógica de primer orden:
+
+\bi
+\item Su sintaxis y semántica formal.
+\item El proceso de especificación formal del español a la lógica.
+% \item Generalizar la noción de validez de argumentos de la lógica
+%   proposicional a la lógica de primer orden.
+\item Los métodos para establecer válidez de argumentos:
+\be
+%\item Tablas de verdad (\textbf{No funcionan!})
+\item Argumentación semántica  (método \'util pero prácticamente imposible de
+  implementar de manera eficaz).
+\item Tableaux semánticos (método fácilmente implementable)
+\item Resolución binaria (método fundamental de la programación lógica)
+\item Deducción natural (método completo y correcto, fundamento de los
+  sistemas de tipos para lenguajes de programación).
+\ee
+\ei
+
+
+\subsection{Lógica proposicional: expresividad vs. decidibilidad}
+
+Por un lado, observemos que la lógica proposicional no es lo suficientemente 
+expresiva. 
+Considérese por ejemplo el siguiente razonamiento:
+\bc
+\emph{Algunas personas van al teatro. Todos los que van al teatro se
+divierten. \\ De manera que algunas personas se divierten.}
+\ec
+La intuición nos dice que el argumento es correcto. Sin embargo la 
+representación correspondiente en lógica proposicional es:
+$$ p,\;q\;/\therefore\;r\qquad \text{ !`Incorrecto! } $$
+
+\espc
+
+Otros ejemplos de expresiones que no pueden ser formalizadas adecuadamente en
+la lógica proposicional son:
+\bi
+\item[] \emph{La lista está ordenada.}
+\item[] \emph{Cualquier empleado tiene un jefe.}
+\item[] \emph{Si los caballos son animales entonces las cabezas de caballos son
+  cabezas de animales.}
+\ei
+Este problema de expresividad se soluciona al introducir la lógica de 
+predicados.
+
+\espc
+
+Por otro lado, la lógica proposicional es decidible, es decir, existen
+diversos algoritmos para responder a las preguntas 
+\bc
+?`$\;\models\vp\;$?, ?` Existe  $\I$ tal que $\I\models\vp\;$?,  \\
+?` Es $\Gamma$ satisfacible?,  ?`$\;\Gamma\models\vp\;$?
+\ec
+Como vimos anteriormente, su estudio es de gran importancia en la teoría de 
+complejidad computacional (problema {\sf SAT}).
+Esta propiedad, de gran importancia desde el punto de vista computacional, se
+pierde en la lógica de predicados.  
+
+As\'i, la l\'ogica proposicional nos ofrece decibilidad de algunas propiedades 
+pero nos limita respecto a la expresividad. La l\'ogica de predicados o de 
+primer orden que estudiaremos, nos ofrecer\'a mayor expresividad para 
+formalizar expresiones m\'as complejas.\\
+
+Antes de empezar el estudio formal de la l\'ogica de primer orden discutiremos
+con detalle un ejemplo de especificación no trivial en lógica de proposiciones. 
+De aquí podremos observar una aplicación directa del problema {\sf SAT} fuera 
+del ámbito de la lógica. Esta clase de representaciones son típicas de los 
+métodos de reducción de problemas en teoría de la complejidad.
+
+\newpage
+
+\subsection{Reducción del Sudoku al problema {\sf SAT}\protect\footnote{
+Esta sección se basa en el artículo \textit{Sudoku as a SAT Problem} de In\^es 
+Lynce y Jo\"el Ouaknine. 9th International Symposium on Artificial Intelligence 
+and Mathematics, January 2006.}}
+
+\noindent Consideramos aquí Sudokus que cumplen las siguientes dos 
+propiedades:
+\be
+\item Tienen una solución única.
+\item Pueden resolverse con razonamiento únicamente, es decir, sin búsqueda.
+\ee
+
+La representación se sirve de $729$ variables proposicionales denotadas 
+$s_{xyz}$ con $x,y,z\in\{1,\ldots,9\}$, cuyo significado es
+que el número~$z$ está en la entrada o celda~$xy$. 
+Debe pensarse el tablero de Sudoku como una matriz de manera que la 
+posición~$xy$ denota a la celda en el renglón~$x$ y columna~$y$. \\
+La \textbf{especificación} es la siguiente:
+\bi
+\item Hay al menos un número en cada celda
+$$ \bigwedge_{x=1}^9\,\bigwedge_{y=1}^9\,\bigvee_{z=1}^9 s_{xyz} $$
+% \beqs
+% \fa x \fa y\Big( 1\leq x,y\leq 9 \to \exists z \big(1\leq z\leq 9 \land 
+% S(x,y,z)\big)\Big)
+% \eeqs
+Esta fórmula nos dice que para cada renglón~$x$ y para cada columna~$y$ hay un 
+número~$z$ en la celda~$xy$.
+
+\item Cada número figura a los más una vez en cada renglón
+$$ \bigwedge_{y=1}^9\,\bigwedge_{z=1}^9\,\bigwedge_{x=1}^8\,\bigwedge_{i=x+1}^9 
+(\neg s_{xyz}\lor \neg s_{iyz}) $$
+Esta fórmula nos dice que para cada columna~$y$, para cada número~$z$ y para 
+cada renglón~$x$, excepto el último, si el número~$z$ está en el renglón~$x$ 
+(en la celda~$xy$) entonces no sucede que el número~$z$ está en alguno de los 
+renglones posteriores a~$x$ (los denotados por~$i$).
+
+\item Cada número figura a lo más una vez en cada columna
+$$ \bigwedge_{x=1}^9\,\bigwedge_{z=1}^9\,\bigwedge_{y=1}^8\,\bigwedge_{i=y+1}^9 
+(\neg s_{xyz}\lor \neg s_{xiz})$$
+Esta fórmula nos dice que para cada renglón~$x$, para cada número~$z$ y para 
+cada columna~$y$, excepto la última, si el número~$z$ está en la columna~$y$ 
+(en la celda~$xy$) entonces no sucede que el número~$z$ está en alguna de las 
+columnas posteriores a $y$ (las denotadas por~$i$).
+
+\item Cada número figura a lo más una vez en cada cuadrante de $3\times 3$: 
+\bi
+\item Dentro de cada cuadrante, si un número~$z$ está en un renglón entonces 
+  no está en las celdas siguientes en el mismo renglón. Aquí $i,j$ delimitan 
+  las celdas válidas del cuadrante y $k$ se encarga de verificar las columnas 
+  siguientes a la de la celda en consideración. Todo dentro del mismo cuadrante.
+  \[ 
+   \bigwedge_{z=1}^9\,\bigwedge_{i=0}^2\,\bigwedge_{j=0}^2\,\bigwedge_{x=1}^3\,
+   \bigwedge_ { y=1}^3\,\bigwedge_{k=y+1}^3 (\neg s_{(3i+x)(3j+y)z}\lor \neg 
+    s_{(3i+x)(3j+k)z})
+  \]
+  
+\item Dentro de cada cuadrante, si un número~$z$ está en una columna entonces 
+  no está en los renglones superiores ni en la misma columna ni en las columnas 
+  siguientes. Aquí $i,j$ delimitan las celdas válidas del cuadrante, $k$ se 
+  encarga de verificar los renglones superiores y $l$ verifica la columna 
+actual 
+  y las columnas siguientes.
+  \[
+   \bigwedge_{z=1}^9\,\bigwedge_{i=0}^2\,\bigwedge_{j=0}^2\,\bigwedge_{x=1}^3\,
+   \bigwedge_ { y=1}^3\,\bigwedge_{k=x+1}^3 \bigwedge_{l=1}^3 
+    (\neg s_{(3i+x)(3j+y)z}\lor \neg s_{(3i+k)(3j+l)z})
+  \]
+\ei
+\ei
+
+Las cláusulas anteriores conforman una codificación m\'inima. Un bonito cálculo 
+combinatorio lleva a concluir que a partir de las fórmulas anteriores la 
+fórmula 
+resultante de la transformación a FNC tendrá 8829 cláusulas de las cuales 81 
+cláusulas tienen 9 literales, y las restantes 8748 son binarias, es decir, 
+tienen 2 literales. \\
+
+Adicionalmente se deben considerar las cláusulas unitarias 
+correspondientes a las entradas del Sudoku que ya tienen un número asignado.
+Al agregar las siguientes cláusulas modelamos la \textbf{unicidad} de un número 
+en cada celda:
+\bi
+\item Hay a lo más un numero en cada celda.
+\[
+\bigwedge_{x=1}^9\,\bigwedge_{y=1}^9\,\bigwedge_{z=1}^8\,\bigwedge_{i=z+1}^9 
+(\neg s_{xyz} \lor \neg s_{xyi})
+\]
+Esta fórmula nos dice que para cada renglón~$x$, para cada columna~$y$, para 
+cada número no $9$, si la celda~$xy$ tiene al numero~$z$ entonces no tiene a 
+los números mayores que~$z$.
+
+\item Cada número figura al menos una vez en cada columna
+$$ \bigwedge_{y=1}^9\,\bigwedge_{z=1}^9\,\bigvee_{x=1}^9 s_{xyz} $$
+Está fórmula nos dice que para cada columna~$y$ y cada número~$z$, existe un 
+renglón~$x$, tal que~$z$ está en la celda~$xy$.
+
+\item Cada número figura al menos una vez en cada renglón
+$$ \bigwedge_{x=1}^9\,\bigwedge_{z=1}^9\,\bigvee_{y=1}^9 s_{xyz} $$
+Está fórmula nos dice que para cada renglón~$x$ y cada número~$z$, existe una 
+columna~$y$, tal que~$z$ está en la celda~$xy$.
+
+\item Cada número figura al menos una vez en cada cuadrante de $3\times 3$.
+\[
+\bigvee_{z=1}^9\,\bigwedge_{i=0}^2\,\bigwedge_{j=0}^2\,\bigwedge_{x=1}^3\, 
+\bigwedge_ { y=1 }^3 s_{(3i+x)(3j+y)z}
+\]
+Está fórmula nos dice que hay un número~$z$ en cada uno de los cuadrantes, los 
+cuales qse generan por las celdas~$(3i+x)(3j+y)$.
+\ei
+
+La fórmula resultante de transformar todas las anteriores consta de 11988 
+cláusulas, 324 de ellas con 9 literales y las restantes 
+11664 binarias. Nuevamente debemos agregar cláusulas unitarias para las 
+entradas 
+previamente asignadas del Sudoku.
+
+\espc
+
+De los c\'alculos anteriores podemos ver que a pesar de ser un problema 
+pesado, la implementaci\'on de la teor\'ia de prueba resoluci\'on binaria puede 
+hacer a la computadora una herramienta \'util para resolver sudokus.
+
+
+
+\section{Lógica de predicados de manera informal}
+
+
+En la lógica proposicional debemos representar a ciertas frases del español
+como por ejemplo
+\bc
+\emph{Algunos programas usan ciclos anidados}
+\ec
+mediante fórmulas proposicionales atómicas, es decir mediante una simple 
+variable proposicional~$p$. 
+En la lógica de predicados descomponemos a este tipo de
+frases distinguiendo dos categorias: objetos y relaciones entre
+objetos. Ambas categorias construidas sobre un universo de discurso fijo el 
+cual varía según el problema particular que se desee representar. 
+Estudiemos con mas detalle estas categorias:
+
+\subsection{Objetos y universo de discurso}
+\bc
+ \emph{Algunas \textbf{personas} van al teatro} \\
+ \emph{Todos los \textbf{programas} en Java usan clases.}
+\ec
+  
+\bi
+ \item Universo o dominio de discurso: conjunto de objetos que se consideran 
+  en el razonamiento, pueden ser cosas, personas, datos, objetos abstractos, 
+  etc.
+   
+ \item En el caso de los enunciados anteriores en el universo podemos tener 
+  personas y programas en Java, y  posiblemente el teatro y las clases.
+\ei
+
+
+\subsection{Relaciones entre objetos}
+\bi
+ \item Las propiedades o relaciones atribuibles a los objetos del dominio de 
+  discurso se representan con predicados.
+
+ \item En el caso de los enunciados anteriores tenemos \emph{ir al teatro, usar 
+  clases}.
+\ei
+
+\subsection{Cuantificadores}
+Los cuantificadores especifican el número de individuos que cumplen con el 
+predicado. Por ejemplo:
+\bi
+\item \emph{Todos} los estudiantes trabajan duro.
+\item \emph{Algunos} estudiantes se duermen en clase.
+\item \emph{La mayoría} de los maestros están locos
+\item \emph{Ocho de cada diez} gatos lo prefieren.
+\item \emph{Nadie} es más tonto que yo.
+\item \emph{Al menos seis} estudiantes están despiertos.
+\item \emph{Hay una infinidad} de números primos.
+\item \emph{Hay más} PCs que Macs.
+\ei
+
+En lógica de primer orden sólo consideraremos dos cuantificadores:
+\emph{todos} y \emph{algunos}. 
+
+
+\subsection{Proposiciones vs. Predicados}
+
+El uso de predicados en lugar de proposiciones podría parecer simplemente
+otra manera de escribir las cosas, por ejemplo, la proposición:
+\bc
+\textit{Chubaka recita poesía nordica}
+\ec
+se representa con predicados como
+\bc
+\textit{Recita(Chubaka, poesía nordica)}
+\ec
+
+\noindent La gran ventaja es que el predicado puede cambiar de argumentos, por 
+ejemplo
+\bc
+\textit{Recita(Licantro, odas en sánscrito)} 
+\ec
+o en el caso general podemos usar variables para denotar individuos:
+\bc
+\textit{Recita(x,y)}
+\ec
+
+
+Obsérvese que está última expresión no es una proposición. 
+En este sentido un mismo predicado está representando un número
+potencialmente infinito de proposiciones.
+
+
+\espc
+\noindent
+Reconozcamos ahora las componentes anteriores en un argumento particular:
+\bc
+ \emph{Todos los matemáticos estudian algún teorema.
+   Los teoremas son elementales o trascendentes. \\
+   Giuseppe es  matemático. Luego entonces, Giuseppe estudia algo 
+   elemental o trascendente.}
+\ec
+    
+\bi
+ \item Universo: \emph{matemáticos y teoremas}
+ \item Predicados: \emph{estudiar, elemental, trascendente.}
+ \item Cuantificadores: \emph{todos, los, algo.}
+ \item Los individuos se representarán formalmente mediante dos categor\'ias:
+  \bi
+   \item Constantes: las cuales denotan individuos particulares,
+     como Giuseppe.
+   \item Variables: las cuales denotan individuos genéricos o
+     indeterminados como los matemáticos o el teorema. \\
+     \textbf{Obsérvese que} las variables no figuran en el lenguaje natural 
+como 
+     el español, pero son necesarias para la formalización y representaci\'on 
+     de individuos no fijos.
+  \ei
+\ei
+
+
+Formalicemos ahora todos los conceptos discutidos anteriormente.
+
+
+\section{Sintaxis de la lógica de primer orden}
+
+En contraposición al lenguaje de la lógica proposicional que está
+determinado de manera única, no es posible hablar de un solo lenguaje
+para la lógica de predicados. Dependiendo de la estructura semántica
+que tengamos en mente será necesario agregar símbolos particulares
+para denotar objetos y relaciones entre objetos. De esta manera
+el alfabeto consta de dos partes ajenas entre sí, la parte común a
+todos los lenguajes está determinada por los símbolos lógicos y auxiliares
+y la parte particular, llamada tipo de semejanza o signatura del lenguaje.
+
+\noindent La parte común a todos los lenguajes consta de:
+\bi
+ \item Un conjunto infinito de variables 
+  $\mathsf{Var}=\{x_1,\ldots,x_n,\ldots\}$
+ \item Constantes lógicas: $\bot,\top$
+ \item Conectivos u operadores lógicos: $\neg,\land,\lor,\imp,\iff$
+ \item Cuantificadores: $\fa,\ex$.
+  \item Símbolos auxiliares: $(\;,\;)$ y $,$ (coma).
+ \item Si se agrega el símbolo de igualdad~$=$, decimos que el lenguaje tiene 
+  igualdad.
+\ei
+
+\noindent La signatura de un lenguaje en particular está dada por:
+\bi
+ \item Un conjunto~$\Pe$, posiblemente vacío, de símbolos o letras de
+  predicado:  $ P_1,\ldots,P_n,\ldots$\\
+  A cada símbolo se le asigna un índice~\footnote{Este índice suele llamarse 
+  también \enquote{aridad}, pero dado que tal palabra no existe en el 
+  diccionario de la lengua española, trataremos de evitar su uso.} o número 
+  de argumentos~$m$, el cual se hace explícito escribiendo~$P_n^{(m)}$ que  
+  significa que el símbolo~$P_n$ necesita de~$m$ argumentos.
+  
+ \item Un conjunto~$\F$, posiblemente vacío, de símbolos o letras de
+  función:  $f_1,\ldots,f_n,\ldots$\\ 
+  Análogamente a los símbolos de predicado cada símbolo de función tiene un 
+  índice asignado, $f_n^{(m)}$ significará que el símbolo~$f_n$ necesita de~$m$ 
+  argumentos.   
+  
+ \item Un conjunto~$\C$, posiblemente vacío, de símbolos de constante:
+  $c_1,\ldots,c_n,\ldots$\\
+  En algunos libros los símbolos de constante se consideran como parte del
+  conjunto de símbolos de función, puesto que pueden verse como funciones de
+  índice cero, es decir, funciones sin argumentos.
+\ei
+
+Dado que un lenguaje de primer orden queda determinado de manera única por su 
+signatura, abusaremos de la notación y escribiremos $\L=\Pe\cup\F\cup\C $
+para denotar al lenguaje dado por tal signatura.
+
+
+\subsection{Términos}  
+Los términos del lenguaje son aquellas expresiones que representarán
+objetos en la semántica y su definición es:
+\bi
+ \item Los símbolos de constante $c_1,\ldots,c_n,\ldots$ son términos.
+ \item Las variables $x_1,\ldots,x_n,\ldots$ son términos. 
+ \item Si $f^{(m)}$ es un símbolo de función y $t_1,\ldots,t_m$ son términos 
+  entonces $f(t_1,\ldots,t_m)$ es un término.
+ \item Son todos.
+\ei
+Es decir, los términos están dados por la siguiente gramática:
+$$ t ::= x \mid c \mid f(t_1,\ldots,t_m) $$
+Y el conjunto de términos de un lenguaje dado se denota con~$\term_\L$, o
+simplemente~$\term$ si es claro cuál es el lenguaje. \\
+
+En algunas ocasiones se encuentra una definición de términos que no incluye 
+constantes. Esta omisión no existe en realidad puesto que las constantes se 
+consideran casos particulares de símbolos de función de índice cero como hemos 
+mencionado antes, es decir un símbolo de función que no recibe argumentos. 
+Considerando lo anterior, presentamos la siguiente implementación.
+
+\subsubsection{Implementación}
+
+\noindent Emplearemos la siguiente representación en \textsc{Haskell}:
+
+\begin{verbatim}
+type Nombre = String
+
+data Term = V Nombre | F Nombre [Term]
+\end{verbatim}
+
+\noindent Veamos algunos ejemplos:
+\bi
+\item $c$ se implementa como  \verb-  F ``c'' [ ]-
+\item $f(x,y)$ se implementa como \verb- F ``f'' [V ``x'', V ``y'']-
+\item $g(a)$ se implementa como  \verb- F ``g'' [F ``a'' []]-
+\item $h(f(x))$ se implementa como  \verb- F ``h'' [F ``f'' [V ``x'']]}-
+\item $h(b,f(a),z)$ se implementa como  
+  \verb-``h'' [F ``b'' [], F ``f'' [F ``a'' []], V ``z'']-
+\ei
+
+\subsection{Fórmulas}
+
+\noindent El siguiente paso es determinar las expresiones o fórmulas atómicas,
+dadas por:
+\bi
+\item Las constantes lógicas $\bot,\top$.
+\item Las expresiones de la forma: $P_1(t_1,\ldots,t_n)$ donde
+  $t_1,\ldots,t_n$ son términos 
+\item Las expresiones de la forma $t_1=t_2$, si el lenguaje cuenta con igualdad
+\ei
+El conjunto de expresiones atómicas se denotará con $\mathsf{ATOM}_\L$. \\
+
+As\'i el conjunto $\form_\L$ de expresiones compuestas aceptadas en un lenguaje 
+$\L$, llamadas usualmente fórmulas, se define recursivamente como sigue: 
+\bi
+\item Si $\vp\in\mathsf{ATOM}_\L$ entonces $\vp\in\form_\L$. Es decir, 
+toda fórmula atómica es una fórmula.
+\item Si $\vp\in\form_\L$ entonces $(\neg\vp)\in\form_\L$.
+\item Si $\vp,\psi\in\form_\L$ entonces 
+$(\vp\land\psi),(\vp\lor\psi),(\vp\imp\psi),(\vp\iff\psi)\in\form_\L$.
+\item Si $\vp\in\form_\L$ y $x\in\mathsf{Var}$ entonces 
+$(\fa x\vp),(\exists x\vp)\in\form_\L$.
+\item Son todas.
+\ei
+
+%La última cláusula de la definición garantiza que el conjunto $\form$ es el
+%mínimo conjunto cerrado bajo las tres primeras reglas.
+%La definición anterior puede darse en la llamada forma de Backus-Naur para
+%definir grámaticas como sigue:
+La gramática para las fórmulas en forma de Backus-Naur es:
+\[
+\begin{array}{rcl}
+  \vp & ::= & at \mid (\neg\vp) \mid (\vp\land\psi) 
+    \mid (\vp\lor\psi) \mid (\vp\imp\psi) \mid (\vp\iff\psi) 
+    \mid (\fa x\vp) \mid (\ex x\vp) \\
+  at & ::= & \bot \mid \top \mid P(t_1,\ldots,t_m) \mid t_1=t_2
+\end{array}
+\]
+Cada lenguaje definido a partir de una signatura y con forme a la 
+gram\'atica recién descrita será un \emph{lenguaje de primer orden}. 
+
+\noindent Las siguientes observaciones son de suma importancia:
+\bi
+ \item Los términos y las fórmulas son dos categorías sintácticas ajenas, es 
+  decir \textbf{ningún} término es fórmula y \textbf{ninguna} fórmula es 
+  término.
+ 
+ \item Los términos denotan exclusivamente individuos u objetos.
+ 
+ \item Las fórmulas atómicas denotan proposiciones o propiedades acerca de los
+    términos. 
+    
+ \item \textbf{Sólo} los individuos u objetos son cuantificables y       
+  \textbf{únicamente} sobre ellos se puede \enquote{predicar}. 
+  Esta característica justifica la denominación \enquote{primer orden}.
+\ei
+
+
+\subsection{Precedencia}
+
+Si bien los cuantificadores no son propiamente operadores entre
+fórmulas y por lo tanto no se puede hablar de una precedencia en el
+sentido usual, usamos la siguiente convención:
+\bc
+ Los cuantificadores se aplican a la \textit{mínima} expresión sintácticamente 
+posible.
+\ec
+de manera que
+\[
+\ba{rll}
+\fa x\vp\imp \psi  & \text{ es} &  (\fa x\vp)\imp \psi \\
+\ex y\vp \land \fa w\psi\imp\chi& \text{ es} & (\ex y\vp)\land(\fa 
+w\psi)\imp\chi\\
+\ea
+\]
+
+\subsection{Implementación}
+La implementación de f\'ormulas es la siguiente:
+\begin{verbatim}
+data Form = TrueF | FalseF | Pr Nombre [Term] | Eq Term Term | 
+            Neg Form | Conj Form Form | Disy Form Form | Imp Form Form | 
+            Equi Form Form | All Nombre Form | Ex Nombre Form 
+\end{verbatim}
+
+Algunos ejemplos son:
+\bi
+ \item $P(x,y)$ se implementa como \verb-Pr ``P'' [V ``x'', V ``y'']-
+ \item $Q(a,h(w))$ se implementa como 
+  \verb-Pr ``Q'' [F ``a'' [], F ``h'' [V ``w'']]-
+ \item $R(x)\imp x=b$ se implementa como 
+  \verb-Imp (Pr ``R'' [V ``x'']) (Eq (V ``x'') (F ``b'' []))-
+ \item $\neg R(z)\lor (S(a)\land f(x)=z)$ se implementa como
+ \begin{verbatim}
+  Disy (Neg (Pr ``R'' [V ``z'']))
+       (Conj (Pr ``S'' [F ``a'' []]) 
+             (Eq (F ``f'' [V ``x'']) (V ``z''))
+       )
+ \end{verbatim}
+ 
+ \vspace{-25pt}
+ 
+ \item $\fa x Q(x,g(x))$ se implementa como
+  \verb-All ``x'' (Pr ``Q'' [V ``x'',F ``g'' [V ``x'']])-
+ \item $\fa x \ex y P(x,y)$ se implementa como
+  \verb-All ``x'' (Ex ``y'' (Pr ``P'' [V ``x'',V ``y'']))-
+\ei
+
+
+%subst (All y f) x t = if not (elem x (y:var t) then All y (sterm f x t) else 
+% (All y f)
+
+
+\section{Inducción y Recursión}
+Las definiciones recursivas para los elementos del lenguaje generan principios 
+de inducci\'on. 
+Dado que ahora tenemos dos categorías sintácticas, términos y fórmulas,
+tenemos también principios de inducción correspondientes a cada categoría.
+
+\defin{[Principio de Inducci\'on Estructural para $\term_\L$]
+Sea $\Pe$ una propiedad acerca de t\'erminos. Para demostrar que $\Pe$ es
+v\'alida para todos los t\'erminos, basta seguir los siguientes pasos:
+\bi
+\item Base de la inducción: mostrar que
+\be
+\item Si $x\in\mathsf{Var}$ entonces $\Pe$ es v\'alida para $x$.
+\item Si $c\in\C$ entonces $\Pe$ es v\'alida para $c$.
+\ee
+\item Hipótesis de inducción: suponer $\Pe$ para cualesquiera 
+$t_1,\ldots,t_n\in\term_\L$.
+\item Paso inductivo: usando la Hipótesis de inducción mostrar que 
+\be
+\item Si $f\in\F$ es un símbolo de función
+  de índice $n$ entonces $f(t_1,\ldots,t_n)$ cumple $\Pe$.
+\ee
+\ei
+}
+
+\defin{[Principio de Inducción Estructural para $\form_\L$]
+Sea $\Pe$ una propiedad acerca de fórmulas. Para probar que toda fórmula $
+\vp\in\form_\L$ tiene la propiedad $\Pe$ basta seguir los siguientes pasos:
+\bi
+\item Caso base: mostrar que toda fórmula atómica tiene la propiedad~$\Pe$.
+\item Hipótesis de inducción: suponer que $\vp$ y $\psi$ cumplen $\Pe$.
+\item Paso inductivo: mostrar usando la Hipótesis de inducci\'on que
+\be
+\item $(\neg\vp)$ también cumple $\Pe$.
+\item  $(\vp\star\psi)$ tiene la propiedad $\Pe$, donde 
+$\star\in\{\imp,\land,\lor,\iff\}$
+\item $\fa x\vp$ y $\ex x\vp$ cumplen $\Pe$.
+\ee
+\ei
+}
+
+Con respecto a la recursión, tambi\'en podemos definir funciones sobre los 
+términos y las fórmulas usando los siguientes principios:
+
+\paragraph{Definici\'on Recursiva para T\'erminos} 
+Para definir una funci\'on~$h:\term_\L\imp A$, basta definir~$h$ como sigue:
+\bi
+\item Definir $h(x)$ para $x\in\mathsf{Var}$.
+\item Definir $h(c)$ para cada constante $c\in\C$.
+\item Suponiendo que $h(t_1),\ldots,h(t_n)$ est\'an definidas, definir
+$h(f(t_1,\ldots,\allowbreak t_n))$ para cada s\'{\i}mbolo de funci\'on $f\in\F$ 
+de índice $n$, utilizando $h(t_1),\ldots,\allowbreak h(t_n)$.
+\ei
+
+
+\paragraph{Definici\'on Recursiva para F\'ormulas}.
+Para definir una funci\'on~$h:\form_\L\imp A$, basta definir~$h$ como sigue:
+\bi
+\item Definir $h$ para cada f\'ormula at\'omica, es decir, definir $h(\bot), 
+h(\top)$, $h(P(t_1,\ldots,t_n))$ y $h(t_1=t_2)$ si el lenguaje tiene igualdad.
+\item Suponiendo definidas $h(\vp)$ y $h(\psi)$, definir a partir de
+ellas a\\
+$h(\neg\vp),\;h(\vp\lor\psi),\;h(\vp\land\psi),\;h(\vp\imp\psi),
+\;h(\vp\iff\psi) 
+,\;h(\fa x\vp)$ y $h(\ex x\vp)$. 
+\ei
+
+\espc
+
+\noindent Veamos algunos ejemplos:
+\ejem{
+Definimos el conjunto de subt\'erminos de un t\'ermino $t$ recursivamente
+como sigue:
+\bi
+\item $\mathsf{Subt}(x)=\{x\}$
+\item $\mathsf{Subt}(c)=\{c\}$
+\item $\mathsf{Subt}(f(t_1,\ldots,t_n))=\{f(t_1,\ldots,t_n)\}\cup
+\mathsf{Subt}(t_1)\cup\ldots\cup \mathsf{Subt}(t_n)$
+\ei
+}
+\ejem{Definimos recursivamente el número de conectivos y cuantificadores de
+  una f\'ormula, conocido como el peso de una fórmula, como sigue:
+\bi
+\item $\mathsf{peso}(\bot)=\mathsf{peso}(\top)=0$.
+\item $\mathsf{peso}(P(t_1,\ldots,t_n))=0$.
+\item $\mathsf{peso}(\neg\vp)=\mathsf{peso}(\vp)+1$.
+\item $\mathsf{peso}(\vp\land\psi)=\mathsf{peso}(\vp)+\mathsf{peso}(\psi)+1$
+\item $\mathsf{peso}(\fa x\vp)=\mathsf{peso}(\vp)+1$
+\ei
+
+}
+
+\begin{comment}
+\subsubsection{Ejercicio}
+
+Definir recursivamente e implementar las siguientes funciones:
+
+\bi
+\item \verb-consT :: Term -> [Nombre]} tal que \verb-ConsT t} devuelve la lista 
+con todos los nombres de constante que figuran en $t$.
+\item \verb-varT :: Term -> [Nombre]} tal que \verb-VarT t} devuelve la lista 
+con 
+todos los nombres de variables que figuran en $t$.
+\item \verb-funT :: Term -> [Nombre]} tal que \verb-FunT t} devuelve la lista 
+con 
+todos los nombres de función que figuran en $t$.
+\item Análogamente para el caso de las fórmulas: \verb-consF, varF,funF:: Form 
+-> 
+[Nombre]}
+\item \verb-subT :: Term -> [Term]} tal que \verb-subT t} devuelve la lista de 
+subtérminos de $t$.
+\item \verb-subF :: Form -> [Form]} tal que \verb-subF A} devuelve la lista de 
+subfórmulas de $A$.
+\item \verb-cuantF :: Form -> [Formm]} tal que \verb-cuantF A} devuelve la 
+lista 
+de cuantificaciones de $A$, es decir, la lista de subfórmulas de $A$ que son 
+cuantificaciones.
+
+\ei
+
+\end{comment}
+\end{document}
