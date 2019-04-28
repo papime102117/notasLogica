@@ -1,0 +1,345 @@
+%%% Presentaciones para Lenguajes de programacion y sus paradigmas 
+
+%\documentclass[xcolor=dvipsnames,table,handout]{beamer}
+\documentclass[xcolor=dvipsnames,table]{beamer}
+
+\newcommand{\espc}{\vspace{0.3cm}}
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{hyperref}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+
+%%%% paquetes matematicas
+\usepackage{amssymb,amsmath,amscd}
+\usepackage{extarrows}
+\usepackage{stmaryrd}
+\usepackage{mathabx}
+\usepackage{mathrsfs}
+% \usepackage{mathabx}
+\usepackage{amsthm}
+
+%%%%%
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{pifont}
+\usepackage{xcolor}
+\usepackage{etex}
+\usepackage{tikz}
+\usepackage{array}
+%\usepackage{pgfplots}
+
+%%%% cosmetics
+% D.Remy package for pretty display of rules
+\usepackage{mathpartir}
+
+% para insertar codigo con formato particular 
+\usepackage{listing} 
+
+% comillas 
+\usepackage[autostyle=true,spanish=mexican]{csquotes}
+
+% codigo 
+\usepackage{verbatim}
+\usepackage{alltt}
+
+% footnotes
+\usepackage[bottom]{footmisc}
+\usepackage{setspace}
+
+\usepackage{wrapfig}
+\usepackage{caption}
+
+
+\hfuzz=5.002pt %parameter to allow hbox overfulled by length before error!
+
+% Options for presentation
+% ------------------------
+% \definecolor{mycolor}{RGB}{255,192,3}
+\definecolor{mycolor}{RGB}{17,132,221}
+\mode<presentation>
+{
+% \usetheme[secheader]{Boadilla}
+% \usecolortheme{orchid}
+\useoutertheme{infolines}
+\useinnertheme{rectangles}
+\setbeamertemplate{itemize items}[square]
+\setbeamertemplate{enumerate items}[square]
+\setbeamersize{text margin left=6mm, text margin right=6mm}
+
+\setbeamercolor{alerted text}{fg=red,bg=red!70!white}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{frametitle}{bg=mycolor,fg=white}
+\setbeamercolor{normal text}{bg=white,fg=black}
+\setbeamercolor{structure}{bg=black,fg=mycolor}
+\setbeamercolor{title}{bg=mycolor,fg=white}
+\setbeamercolor{subtitle}{bg=mycolor,fg=white}
+\setbeamercolor{titlelike}{bg=white,fg=mycolor}
+
+\setbeamercovered{invisible}
+
+\setbeamercolor*{palette primary}{fg=mycolor,bg=white}
+\setbeamercolor*{palette secondary}{bg=white,fg=white}
+\setbeamercolor*{palette tertiary}{fg=mycolor,bg=white}
+\setbeamercolor*{palette quaternary}{fg=white,bg=white}
+
+\setbeamercolor{separation line}{bg=mycolor,fg=mycolor}
+\setbeamercolor{fine separation line}{bg=white,fg=red}
+\setbeamercolor{author in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{title in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{date in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{institute in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{section in head/foot}{bg=mycolor!60!white, fg=Red}
+\setbeamercolor{subsection in head/foot}
+{bg=mycolor!50!white,fg=mycolor!50!white}
+
+
+\setbeamertemplate{headline}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.65ex,dp=1.5ex,center]{section in 
+head/foot}%
+    \usebeamerfont{section in head/foot}\insertsectionhead\hspace*{2ex}
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.65ex,dp=1.5ex,center]{subsection 
+in head/foot}%
+    \usebeamerfont{subsection in head/foot}\hspace*{2ex}\insertsubsectionhead
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+% \beamerdefaultoverlayspecification{<+->}
+\beamertemplatenavigationsymbolsempty
+% \setbeamertemplate{footline}[frame number]
+}
+
+\input{macroslc}
+
+\title[]{Lógica computacional}
+\subtitle{Tema: Lógica de Primer Orden. \\Conceptos sintácticos importantes.}
+\author{ Pilar Selene Linares Ar\'evalo}
+\institute[UNAM-FC]{Facultad de Ciencias\\ 
+Universidad Nacional Aut\'onoma de M\'exico}
+\date[]{ \footnotesize{marzo 2018}
+\newline{\tiny{Material desarrollado bajo el proyecto UNAM-PAPIME PE102117.}}}
+ 
+
+\beamerdefaultoverlayspecification{<+->}
+ 
+\titlegraphic{\includegraphics[width=16mm]{fc2.png}}
+ 
+
+\begin{document}
+
+\begin{frame}
+\titlepage 
+\end{frame}
+\note{}
+
+\frame{\titulos{Ligado y alcance}{}
+La presencia de los cuantificadores $\forall x$ y $\exists x$ en Lógica de Predicados dan pie al fenómeno de {\em ligado} que también surge en la mayoría de los lenguajes de programación: ciertas presencias de variables son presencias {\em ligadas}, cada una de las cuales se asocia con una expresión llamada {\em alcance}.
+}
+
+\frame{\titulos{Ligado y alcance}{}
+\begin{block}{{Alcance}}
+Dada una fórmula cuantificada $\forall x \varphi$ o $\exists x \varphi$, la presencia de $x$ en $\forall x \varphi$ o $\exists x \varphi$ es la variable (artificial) que liga el cuantificador correspondiente, mientras que la fórmula $\varphi$ se llama el {\bf alcance}, de este cuantificador.
+\end{block}
+\espc
+\begin{block}{{Presencias libres y ligadas}}
+Una presencia de la variable $x$ en la fórmula $\varphi$ está {\bf ligada} si es la variable que liga a un cuantificador de $\varphi$ o si figura en el alcance de un cuantificador $\forall x $ o $\exists x$ de $\varphi$. \\
+Si una presencia de la variable $x$ en la fórmula $\varphi$ no está ligada, decimos que está {\bf libre} en $\varphi$.
+\end{block}
+}
+
+
+\frame{\titulos{Ligado y alcance}{}
+Sea $\varphi = \forall x \color<2>{blue}{\exists z \color<3>{blue}{(Q(y,\color<5>{orange}{z}\color<5>{black} ) \lor R(\color<5>{orange}{z} \color<5>{black} ,\color<4>{orange}{x} \color<4>{black},y))}} \color<1,2,3,4>{black} \land P(\color<5>{green}{z} \color<5>{black},\color<4>{green}{x} \color<1,2,3,4>{black})$
+\pause
+\espc
+\begin{itemize}
+\item El alcance del cuantificador \color<2>{blue}{$\forall$} \color<2>{black} es la fórmula $\exists z  (Q(y, z) \lor R(z, x, y))$.
+\item El alcance del cuantificador \color<3>{blue}{$\exists$} \color<3>{black} es la fórmula $Q(y, z) \lor R(z, x, y)$.
+\item En $\varphi$ hay tres presencias de x: la primera es la variable asociada al cuantificador, la segunda es \color<4>{orange}{ligada} \color<4>{black}y la tercera \color<4>{green}{libre}.
+\item Las presencias de $z$ son cuatro: la primera es la variable asociada al cuantificador, \color<5>{orange}{ligadas }\color<5>{black}   segunda y terceras y \color<5>{green}{libre} \color<5>{black}la última.
+\item Finalmente las dos presencias de $y$ son libres.
+\end{itemize}
+}
+
+\frame{\titulos{Ligado y alcance}{}
+\begin{block}{{\bf Conjunto de variables libres}}
+Sea $\varphi$ una fórmula. El {\bf conjunto de variables libres} de $\varphi$, se denota $FV(\varphi)$. Es decir, $FV(\varphi)= \{ x \in Var \; | \; x \mbox{ figura libre en } \varphi \}$. \\
+La notación $\varphi(x_{1} , \dots , x_{n}$ quiere decir que $\{ x_{1}, \dots , x_{n} \subseteq FV(\varphi)\}$.
+\end{block}
+
+\begin{block}{{\bf Fórmula cerrada}}
+Una fórmula $\varphi$ es {\bf cerrada} si no tiene variables libres, es decir, si $FV(\varphi) = \emptyset$. Una fórmula cerrada también se conoce como enunciado o sentencia.
+\end{block}
+
+\begin{block}{{\bf Cerradura universal / existencial}}
+Sea $\varphi(x_{1} , \dots , x_{n}$ una fórmula con $FV(\varphi) = \{x_{1}, \dots , x_{n}\}$. La cerradura universal de $\varphi$, denotada
+$\forall x \varphi$, es la fórmula $\forall x_{1} \dots \forall x_{n} \varphi$. La cerradura existencial de $\varphi$, denotada $\exists \varphi$ es la fórmula $\exists x_{1} \dots \exists x_{n} \varphi$.
+\end{block}
+}
+
+\frame{\titulos{Sustitución}{}
+A diferencia de lo que sucede en lógica proposicional, donde una sustitución es sólo una operación textual sobre las fórmulas, en la lógica de predicados las sustituciones son operaciones sobre los términos y sobre las fórmulas y en este último caso deben respetar el ligado de variables, por lo tanto no son operaciones textuales.
+}
+
+\frame{\titulos{Sustitución}{}
+\begin{block}{Sustitución}
+Una {\bf sustitución} en un lenguaje de predicados $\mathcal{L}$ es una tupla de variables y términos denotada como $[x_{1}, x_{2}, \dots , x_{n} := t_{1}, \dots , t_{n} ]$ donde
+\begin{itemize}
+\item $x_{1}, \dots , x_{n}$ son variables distintas.
+\item $t_{1}, \dots , t_{n}$ son términos de $\mathcal{L}$.
+\item $x_{i} \neq t_{i} $ para cada $1 \leq y \leq n$.
+\end{itemize}
+
+Por lo general denotaremos a esta sustitución con $[\overrightarrow{x} := \overrightarrow{t}]$
+\end{block}
+}
+
+\frame{\titulos{Sustitución}{}
+La aplicación de una sustitución $[\overrightarrow{x} := \overrightarrow{t}]$ a un término $r$, denotada $r [\overrightarrow{x} := \overrightarrow{t}]$, se define como el término obtenido al reemplazar simultáneamente todas las presencias de $x_{i}$ en $r$ por $t_{i}$ . Este proceso de define recursivamente como sigue:
+\[
+\ba{rll}
+x_i[\vx:=\vt\,] & = & t_i \qquad  1\leq i\leq n \\ \\ 
+z[\vx:=\vt\,] & = & z \qquad  \text{ si } z\neq x_i\;1\leq i\leq n  \\ \\
+c[\vx:=\vt\,] & = & c \qquad 
+  \text{ si } c\in\C\text{, es decir, }c\text{ constante } \\ \\
+f(t_1,\ldots,t_m)[\vx:=\vt\,]& = & 
+f(t_1[\vx:=\vt\,],\ldots,t_m[\vx:=\vt\,]) \; \text{ con }f^{(m)}\in\F.
+\ea
+\]
+}
+
+\frame{\titulos{Sustitución}{}
+La aplicación de sustituciones a fórmulas, necesita de ciertos cuidados debido  a la presencia de variables ligadas mediante cuantificadores. La aplicación de  una sustitución textual a una fórmula puede llevar a situaciones problemáticas
+con respecto a la sintaxis y a la semántica de la lógica. En particular deben evitarse los siguientes problemas:
+\begin{itemize}
+\item Generación de expresiones que no son fórmulas.
+\item Captura de variables libres.
+\end{itemize}
+}
+
+\frame{\titulos{Sustitución}{}
+\begin{block}{Aplicación sustitución a fórmulas}
+La aplicación de una sustitución~$[\vx:=\vt]$ a una fórmula~$\vp$, denotada~$\vp[\vx:=\vt]$ se define como la fórmula obtenida al reemplazar  \textit{simultáneamente} todas las presencias libres de~$x_i$ en~$\vp$  por~$t_i$, verificando que este proceso no capture posiciones de variables libres.
+\end{block}
+}
+
+\frame{\titulos{}{}
+La aplicación de una sustitución a una fórmula $\vp[\vx:=\vt\,]$ se define   \textbf{recursivamente} como sigue:
+\[
+ \ba{rll}
+  \bot[\vx:=\vt\;] & = & \bot \\
+  \top[\vx:=\vt\;] & = & \top \\
+  P(t_1,\ldots,t_m)[\vx:=\vt\;] & = &
+    P\big(t_1[\vx:=\vt\;], \ldots, t_m[\vx:=\vt\;]\big) \\ 
+  (t_1 = t_2)[\vx:=\vt\;] & = & t_1[\vx:=\vt\;]=t_2[\vx:=\vt\;]\\ \\ \pause
+  (\neg \vp)[\vx:=\vt\;] & = & \neg \big(\vp[\vx:=\vt\;]\big)\\
+  (\vp\land\psi)[\vx:=\vt\;] & = &
+  \big(\vp[\vx:=\vt\;]\land\psi[\vx:=\vt\;]\big)\\
+  (\vp\lor\psi)[\vx:=\vt\;] & = &
+  \big(\vp[\vx:=\vt\;]\lor\psi[\vx:=\vt\;]\big)\\
+  (\vp\imp\psi)[\vx:=\vt\;] & = &
+  \big(\vp[\vx:=\vt\;]\imp\psi[\vx:=\vt\;]\big)\\
+  (\vp\iff\psi)[\vx:=\vt\;] & = &
+  \big(\vp[\vx:=\vt\;]\iff\psi[\vx:=\vt\;]\big)\\ \\ \pause
+  (\fa y\vp)[\vx:=\vt\;] & = & \fa y\big(\vp[\vx:=\vt\;]\big)\; 
+\text{ \textbf{si} } y\notin
+  \vx\cup Var(\vt) \\ \pause
+(\ex y\vp)[\vx:=\vt\;] & = & \ex y\big(\vp[\vx:=\vt\;]\big)\; \text{ 
+\textbf{si} } y\notin  \vx\cup Var(\vt) \\
+\ea
+\]
+}
+
+\frame{\titulos{Sustitución}{}
+\begin{exampleblock}{Propiedades de la sustitución}
+La operación de sustitución tiene las siguientes propiedades, 
+  considerando~$x\notin \vx$.
+  \bi
+   \item Si $x\notin FV(\vp)$ entonces 
+    $\vp[\vec{x},x:=\vec{t},r\,] = \vp[\vec{x}:=\vec{t}\,]$.
+   \item Si $\vec{x}\cap FV(\vp)=\vacio$ entonces $\vp[\vx:=\vt\,]=\vp$.
+   \item $FV(\vp[\vx:=\vt\,])\inc (FV(\vp)-\vx)\cup Var(\vt)$.
+   \item Si $x\notin \vx\cup Var(\vt\,)$ entonces $x\in FV(\vp)$
+    si y sólo si $x\in FV(\vp[\vx:=\vt\,])$.
+   \item Si $x\notin \vx\cup Var(\vt\,)$ entonces            
+    $\vp[x:=t][\vx:=\vt\,]=\vp\big[\vx:=\vt\,\big]\big[x:=t[\vx:=\vt\,]\big]$.
+   \item Si $x\notin \vx\cup Var(\vt\,)$ entonces 
+    $\vp[\vx,x := \vt,t]=\vp[\vx:=\vt\,][x:=t]$.
+  \ei
+\end{exampleblock}
+}
+
+\frame{\titulos{$\alpha$ equivalencia}{}
+La definición de sustitución en fórmulas cuenta con una restricción aparente
+en el caso de los cuantificadores, por ejemplo, la sustitución
+\pause
+\[
+\fa x (Q(x)\to R(z,x))[z:=f(x)]
+\] 
+\pause
+no está definida, puesto que~$x$ figura en~$f(x)$ es decir~$x\in Var(f(x))$, 
+con lo que no se cumple la condición necesaria para aplicar la sustitución, a 
+saber que las variables en la sustitución son ajenas a las de la fórmula.
+Por lo tanto, la aplicación de cualquier sustitución a una fórmula hasta 
+ahora es una función parcial.
+}
+
+\frame{\titulos{$\alpha$ equivalencia}{}
+Esta aparente restricción desaparece al notar que los nombres de las  variables ligadas no importan: por ejemplo, las fórmulas $\fa x P(x)$ y $\fa y P(y)$ significan exactamente lo mismo, a saber que todos los  elementos del universo dado cumplen la propiedad~$P$.\\ \pause
+\espc
+Por lo tanto convenimos en identificar fórmulas que sólo difieren en sus
+variables ligadas.
+}
+
+\frame{\titulos{$\alpha$ equivalencia}{}
+\begin{block}{$\alpha$ equivalencia}
+Decimos que dos fórmulas~$\vp_1,\;\vp_2$ son $\mathbf{\al}${\bf -equivalentes} lo cual escribimos $\vp_1\sim_\al \vp_2$ si y sólo si $\vp_1$ y $\vp_2$ difieren a lo más en los nombres de sus variables ligadas.
+\end{block}
+
+\pause
+Las siguientes expresiones son $\al$-equivalentes.
+\[
+\fa x P(x,y)\to \ex y R(x,y,z)\;\;\sim_\al\;\; 
+\fa w P(w,y)\to \ex v R(x,v,z) \;\; \;\; 
+\]
+\[
+\fa w P(w,y)\to \ex v R(x,v,z) \;\; \sim_\al \;\; \fa z P(z,y)\to \ex u R(x,u,z) \;\; \;\; 
+\]
+}
+
+\frame{\titulos{$\alpha$ equivalencia}{}
+Usando la $\al$-equivalencia, la operación de sustitución en fórmulas se vuelve una función \textit{total} por lo que siempre está definida.  \\
+\pause
+\espc
+Por ejemplo se tiene que
+\[
+\begin{array}{rcl}
+\fa x (Q(x)\to R(z,x))[z:=f(x)] & = &  \fa y(Q(y)\to R(z,y))[z:=f(x)] \\
+ & = & \fa y(Q(y)\to R(f(x),y)) \\
+\end{array}	
+\]
+}
+
+%\frame{\titulos{}{}
+%\begin{block}{}
+%
+%\end{block}
+%}
+%
+%\frame{\titulos{}{}
+%\begin{exampleblock}{}
+%
+%\end{exampleblock}
+%}
+%
+%\frame{\titulos{}{}
+%
+%}
+
+\end{document}

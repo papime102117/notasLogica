@@ -1,0 +1,524 @@
+%%% Presentaciones para Lenguajes de programacion y sus paradigmas 
+
+%\documentclass[xcolor=dvipsnames,table,handout]{beamer}
+\documentclass[xcolor=dvipsnames,table]{beamer}
+
+\newcommand{\espc}{\vspace{0.3cm}}
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{hyperref}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+
+%%%% paquetes matematicas
+\usepackage{amssymb,amsmath,amscd}
+\usepackage{extarrows}
+\usepackage{stmaryrd}
+\usepackage{mathabx}
+\usepackage{mathrsfs}
+% \usepackage{mathabx}
+\usepackage{amsthm}
+
+%%%%%
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{pifont}
+\usepackage{xcolor}
+\usepackage{etex}
+\usepackage{tikz}
+\usepackage{array}
+%\usepackage{pgfplots}
+
+%%%% cosmetics
+% D.Remy package for pretty display of rules
+\usepackage{mathpartir}
+
+% para insertar codigo con formato particular 
+\usepackage{listing} 
+
+% comillas 
+\usepackage[autostyle=true,spanish=mexican]{csquotes}
+
+% codigo 
+\usepackage{verbatim}
+\usepackage{alltt}
+
+% footnotes
+\usepackage[bottom]{footmisc}
+\usepackage{setspace}
+
+\usepackage{wrapfig}
+\usepackage{caption}
+
+
+\hfuzz=5.002pt %parameter to allow hbox overfulled by length before error!
+
+% Options for presentation
+% ------------------------
+% \definecolor{mycolor}{RGB}{255,192,3}
+\definecolor{mycolor}{RGB}{17,132,221}
+\mode<presentation>
+{
+% \usetheme[secheader]{Boadilla}
+% \usecolortheme{orchid}
+\useoutertheme{infolines}
+\useinnertheme{rectangles}
+\setbeamertemplate{itemize items}[square]
+\setbeamertemplate{enumerate items}[square]
+\setbeamersize{text margin left=6mm, text margin right=6mm}
+
+\setbeamercolor{alerted text}{fg=red,bg=red!70!white}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{frametitle}{bg=mycolor,fg=white}
+\setbeamercolor{normal text}{bg=white,fg=black}
+\setbeamercolor{structure}{bg=black,fg=mycolor}
+\setbeamercolor{title}{bg=mycolor,fg=white}
+\setbeamercolor{subtitle}{bg=mycolor,fg=white}
+\setbeamercolor{titlelike}{bg=white,fg=mycolor}
+
+\setbeamercovered{invisible}
+
+\setbeamercolor*{palette primary}{fg=mycolor,bg=white}
+\setbeamercolor*{palette secondary}{bg=white,fg=white}
+\setbeamercolor*{palette tertiary}{fg=mycolor,bg=white}
+\setbeamercolor*{palette quaternary}{fg=white,bg=white}
+
+\setbeamercolor{separation line}{bg=mycolor,fg=mycolor}
+\setbeamercolor{fine separation line}{bg=white,fg=red}
+\setbeamercolor{author in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{title in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{date in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{institute in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{section in head/foot}{bg=mycolor!60!white, fg=Red}
+\setbeamercolor{subsection in head/foot}
+{bg=mycolor!50!white,fg=mycolor!50!white}
+
+
+\setbeamertemplate{headline}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.65ex,dp=1.5ex,center]{section in 
+head/foot}%
+    \usebeamerfont{section in head/foot}\insertsectionhead\hspace*{2ex}
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.65ex,dp=1.5ex,center]{subsection 
+in head/foot}%
+    \usebeamerfont{subsection in head/foot}\hspace*{2ex}\insertsubsectionhead
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+% \beamerdefaultoverlayspecification{<+->}
+\beamertemplatenavigationsymbolsempty
+% \setbeamertemplate{footline}[frame number]
+}
+
+\input{macroslc}
+
+\title[]{Lógica computacional}
+\subtitle{Tema: Tableaux}
+\institute[UNAM-FC]{Facultad de Ciencias\\ 
+Universidad Nacional Aut\'onoma de M\'exico}
+\author{ Pilar Selene Linares Ar\'evalo}
+\date[]{ \footnotesize{abril 2018}
+\newline{\tiny{Material desarrollado bajo el proyecto UNAM-PAPIME PE102117.}}}
+ 
+
+\beamerdefaultoverlayspecification{<+->}
+ 
+\titlegraphic{\includegraphics[width=16mm]{fc2.png}}
+ 
+
+\begin{document}
+
+\begin{frame}
+\titlepage 
+\end{frame}
+\note{}
+
+\frame{\titulos{Introducción}{}
+Los {\bf tableaux} o \emph{tablas semánticas} son un método de demostración por refutación: dado un 
+conjunto de premisas~$\Gamma$ y una conclusión~$\varphi$, para mostrar que $\G\models\vp$ se debe demostrar que el conjunto $\Gamma\cup \{ \lnot \varphi \}$ no tiene un modelo. \\
+\espc
+\pause
+Este método se basa en la semántica más que en la sintáxis de las fórmulas. Sin
+embargo, se requiere de una clasificación de las fórmulas basada en sintaxis.
+}
+
+
+\frame{\titulos{Esquemas}{}
+Aunque el método fue introducido en los años 1950 de manera independiente por Hintikka y Beth, fue Smullyan quien estandariza la notación y realiza la clasificación de las fórmulas en literales y cuatro tipos identificando su esquema:
+\espc
+ \pause
+
+\begin{block}{Literal}
+Una {\bf literal} es una fórmula atómica o la negación de una fórmula atómica.
+\end{block}
+
+}
+
+\frame{\titulos{Esquemas}{}
+El conjunto de fórmulas que no son literales se clasifica en cuatro tipos, en cada tipo de fórmula se distinguen ciertas subfórmulas necesarias posteriormente:
+\begin{block}{Tipo $\alpha$}
+\textbf{Tipo $\boldsymbol{\alpha}$}: si la fórmula es conjuntiva o es equivalente
+   a una fórmula conjuntiva. \\
+   Una fórmula $\chi \in \form$ es tipo $\alpha$, si tiene alguna de las
+   siguientes formas:
+   \begin{enumerate} 
+   \item  $\chi = \vp \land \psi$, con subfórmulas $\alpha_{1} = \vp$ y
+     $\alpha_{2} = \psi$.
+
+   \item  $\chi = \lnot(\vp \lor \psi)$, con subfórmulas 
+   $\alpha_{1} = \lnot \vp$ y  $\alpha_{2} = \lnot \psi$.
+
+   \item   $\chi = \lnot(\varphi \imp \psi)$, con subfórmulas  
+   $\alpha_{1} = \vp$ y  $\alpha_{2} = \lnot \psi$.
+   \end{enumerate}
+\end{block}
+
+}
+
+
+\frame{\titulos{Esquemas}{}
+
+\begin{block}{Tipo $\beta$}
+\textbf{Tipo $\boldsymbol{\beta}$}: si la fórmula es disyuntiva o es equivalente
+   a una fórmula disyuntiva. \\
+   Una fórmula $\chi \in \form$ es tipo $\beta$, si tiene alguna de las
+   siguientes formas:
+   \begin{enumerate}
+   \item  $\chi = \vp \lor \psi$, con subfórmulas $\beta_{1} = \varphi$ y
+    $\beta_{2} = \psi$.
+
+   \item $\chi = \lnot(\vp \land \psi)$, con subfórmulas  
+    $\beta_{1} = \lnot \varphi$ y $\beta_{2} = \lnot \psi$.
+
+   \item $\chi = \vp \imp \psi$, con subfórmulas $\beta_{1} = \lnot \vp$
+    y $\beta_{2} = \psi$.
+
+   \item $\chi = \varphi \leftrightarrow \psi$, con subfórmulas 
+   $\beta_{1} = \varphi \land \psi$ y $\beta_{2} = \lnot \vp \land \lnot \psi$.
+
+   \item $\chi = \lnot ( \varphi \leftrightarrow \psi)$, con subfórmulas  
+   $\beta_{1} = \lnot \varphi \land  \psi$ y $\beta_{2} = \vp\land \lnot \psi$.
+   \end{enumerate}
+\end{block}
+}
+
+
+\frame{\titulos{Esquemas}{}
+
+
+\begin{block}{Tipo $\gamma$}
+\textbf{Tipo $\boldsymbol{\gamma}$}: si la fórmula está cuantificada universalmente 
+  o es equivalente a una fórmula cuantificada universalmente. \\
+  Una fórmula $\varphi$ es de tipo $\gamma$, si tiene alguna de las 
+  siguientes formas:
+  \begin{enumerate}
+   \item  $\chi = \forall x \varphi$.
+   \item  $\chi = \lnot \exists x \varphi$.
+    \end{enumerate}
+\end{block}
+
+\espc\begin{block}{Tipo $\delta$}
+\textbf{Tipo $\boldsymbol{\delta}$}: si la fórmula está cuantificada 
+  existencialmente o es equivalente a una fórmula cuantificada 
+  existencialmente. \\
+  Una fórmula $\varphi$ es tipo $\gamma$, si tiene alguna de las  siguientes 
+  formas:
+  \begin{enumerate}
+   \item  $\chi = \exists x \varphi$.
+   \item  $\chi = \lnot \forall x \varphi$.
+  \end{enumerate}
+\end{block}
+}
+
+\frame{\titulos{Tableaux}{}
+
+Un {\bf tableau} es un árbol donde cada nodo está etiquetado con una fórmula y tiene a lo más dos hijos. \\
+\espc
+\pause
+ Inicialmente el árbol únicamente contiene una rama en donde cada uno de los nodos que la conforman
+están etiquetados con una de las fórmulas del conjunto $\Gamma \cup
+\{\lnot \varphi \}$, si lo que queremos probar es que 
+$\Gamma \models\varphi$; o bien, $\Gamma$ si lo que queremos probar es que este 
+conjunto es insatisfacible.  \\
+\espc
+\pause
+ La construcción del árbol la dictan las siguientes reglas de extensión: 
+}
+
+
+\frame{\titulos{Tableau}{}
+\begin{exampleblock}{Regla de extensión $\al$: }
+
+ \begin{center}
+%   \boldmath
+\tikzstyle{level 1}=[level distance=10mm]
+   \tikz{\node{$\vp\land \psi$}
+       child{node{$\vp$}
+             child{node{$\psi$}}
+            }
+     ;
+     }
+\end{center}
+\end{exampleblock}
+
+\begin{exampleblock}{Regla de extensión $\beta$:}
+ \begin{center}
+%   \boldmath
+\tikzstyle{level 1}=[level distance=15mm]
+   \tikz{\node{$\vp\lor \psi$}
+     child{node{$\vp$}}
+     child{node{$\psi$}}
+     ;
+     }
+\end{center}
+\end{exampleblock}
+}
+
+\frame{\titulos{Tableau}{}
+\begin{exampleblock}{Regla de extensión $\ga$:}
+  \begin{center}
+  \tikzstyle{level 1}=[level distance=12mm]
+    \tikz{\node{$\fa x\vp$}
+       child{node{$\vp[x:=t]$}
+            }
+     ;
+     }
+\end{center}
+donde $t$ es cualquier término cerrado. Las fórmulas
+tipo $\gamma$ siempre están activas.
+\end{exampleblock}
+
+}
+
+\frame{\titulos{Tableau}{}
+\begin{exampleblock}{Regla de extensión $\delta$: }
+  \begin{center}
+  \tikzstyle{level 1}=[level distance=12mm]
+    \tikz{\node{$\ex x\vp$}
+       child{node{$\vp[x:=c]$}
+            }
+     ;
+     }
+\end{center}
+donde $c$ es una constante nueva, es decir una constante que no figura
+antes en la rama.
+\end{exampleblock}
+}
+
+\frame{\titulos{Tableaux}{}
+Ejemplos de reglas de extensión aplicadas a diferentes fórmulas:
+\bi
+\item Extensión de f\'ormulas equivalentes tipo~$\al$: 
+ \begin{center}
+\tikzstyle{level 1}=[level distance=10mm]
+  \tikz{\node{$\neg(\vp\lor \psi)$}
+       child{node{$\neg\vp$}
+             child{node{$\neg\psi$}}
+            }
+     ;
+     }
+\qquad \qquad 
+  \tikz{\node{$\neg(\vp\to\psi)$}
+       child{node{$\vp$}
+             child{node{$\neg\psi$}}
+            }
+     ;
+     }
+\end{center}
+
+\ei
+}
+
+
+\frame{\titulos{Tableaux}{}
+Ejemplos de reglas de extensión aplicadas a diferentes fórmulas:
+\bi
+
+\item Extensión de f\'ormulas equivalentes tipo~$\beta$:
+\begin{center}
+\tikzstyle{level 1}=[level distance=15mm]
+\tikzstyle{level 1}=[sibling distance= 20mm]
+   \tikz{\node{$\neg(\vp\land \psi)$}
+     child{node{$\neg \vp$}}
+     child{node{$\neg \psi$}}
+     ;
+     }
+ \quad
+   \tikz{\node{$\vp\to \psi$}
+     child{node{$\neg \vp$}}
+     child{node{$\psi$}}
+     ;
+     }
+\espc
+\quad
+   \tikz{\node{$\vp\iff \psi$}
+     child{node{$\vp\land \psi$}}
+     child{node{$\lnot\vp\land\lnot\psi$}}
+     ;
+     }
+\quad
+   \tikz{\node{$\lnot(\vp\iff \psi)$}
+     child{node{$\neg \vp \land \psi$}}
+     child{node{$\vp \land \lnot \psi$}}
+     ;
+     }
+\end{center}
+\ei
+}
+
+
+\frame{\titulos{Tableaux}{}
+Ejemplos de reglas de extensión aplicadas a diferentes fórmulas:
+\bi
+\item Extensión de f\'ormulas equivalentes tipo~$\gamma$:
+\begin{center}
+  \tikzstyle{level 1}=[level distance=12mm]
+    \tikz{\node{$\lnot\exists x\vp$}
+       child{node{$\lnot \vp[x:=t]$}
+            }
+     ;
+     }
+\end{center}
+\espc
+\item Extensión de f\'ormulas equivalentes tipo~$\delta$:
+\begin{center}
+  \tikzstyle{level 1}=[level distance=12mm]
+    \tikz{\node{$\lnot \fa x\vp$}
+       child{node{$\lnot \vp[x:=a]$}
+            }
+     ;
+     }
+\end{center}
+\ei
+}
+
+\frame{\titulos{Tableaux}{}
+
+\begin{block}{Tableaux semánticos}
+Sea $\Gamma = \{\varphi_{1},\varphi_{2},\ldots , \varphi_{n}\}$ un conjunto de
+ fórmulas, un {\bf tableau} para $\Gamma$ denotado $\mathcal{T}(\Gamma)$ es una 
+ extensión obtenida recursivamente como sigue:
+ \begin{enumerate}
+ \item El árbol formado por la rama cuyos nodos son $\varphi_{1}, \varphi_{2},
+   \ldots , \varphi_{n}$ es un tableau para $\Gamma$.
+\espc
+ \item Si $\mathcal{T}_{1}$ es un  tableau para $\Gamma$, entonces la extensión
+   que se obtiene después de aplicarle alguna de las reglas $\alpha,\;
+   \beta,\;\gamma,\;\delta$ es un tableau para $\Gamma$.
+\espc
+   \item Son todos 
+   % Únicamente son tableaux de $\Gamma$ aquellos que se obtienen
+   %  utilizando las reglas mencionadas en 1 y 2.
+ \end{enumerate}
+\end{block}
+}
+
+\frame{\titulos{Tableaux}{}
+\begin{block}{Tableau cerrado}
+ Una rama $\rho$ de un tableau es \emph{cerrada } si tanto una literal (fórmula  atómica) $\varphi$ como su negación figuran en $\rho$. \\ 
+Un tableau es {\bf cerrado} si todas sus ramas están cerradas.
+\end{block}
+\espc
+\begin{block}{Tableau abierto}
+Una rama $\rho$ de una tableau es \emph{abierta} si  no es cerrada. Un tableau se considera {\bf abierto} si contiene al menos una rama abierta.
+\end{block}
+}
+
+\frame{\titulos{Tableaux}{}
+
+\begin{exampleblock}{Correctud}
+Si hay un tableau cerrado para $\Gamma$ entonces $\Gamma$ no tiene un modelo. \\
+Es decir, si un tableaux con conjunto inicial $\G$ se cierra entonces dicho conjunto es insatisfacible.
+\end{exampleblock}
+\espc
+\begin{exampleblock}{Completud refutacional}
+Si $\Gamma$ no tiene un modelo entonces existe un tableau $\mathcal{T}(\Gamma)$
+cerrado. \\
+Es decir, si un conjunto inicial $\G$ es insatisfacible entonces 
+existe una extensión $\Te(\G)$ cerrada.\\
+\end{exampleblock}
+}
+
+\frame{\titulos{Tableaux}{}
+\begin{exampleblock}{Corolario 1}
+$\Gamma \models \varphi$ si y s\'olo si existe una extensión
+ $\mathcal{T}(\Gamma \cup \{ \lnot\varphi \})$ cerrada.
+\end{exampleblock}
+\espc
+\begin{exampleblock}{Corolario 2}
+$\models\varphi$  si y s\'olo si existe una extensión $\mathcal{T}(\lnot
+ \varphi)$ cerrada.
+\end{exampleblock}
+}
+
+\frame{\titulos{Indecibilidad}{}
+Sabemos que la lógica de predicados es indecidible, es decir, \textit{no existe un algoritmo que reciba una fórmula~$\vp$ y decida si ésta
+es o no una fórmula universalmente válida}. En particular:
+\espc
+\bi
+\item No existe un algoritmo que reciba un conjunto de premisas $\G$ y
+una fórmula $\vp$ y decida si se cumple o no $\G\models\vp$.
+\espc
+\item Podemos preguntarnos entonces por qu\'e el método de tableaux no nos permitirá 
+  decidir la consecuencia lógica en la lógica de predicados.
+\ei
+
+}
+
+\frame{\titulos{Indecibilidad}{}
+Consideremos el siguiente argumento: \\
+$$ \fa x\ex y P(x,y),\; R(a,b)\;/\;\therefore \ex x R(x,b) $$ \\
+\pause
+es claramente correcto pues la conclusión es consecuencia de la 
+segunda premisa, la primera no aporta información. \\
+\pause
+\espc
+Aunque existe un tableau cerrado (utilizando la segunda premisa y la negaci\'on de la conclusión) también existe un tableau 
+infinito (utilizando la primera premisa). \\
+\espc
+\pause
+
+\setbeamercolor{postit}{bg=yellow!50!white}
+\begin{beamercolorbox}{postit}
+Por lo tanto si en el análisis de un argumento nos encontramos ante un tableau que no se ha cerrado no podemos asegurar algo.
+\end{beamercolorbox}    
+}
+
+
+\frame{\titulos{Tableaux}{}
+
+\setbeamercolor{postit}{bg=yellow!50!white}
+\begin{beamercolorbox}{postit}
+Los tableaux en lógica de 
+predicados únicamente pueden ser utilizados  para trata de establecer  
+\emph{insatisfacibilidad, validez} ó \emph{consecuencia lógica} y  por lo 
+general \textbf{no} son un método apto para construir modelos como en   el caso 
+de la lógica de proposiciones. 
+\end{beamercolorbox}    
+}
+
+%
+%\frame{\titulos{}{}
+%\begin{block}{}
+%
+%\end{block}
+%}
+%
+%\frame{\titulos{}{}
+%\begin{exampleblock}{}
+%
+%\end{exampleblock}
+%}
+%
+%\frame{\titulos{}{}
+%
+%}
+
+
+
+\end{document}

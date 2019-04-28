@@ -1,0 +1,459 @@
+%%% Presentaciones para Lenguajes de programacion y sus paradigmas 
+
+\documentclass[xcolor=dvipsnames,table,handout]{beamer}
+%\documentclass[xcolor=dvipsnames,table]{beamer}
+\newcommand{\espc}{\vspace{0.3cm}}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{hyperref}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+
+%%%% paquetes matematicas
+\usepackage{amssymb,amsmath,amscd}
+\usepackage{extarrows}
+\usepackage{stmaryrd}
+\usepackage{mathabx}
+\usepackage{mathrsfs}
+% \usepackage{mathabx}
+\usepackage{amsthm}
+
+%%%%%
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{pifont}
+\usepackage{xcolor}
+\usepackage{etex}
+\usepackage{tikz}
+\usepackage{array}
+%\usepackage{pgfplots}
+
+%%%% cosmetics
+% D.Remy package for pretty display of rules
+\usepackage{mathpartir}
+
+% para insertar codigo con formato particular 
+\usepackage{listing} 
+
+% comillas 
+\usepackage[autostyle=true,spanish=mexican]{csquotes}
+
+% codigo 
+\usepackage{verbatim}
+\usepackage{alltt}
+
+% footnotes
+\usepackage[bottom]{footmisc}
+\usepackage{setspace}
+
+\usepackage{wrapfig}
+\usepackage{caption}
+
+
+\hfuzz=5.002pt %parameter to allow hbox overfulled by length before error!
+
+% Options for presentation
+% ------------------------
+% \definecolor{mycolor}{RGB}{255,192,3}
+\definecolor{mycolor}{RGB}{17,132,221}
+\mode<presentation>
+{
+% \usetheme[secheader]{Boadilla}
+% \usecolortheme{orchid}
+\useoutertheme{infolines}
+\useinnertheme{rectangles}
+\setbeamertemplate{itemize items}[square]
+\setbeamertemplate{enumerate items}[square]
+\setbeamersize{text margin left=6mm, text margin right=6mm}
+
+\setbeamercolor{alerted text}{fg=red,bg=red!70!white}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{frametitle}{bg=mycolor,fg=white}
+\setbeamercolor{normal text}{bg=white,fg=black}
+\setbeamercolor{structure}{bg=black,fg=mycolor}
+\setbeamercolor{title}{bg=mycolor,fg=white}
+\setbeamercolor{subtitle}{bg=mycolor,fg=white}
+\setbeamercolor{titlelike}{bg=white,fg=mycolor}
+
+\setbeamercovered{invisible}
+
+\setbeamercolor*{palette primary}{fg=mycolor,bg=white}
+\setbeamercolor*{palette secondary}{bg=white,fg=white}
+\setbeamercolor*{palette tertiary}{fg=mycolor,bg=white}
+\setbeamercolor*{palette quaternary}{fg=white,bg=white}
+
+\setbeamercolor{separation line}{bg=mycolor,fg=mycolor}
+\setbeamercolor{fine separation line}{bg=white,fg=red}
+\setbeamercolor{author in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{title in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{date in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{institute in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{section in head/foot}{bg=mycolor!60!white, fg=Red}
+\setbeamercolor{subsection in head/foot}
+{bg=mycolor!50!white,fg=mycolor!50!white}
+
+
+\setbeamertemplate{headline}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.65ex,dp=1.5ex,center]{section in 
+head/foot}%
+    \usebeamerfont{section in head/foot}\insertsectionhead\hspace*{2ex}
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.65ex,dp=1.5ex,center]{subsection 
+in head/foot}%
+    \usebeamerfont{subsection in head/foot}\hspace*{2ex}\insertsubsectionhead
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+% \beamerdefaultoverlayspecification{<+->}
+\beamertemplatenavigationsymbolsempty
+% \setbeamertemplate{footline}[frame number]
+}
+
+\input{macroslc}
+
+\title[]{Lógica computacional}
+\subtitle{Tema: Semántica de la Lógica de Primer Orden II}
+\author{ Pilar Selene Linares Ar\'evalo}
+\institute[UNAM-FC]{Facultad de Ciencias\\ 
+Universidad Nacional Aut\'onoma de M\'exico}
+\date[]{ \footnotesize{marzo 2018}
+\newline{\tiny{Material desarrollado bajo el proyecto UNAM-PAPIME PE102117.}}}
+ 
+
+\beamerdefaultoverlayspecification{<+->}
+ 
+\titlegraphic{\includegraphics[width=16mm]{fc2.png}}
+ 
+
+\begin{document}
+
+\begin{frame}
+\titlepage 
+\end{frame}
+\note{}
+
+
+\frame{\titulos{Modelos}{}
+Uno de los problemas fundamentales en l\'ogica es la búsqueda de modelos de
+un conjunto dado de fórmulas~$\G$. \\
+\pause
+\espc
+Sabemos que un modelo para una fórmula~$\vp$ es una interpretación~$\M=\pt{M,\I}$ tal que $\M\models\vp$, es decir tal que
+$\I_\sigma(\vp)$ para cualquier estado~$\sigma$. \\
+\pause
+\espc
+
+También sabemos que si bien una fórmula no necesariamente tiene un modelo, es decir, no
+necesariamente es verdadera o falsa, esta propiedad sí se cumple para los enunciados, puesto que no tienen variables libres que
+cambien de valor dependiendo del estado.
+}
+
+\frame{\titulos{Modelos}{}
+Buscamos un modelo $\M$ para \\
+$\G=\{Pb,Qb,Rb,\ex x(Px\land \neg(Qx\lor Rx),\;\fa x
+(Rx \imp Px)\}$.\\
+\espc
+\pause
+
+\only<2>{
+\setbeamercolor{postit}{bg=yellow!50!white}
+\begin{beamercolorbox}{postit}
+Lo m\'as f\'acil es ir construyendo un modelo para cada f\'ormula de $\G$, si logramos que todas las f\'ormulas de $\G$ sean
+verdaderas al mismo tiempo entonces habremos construído un modelo para $\G$.
+\end{beamercolorbox} }    
+
+\pause
+
+Analicemos cada f\'ormula de $\G$: \\
+\pause
+\be
+\item $Pb$:  para que $\M\models Pb$ se debe cumplir que $b^\I\in
+P^\I$. As\'{\i} que al menos debemos tener $P^\I=\{b^\I\}$
+\item $Qb$: para que $\M\models Q(b)$ se debe cumplir que $b^\I\in
+Q^\I$, as\'{\i} que basta $Q^\I=\{b^\I\}$ 
+\item $Rb$: para que $\M\models Q(b)$ se debe cumplir que $b^\I\in
+R^\I$ por lo que basta con $R=\{b^\I\}$.
+%\item $\ex x(P(x)\land \neg(Q(x)\lor R(x))$. Es decir, hay un elemento de
+%$|\M|$ tal que cumple $P$ y no cumple $Q$ ni $R$. Claramente este elemento
+%no puede ser $b^\I$ por lo que $P^\I$ debe tener al menos otro elemento,
+%digamos $P^\I=\{b^\I, m\}$.
+%\item $\fa x (R(x)\allowbreak\imp P(x))$. Debemos tener que todo elemento
+%de $\G$ que cumple $R^\I$, debe cumplir $P^\I$, pero de acuerdo a como definimos
+%$R^\I$ esto ya se cumple pues $b^\I\in R^\I$ y $b^\I\in P^\I$. 
+\ee
+%De manera que $P^\I=\{b^\I, m\}$ y $Q^\I=\{b^\I\}=R^\I$ y para
+%que el modelo resulte m\'as natural podemos tomar $M=\{0,1\},\;b^\I=0$ y
+%$m=1$, con lo que queda $\M=\pt{\{0,1\},\I}$ con
+%$P^\I=\{0,1\}, Q^\I=\{0\}=R^\I, b^\I=0$. 
+}
+
+
+\frame{\titulos{Modelos}{}
+Buscamos un modelo $\M$ para \\
+$\G=\{Pb,Qb,Rb,\ex x(Px\land \neg(Qx\lor Rx),\;\fa x
+(Rx \imp Px)\}$.\\
+\espc
+
+Analicemos cada f\'ormula de $\G$: \\
+\pause
+\be
+\item $\ex x(Px\land \neg(Qx\lor Rx)$:  hay un elemento de
+$|\M|$ que cumple $P$ y no cumple $Q$ ni $R$. Este elemento
+no puede ser $b^\I$ por lo que $P^\I$ debe tener al menos otro elemento,
+digamos $P^\I=\{b^\I, m\}$.
+\item $\fa x (Rx \imp Px)$: todo elemento de $\G$ que cumple $R^\I$, también cumple $P^\I$, pero de acuerdo a como definimos $R^\I$ esto ya se satisface pues $b^\I\in R^\I$ y $b^\I\in P^\I$. 
+\ee
+%De manera que $P^\I=\{b^\I, m\}$ y $Q^\I=\{b^\I\}=R^\I$ y para
+%que el modelo resulte m\'as natural podemos tomar $M=\{0,1\},\;b^\I=0$ y
+%$m=1$, con lo que queda $\M=\pt{\{0,1\},\I}$ con
+%$P^\I=\{0,1\}, Q^\I=\{0\}=R^\I, b^\I=0$. 
+}
+
+\frame{\titulos{Modelos}{}
+Buscamos un modelo $\M$ para \\
+$\G=\{Pb,Qb,Rb,\ex x(Px\land \neg(Qx\lor Rx),\;\fa x
+(Rx \imp Px)\}$.\\
+\espc
+
+De lo anterior tenemos  que $P^\I=\{b^\I, m\}$ y $Q^\I=\{b^\I\}=R^\I$. \\
+\espc \pause
+Para que el modelo resulte m\'as natural podemos tomar $M=\{0,1\},\;b^\I=0$ y
+$m=1$, con lo que queda $\M=\pt{\{0,1\},\I}$ con
+$P^\I=\{0,1\}, Q^\I=\{0\}=R^\I, b^\I=0$. \\
+\espc
+\espc
+}
+
+\frame{\titulos{Validez universal}{}
+El concepto de tautología en lógica proposicional tiene su contraparte en lógica de predicados mediante el concepto de validez universal. 
+\espc
+\pause
+\begin{block}{Validez universal}
+Decimos que una fórmula~$\vp$ es {\bf universalmente 
+  válida} (o simplemente válida) si para toda interpretación~$\M$ se cumple que 
+  $\M\models\vp$, es decir, si $\vp$ es verdadera en cualquier interpretación 
+  posible, lo cual se denota con $\models\vp$.
+\end{block}
+}
+
+\frame{\titulos{Validez universal}{}
+La noción de validez universal es análoga a la noción de tautología en lógica proposicional. \\
+\espc
+\pause
+De hecho toda fórmula cuyo esqueleto proposicional es una tautología, resulta ser una fórmula universalmente válida. \\
+\espc
+\pause
+Por ejemplo:
+$\models\fa x(Px\imp Px\lor Qxy)$  puesto que en lógica proposicional se tiene que $\models P\imp P\lor Q$.
+}
+
+\frame{\titulos{Validez Universal}{}
+{\bf Ejercicio:} Mostrar que $\models\neg\ex x \vp\iff\fa x\neg \vp$. \\
+\espc
+\pause
+Sea $\M$ una interpretaci\'on y $\sigma$ un estado de las variables, hay 2 casos:
+\bi
+\item $\boldsymbol{\I_\sigma(\neg\ex x\vp)=1}$. \pause Es equivalente a $\I_\sigma(\ex x\vp)=0$
+cuya definición es que no existe $m\in |\M|$ tal que $\I_{\sigma[x/m]}(\vp)=1$ \\
+\pause
+\espc
+Es decir,  para todo $m\in |\M|,\;\I_{\sigma[x/m]}(\vp)=0$ o  equivalentemente
+para todo $m\in |\M|,\;\I_{\sigma[x/m]}(\neg\vp)=1$ \\
+\pause
+\espc
+Lo anterior significa que $\I_\sigma(\fa x\neg\vp)=1$.
+\ei
+%Por lo tanto en cualquier caso se tiene que %$\M\models_\sigma\neg\ex x \vp$ syss
+%                                %$\M\models_\sigma\fax\neg \vp$. 
+%$\I_\sigma(\neg\ex x\vp)=\I_\sigma(\fa x\neg\vp)$ es decir, $\I_\sigma(\neg\ex
+%x\vp\iff\fa x\neg\vp)=1$. Por lo tanto $\M\models\neg\ex x\vp\iff\fa x\neg
+%\vp$. Pero como $\M$ era una interpretación arbitraria, se tiene que $\models\neg\ex x\vp\iff\fa x\neg \vp$.
+}
+
+\frame{\titulos{Validez Universal}{}
+{\bf Ejercicio:} Mostrar que $\models\neg\ex x \vp\iff\fa x\neg \vp$. \\
+\espc
+
+Sea $\M$ una interpretaci\'on y $\sigma$ un estado de las variables, hay 2 casos:
+\bi
+\item $\boldsymbol{\I_\sigma(\neg\ex x\vp)=0}$. \pause Es decir, $\I_\sigma(\ex x\vp)=1$ syss
+existe $m\in |\M|$ tal que $\I_{\sigma[x/m]}(\vp)=1$. \\
+\pause
+\espc
+Lo anterior sucede syss existe $m\in |\M|$ tal que $\I_{\sigma[x/m]}(\neg\vp)=0$
+syss no para todo $m\in |\M|,\;\I_{\sigma[x/m]}(\neg\vp)=1$ \\
+\espc
+\pause
+Por lo tanto $\I_\sigma(\fa x\neg\vp)=0$.
+\ei
+%Por lo tanto en cualquier caso se tiene que %$\M\models_\sigma\neg\ex x \vp$ syss
+%                                %$\M\models_\sigma\fax\neg \vp$. 
+%$\I_\sigma(\neg\ex x\vp)=\I_\sigma(\fa x\neg\vp)$ es decir, $\I_\sigma(\neg\ex
+%x\vp\iff\fa x\neg\vp)=1$. Por lo tanto $\M\models\neg\ex x\vp\iff\fa x\neg
+%\vp$. Pero como $\M$ era una interpretación arbitraria, se tiene que $\models\neg\ex x\vp\iff\fa x\neg \vp$.
+}
+
+
+\frame{\titulos{Validez Universal}{}
+{\bf Ejercicio:} Mostrar que $\models\neg\ex x \vp\iff\fa x\neg \vp$. \\
+\espc
+
+De lo anterior concluimos que en cualquier caso se tiene que %$\M\models_\sigma\neg\ex x \vp$ syss
+%                                %$\M\models_\sigma\fax\neg \vp$. 
+$\I_\sigma(\neg\ex x\vp)=\I_\sigma(\fa x\neg\vp)$, es decir, $\I_\sigma(\neg\ex
+x\vp\iff\fa x\neg\vp)=1$.  \\
+\espc
+\pause 
+Por lo tanto $\M\models\neg\ex x\vp\iff\fa x\neg
+\vp$. \\
+\espc
+\pause 
+Como además $\M$ es una interpretación arbitraria, se tiene que $\models\neg\ex x\vp\iff\fa x\neg \vp$.
+}
+
+
+\frame{\titulos{Equivalencia lógica}{}
+
+\begin{block}{Equivalencia lógica}
+Sean $\vp,\psi$ f\'ormulas. Decimos que $\vp$ es {\bf l\'ogicamente
+equivalente} a $\psi$, denotado con $\vp\equiv\psi$, si y sólo si
+$\models\vp\iff\psi$, es decir si y sólo si la fórmula $\vp\iff\psi$ es universalmente válida. 
+\end{block}
+
+}
+
+\frame{\titulos{Equivalencia lógica}{}
+
+Las siguientes equivalencias l\'ogicas ser\'an
+de utilidad m\'as adelante: 
+\espc
+\bi
+\item {\bf Negación de cuantificaciones } (Leyes de De Morgan generalizadas):
+  \be
+\item $\neg\fa x \vp\equiv\ex x\neg \vp$
+\item $\neg\ex x \vp\equiv\fa x\neg \vp$ \\
+  \ee
+\espc
+\item {\bf Eliminaci\'on de cuantificaciones m\'ultiples.}\index{eliminaci\'on!del
+cuantificador m\'ultiple} 
+\be
+\item$\fa x\fa x\vp\equiv\fa x\vp$.
+\item $\ex x\ex x\vp\equiv\ex x\vp$.
+\ee
+
+\ei
+}
+
+
+\frame{\titulos{Equivalencia lógica}{}
+
+Las siguientes equivalencias l\'ogicas ser\'an
+de utilidad m\'as adelante: 
+\espc
+\bi
+\item {\bf Renombre de variables}. \\ Si $y$ no figura libre en $\vp$
+entonces:\index{renombre de variables}
+\be
+\item $\fa x\vp\equiv\fa y(\vp[x:=y])$.
+\item $\ex x\vp\equiv\ex y(\vp[x:=y])$.
+\ee
+\espc
+\item {\bf Eliminaci\'on de cuantificaciones vacuas.} \\
+ Si $x$ no figura libre en
+$\vp$ entonces:\index{eliminaci\'on!del cuantificador vacuo}
+\be
+\item $\fa x\vp\equiv\vp$.
+\item $\ex x\vp\equiv\vp$.
+\ee
+\ei
+}
+
+
+\frame{\titulos{Consecuencia lógica}{}
+
+\begin{block}{consecuencia lógica}
+Sean $\G$ un conjunto de f\'ormulas y $\vp$ una f\'ormula. Decimos que
+$\vp$ es {\bf consecuencia l\'ogica} de $\G$, denotado con
+$\G\models\vp$, si y sólo si todo modelo de $\G$ es un modelo de $\vp$. \\
+\pause
+\espc
+Es decir, $\G\models\vp$ si y sólo si para toda interpretaci\'on $\M$, si $\M\models \G$ 
+entonces $\M\models\vp$. \\
+\pause
+\espc
+Si $\G\models\vp$ también decimos que $\G$ \emph{implica l\'ogicamente} a $\vp$.
+\end{block}
+}
+
+\frame{\titulos{Consecuencia lógica}{}
+Las siguientes observaciones son importantes:
+\bi
+\item Al igual que en lógica proposicional el símbolo $\models$ está
+  sobrecargado y se usa para las relaciones \emph{``ser modelo de''} y
+  \emph{``ser consecuencia lógica de''}.
+\item Al no cambiar la definición de consecuencia lógica las
+  propiedades de ésta siguen siendo válidas.
+En particular el argumento con premisas $\G=\{\vp_1,\ldots,\vp_n\}$ y
+conclusión $\vp$, es correcto si y sólo si $\G\models\vp$.
+\ei
+}
+
+\frame{\titulos{Indecibilidad LPO}{}
+Decidir validez universal, equivalencia lógica y consecuencia lógica son problemas 
+son \textbf{indecidibles}, es decir, no existe un algoritmo para poder decidir  el problema en general.
+\espc
+\pause
+\begin{exampleblock}{Teorema de Indecibilidad de Church.}
+El problema de validez universal es indecidible. Es decir, no puede existir un algoritmo que reciba un enunciado 
+$\vp$ como entrada y decida si $\models\vp$.
+\end{exampleblock}
+
+\begin{exampleblock}{Equivalencia lógica indecidible}
+La equivalencia lógica es indecidible. Es decir, no puede existir un algoritmo que reciba como entrada dos fórmulas $\vp$ y $\psi$ y decida si $\vp\equiv\psi$.
+\end{exampleblock}
+}
+
+\frame{\titulos{Indecibilidad LOP}{}
+%\pause
+\espc
+\begin{exampleblock}{Consecuencia lógica indecidible}
+La consecuencia lógica es indecidible. Es decir, no puede existir un algoritmo que reciba como entrada un conjunto finito de fórmulas $\G$ y una fórmula $\vp$ y decida si $\G\models\vp$.
+\end{exampleblock}
+\espc
+\begin{exampleblock}{Satisfacibilidad indecidible}
+Es indecidible si una fórmula es satisfacible. Es decir, dada una fórmula $\vp$ no existe un algoritmo que decida si existe un modelo $\M$ y un estado $\sigma$ tal que $\M\models_\sigma\vp$.
+\end{exampleblock}
+}
+
+
+
+
+
+
+
+
+
+%\frame{\titulos{}{}
+%\begin{block}{}
+%
+%\end{block}
+%}
+%
+%\frame{\titulos{}{}
+%\begin{exampleblock}{}
+%
+%\end{exampleblock}
+%}
+%s
+%\frame{\titulos{}{}
+%
+%}
+%
+
+
+
+\end{document}

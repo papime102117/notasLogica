@@ -1,0 +1,422 @@
+%%% Presentaciones para Lenguajes de programacion y sus paradigmas 
+
+\documentclass[xcolor=dvipsnames,table,handout]{beamer}
+%\documentclass[xcolor=dvipsnames,table]{beamer}
+
+\newcommand{\espc}{\vspace{0.3cm}}
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{hyperref}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+
+%%%% paquetes matematicas
+\usepackage{amssymb,amsmath,amscd}
+\usepackage{extarrows}
+\usepackage{stmaryrd}
+\usepackage{mathabx}
+\usepackage{mathrsfs}
+% \usepackage{mathabx}
+\usepackage{amsthm}
+
+%%%%%
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{pifont}
+\usepackage{xcolor}
+\usepackage{etex}
+\usepackage{tikz}
+\usepackage{array}
+%\usepackage{pgfplots}
+
+%%%% cosmetics
+% D.Remy package for pretty display of rules
+\usepackage{mathpartir}
+
+% para insertar codigo con formato particular 
+\usepackage{listing} 
+
+% comillas 
+\usepackage[autostyle=true,spanish=mexican]{csquotes}
+
+% codigo 
+\usepackage{verbatim}
+\usepackage{alltt}
+
+% footnotes
+\usepackage[bottom]{footmisc}
+\usepackage{setspace}
+
+\usepackage{wrapfig}
+\usepackage{caption}
+
+
+\hfuzz=5.002pt %parameter to allow hbox overfulled by length before error!
+
+% Options for presentation
+% ------------------------
+% \definecolor{mycolor}{RGB}{255,192,3}
+\definecolor{mycolor}{RGB}{17,132,221}
+\mode<presentation>
+{
+% \usetheme[secheader]{Boadilla}
+% \usecolortheme{orchid}
+\useoutertheme{infolines}
+\useinnertheme{rectangles}
+\setbeamertemplate{itemize items}[square]
+\setbeamertemplate{enumerate items}[square]
+\setbeamersize{text margin left=6mm, text margin right=6mm}
+
+\setbeamercolor{alerted text}{fg=red,bg=red!70!white}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{frametitle}{bg=mycolor,fg=white}
+\setbeamercolor{normal text}{bg=white,fg=black}
+\setbeamercolor{structure}{bg=black,fg=mycolor}
+\setbeamercolor{title}{bg=mycolor,fg=white}
+\setbeamercolor{subtitle}{bg=mycolor,fg=white}
+\setbeamercolor{titlelike}{bg=white,fg=mycolor}
+
+\setbeamercovered{invisible}
+
+\setbeamercolor*{palette primary}{fg=mycolor,bg=white}
+\setbeamercolor*{palette secondary}{bg=white,fg=white}
+\setbeamercolor*{palette tertiary}{fg=mycolor,bg=white}
+\setbeamercolor*{palette quaternary}{fg=white,bg=white}
+
+\setbeamercolor{separation line}{bg=mycolor,fg=mycolor}
+\setbeamercolor{fine separation line}{bg=white,fg=red}
+\setbeamercolor{author in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{title in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{date in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{institute in head/foot}{bg=mycolor!30!white,fg=mycolor!80!black}
+\setbeamercolor{section in head/foot}{bg=mycolor!60!white, fg=Red}
+\setbeamercolor{subsection in head/foot}
+{bg=mycolor!50!white,fg=mycolor!50!white}
+
+
+\setbeamertemplate{headline}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.65ex,dp=1.5ex,center]{section in 
+head/foot}%
+    \usebeamerfont{section in head/foot}\insertsectionhead\hspace*{2ex}
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.65ex,dp=1.5ex,center]{subsection 
+in head/foot}%
+    \usebeamerfont{subsection in head/foot}\hspace*{2ex}\insertsubsectionhead
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+% \beamerdefaultoverlayspecification{<+->}
+\beamertemplatenavigationsymbolsempty
+% \setbeamertemplate{footline}[frame number]
+}
+
+\input{macroslc}
+
+\title[]{Lógica computacional}
+\subtitle{Tema: Semántica de la Lógica de Primer Orden }
+\author[]{}
+\institute[UNAM-FC]{Facultad de Ciencias\\ 
+Universidad Nacional Aut\'onoma de M\'exico}
+\author{ Pilar Selene Linares Ar\'evalo}
+\date[]{ \footnotesize{marzo 2018}
+\newline{\tiny{Material desarrollado bajo el proyecto UNAM-PAPIME PE102117.}}}
+ 
+
+\beamerdefaultoverlayspecification{<+->}
+ 
+\titlegraphic{\includegraphics[width=16mm]{fc2.png}}
+ 
+
+\begin{document}
+
+\begin{frame}
+\titlepage 
+\end{frame}
+			
+\frame{\titulos{Semántica formal}{}
+\begin{block}{Interpretación (estructura)}
+Sea $\L=\Pe\cup\F\cup\C$ un lenguaje o signatura de primer orden. Una 
+  {\bf estructura o interpretación} para~$\L$ es un par~$\M=\pt{M,\I}$ donde 
+  $M\neq\varnothing$ es un conjunto no vacío llamado el universo de la 
+  estructura e $\I$ es una función con dominio~$\L$ tal que:
+\bi
+\item Si $P^{(n)}\in\Pe$ entonces $\I(P)$ es una relación de $m$-argumentos
+  sobre $M$, es decir $\I(P)\inc M^n$. Alternativamente podemos definir la interpretación de $P$ como una función booleana que decide si una tupla está o no en la relación deseada, es decir, $\I(P): M^n \to Bool$.
+\item Si $f^{(n)}\in\F$ entonces $\I(f)$ es una función con dominio $M^n$ y
+  contradominio $M$, es decir\\ $\I(f):M^n\imp M$.
+\item Si $c\in\C$ entonces $\I(c)$ es un elemento de $M$, es decir~$\I(c)\in M$.
+\ei 
+\end{block}
+}
+
+\frame{\titulos{Semántica formal}{}
+Dada una interpretación $\M=\pt{M,\I}$ haremos uso de la siguiente notación :
+\pause
+\[
+\ba{rll}
+|\M| &\; =_{def} \;& M  \\ 
+P^\I &\; =_{def}\;& \I(P) \\
+f^\I &\; =_{def} \;& \I(f) \\ 
+c^\I  &\; =_{def} \;& \I(c) 
+\ea 
+\]
+
+}
+
+
+\frame{\titulos{Interpretación de términos}{}
+\begin{block}{Estado/ asignación}
+Un {\bf estado}, asignación o valuación de las variables es una función $\sigma:\mathsf{Var}\imp M$.
+\end{block}
+
+\begin{block}{Estado modificado}
+Sea  
+  $\sigma:\mathsf{Var}\imp M$ un estado de las variables. Dadas las
+  variables $x_1,\ldots,x_n$ y los elementos del universo $m_1,\ldots,m_n\in
+  M$ definimos el {\bf estado modificado} o actualizado en $x_1,\ldots,x_n$ por
+  $m_1,\ldots,m_n$ denotado $\sigma[x_1,\ldots,x_n/m_1,\ldots,m_n]$ o 
+  $\sigma[\vx/\vec{m}\,]$ como sigue:
+\beqs
+\sigma[\vx/\vec{m}\,](y) =\left\{\ba{rl}
+\sigma(y) & \mbox{si}\; y\notin\{x_1,\ldots,x_n\} \\ \\
+m_i      & \mbox{si}\; y = x_i\;\;\;\;1\leq i\leq n 
+\ea
+\right.
+\eeqs
+\end{block}
+}
+
+\frame{\titulos{Interpretación de términos}{}
+\begin{block}{Interpretación de términos}
+Sea $\sigma$ un estado de las variables. Definimos la {\bf función de interpretación} o significado de los términos con respecto a $\sigma$, $\I_\sigma:\term\imp |\M|$ como sigue:
+\[
+\ba{rcl}
+\I_\sigma(x) &\; = \; & \sigma(x) \\ \\ 
+\I_\sigma(c) &\; = \; & \I(c) \\ \\  %= c^\I \\ 
+\I_\sigma\big(f(t_1,\ldots,t_n)\big)  & \; = \; &  
+f^\I(\I_\sigma(t_1),\ldots,\I_\sigma(t_n))
+\ea
+\]
+\end{block}
+}
+
+\frame{\titulos{Interpretación de términos}{}
+Hay una relación entre los estados modificados y las sustituciones: \\
+\espc 
+  \pause
+Sup\'ongase que tenemos un t\'ermino $t$ que tiene muchas presencias de la variable $x$ y que queremos evaluar $t[x:=r]$ en alg\'un estado de cierta interpretaci\'on. \\ \espc \pause
+Para ello aplicamos la definici\'on y cada vez que encontramos una presencia del subt\'ermino $r$ en $t[x:=r]$ debemos calcular el valor de $r$ en el mismo estado; lo cual es poco pr\'actico.  \\ \espc \pause
+
+Una mejor manera de evaluar
+$t[x:=r]$ ser\'{\i}a evaluar $r$ en el estado dado $\sigma$, lo cual nos da cierto
+valor $m$ y evaluar el t\'ermino $t[x:=r]$ en el estado modificado
+$\sigma[x/m]$. El resultado ser\'a el mismo.
+}	
+
+\frame{\titulos{Interpretación de términos}{}
+\begin{exampleblock}{Lema de coincidencia para términos}
+Sean $t\in\term$ y $\sigma_1,\sigma_2$ dos
+  estados de las variables tales que $\sigma_1(x)=\sigma_2(x)$ para toda variable $x$
+  que figura en $t$. Entonces $\I_{\sigma_1}(t)=\I_{\sigma_2}(t)$.
+\end{exampleblock}
+\espc
+\begin{exampleblock}{Lema de sustitución para términos}
+Sean $r\in\term$, $\sigma$ un estado de
+  las variables, $[\vx:=\vt\;]$ una sustitución y $m_1,\ldots,m_n\in
+  M$ tales que $\I_\sigma(t_i)=m_i\;\;1\leq i\leq n$. Entonces
+\beqs
+\I_\sigma\big(r[\vx:=\vt\;]\big) = \I_{\sigma[\vx/\vec{m}\;]}(r)
+\eeqs
+\end{exampleblock}
+}
+
+\frame{\titulos{Interpretación de fórmulas}{}
+Ya que sabemos cómo interpretar términos, es posible definir la interpretación de fórmulas. \espc
+\pause
+\begin{block}{Interpretación de fórmulas I}
+Sea $\sigma$ un estado de las
+  variables. Definimos la {\bf función de interpretación} o significado de las
+  fórmulas con respecto a $\sigma$, $\I_\sigma:\form\imp\{0,1\}$ como sigue:
+\[
+\ba{lcl}
+\I_\sigma(\bot) \; = \;  0  &  \I_\sigma(\top) \; = \;  1  & \\ \\ \pause
+\I_\sigma\big(P(t_1,\ldots,t_m)\big)\; = \;1 & \;\mbox{si y sólo si}\; &
+\big(\I_\sigma(t_1),\ldots,\I_\sigma(t_m)\big)\in P^\I \\ \\ \pause
+\I_\sigma(t_1=t_2) \; = \;  1 & \;\mbox{si y sólo si}\; & \I_\sigma(t_1)=\I_\sigma(t_2) \\ \\
+\ea
+\]
+\end{block}
+}
+
+
+\frame{\titulos{Interpretación de fórmulas}{}
+\begin{block}{Interpretación de fórmulas II}
+Sea $\sigma$ un estado de las
+  variables. Definimos la {\bf función de interpretación} o significado de las
+  fórmulas con respecto a $\sigma$, $\I_\sigma:\form\imp\{0,1\}$ como sigue:
+\[
+\ba{lcl}
+\I_\sigma(\neg\vp) \; = \; 1 & \;\mbox{si y sólo si}\; & \I_\sigma(\vp)=0 \\ \\ \pause
+\I_\sigma(\vp\land\psi) \; = \;  1 & \;\mbox{si y sólo si}\; &
+\I_\sigma(\vp)=\I_\sigma(\psi)=1 \\ \\ \pause
+\I_\sigma(\vp\lor\psi) \; = \;  0 & \;\mbox{si y sólo si}\; &
+\I_\sigma(\vp)=\I_\sigma(\psi)=0 \\ \\ \pause
+\I_\sigma(\vp\imp\psi) \; = \;  0 & \;\mbox{si y sólo si}\; &
+\I_\sigma(\vp)=1\;\mbox{e}\;\I_\sigma(\psi)=0 \\ \\ \pause
+\I_\sigma(\vp\iff\psi) \; = \;  1 & \;\mbox{si y sólo si}\; &
+\I_\sigma(\vp)=\I_\sigma(\psi) \\ \\
+
+\ea
+\]
+\end{block}
+}
+
+\frame{\titulos{Interpretación de fórmulas}{}
+\begin{block}{Interpretación de fórmulas III}
+Sea $\sigma$ un estado de las
+  variables. Definimos la {\bf función de interpretación} o significado de las
+  fórmulas con respecto a $\sigma$, $\I_\sigma:\form\imp\{0,1\}$ como sigue:
+\[
+\ba{lcl}
+\I_\sigma(\fa x\vp) \; = \;  1 & \;\mbox{si y sólo si}\; &
+\I_{\sigma[x/m]}(\vp)=1\;\;\mbox{para todo}\;m\in M \\ \\ \pause
+\I_\sigma(\ex x\vp) \; = \;  1 & \;\mbox{si y sólo si}\; &
+\I_{\sigma[x/m]}(\vp)=1\;\;\mbox{para algún}\;m\in M \\ \\
+\ea
+\]
+\end{block}
+}
+
+\frame{\titulos{Interpretación de fórmulas}{}
+Análogamente al caso de términos se cumplen los lemas de coincidencia y
+sustitución. \espc \pause
+\begin{exampleblock}{Lema de coincidencia para fórmulas}
+Sean $\vp$ una fórmula y 
+$\sigma_1,\sigma_2$ dos estados de las variables tales que 
+$\sigma_1(x)=\sigma_2(x)$ para toda variable
+$x\in FV(\vp)$. Entonces $\I_{\sigma_1}(\vp)=\I_{\sigma_2}(\vp)$.
+\end{exampleblock}
+\pause
+\espc
+\begin{exampleblock}{Lema de sustitución para fórmulas}
+Sean $\vp\in\form$, $\sigma$ un estado 
+  de las variables, \\$[\vx:=\vt\;]$ una sustitución y $m_1,\ldots,m_n\in M$ 
+  tales que $m_i=\I_\sigma(t_i)\;\;1\leq i\leq n$. Entonces
+\[
+\I_\sigma\big(\vp[\vx:=\vt\;]\big) = \I_{\sigma[\vx/\vec{m}\;]}(\vp) 
+\]
+\end{exampleblock}
+
+}
+
+\frame{\titulos{Interpretación de fórmulas}{}
+\begin{block}{Satisfacibilidad, verdad y falsedad.}
+Sean $\vp$ una fórmula y $\M=\pt{M,\I}$ una 
+interpretación. Entonces
+\bi
+\item $\vp$ es {\bf satisfacible} en $\M$ si existe un estado de las variables $\sigma$ tal que $\I_\sigma(\vp)=1$, lo cual suele
+  denotarse con $\M\models\vp[\sigma]$ o con $\M\models_\sigma\vp$.  
+\item $\vp$ es {\bf verdadera} en $\M$ si para todo estado de las variables $\sigma$  se tiene $\I_\sigma(\vp)=1$, es decir, si $\vp$ es satisfacible en $\M$ en todos los estados posibles. \\
+En tal caso también decimos que $\M$ es un {\bf modelo} de $\vp$ lo cual se
+  denotará con $\M\models\vp$.
+\item $\vp$ es {\bf falsa} en $\M$ si y sólo si $\M\models\neg\vp$. Es decir $\vp$ es falsa 
+si y sólo si su negación $\neg\vp$ es verdadera.
+\ei
+\end{block}
+}
+
+\frame{\titulos{Interpretación de fórmulas}{}
+¡En lógica de predicados decir que $\varphi$ es falsa y no es verdadera NO es lo mismo!. \\
+\pause
+
+\bi
+\item Si $\vp$ no es verdadera (es decir, si~$\M\not\models\vp$), entonces existe un estado~$\sigma$ tal que 
+$\M\not\models_\sigma\vp$, es decir $\I_\sigma(\vp)=0$ o bien $\vp$ es  insatisfacible en el estado~$\sigma$.
+
+\item Una fórmula no verdadera es  aquella tal que es insatisfacible en algún estado de sus variables, o bien tal que su negación es satisfacible en algún estado de sus variables. 
+
+\item Para poder afirmar que  $\vp$ es falsa, tendríamos que mostrar que $\M\models\neg\vp$, es decir  que~$\neg\vp$ es satisfacible en \textbf{todos} los estados posibles. 
+\ei
+
+\pause
+\setbeamercolor{postit}{bg=yellow!50!white}
+\begin{beamercolorbox}{postit}
+Si una fórmula~$\vp$ no es verdadera, no podemos concluir que $\vp$ es falsa.
+\end{beamercolorbox}
+
+}
+
+\frame{\titulos{Interpretación de fórmulas}{}
+\begin{figure}[t]
+\includegraphics[width=8cm]{diagrama}
+\centering
+\end{figure}
+}
+
+\frame{\titulos{Propiedades noción verdad}{}
+La relaci\'on de verdad en lógica de predicados no tiene las mismas propiedades que su contraparte en la lógica proposicional, propiedades que sí hereda la relación de satisfacibilidad. \\
+\espc
+\pause
+Sean $\L=\{P^{(1)},Q^{(1)}\},\;\M=\langle \mathbb{N},\I\rangle$  donde $P^\I$ es la propiedad \enquote{ser par} y $Q^\I$ es la
+propiedad \enquote{ser impar}. \\
+\espc
+\pause
+Entonces $\M\models P(x)\lor Q(x)$ puesto que cualquier n\'umero natural es
+par o es impar. \\ \pause
+Sin embargo no se cumple que $\M\models P(x)$ ni que $\M\models Q(x)$. Puesto 
+que el valor de~$x$ no puede ser siempre par o siempre impar.
+
+\pause
+\espc
+\setbeamercolor{postit}{bg=yellow!50!white}
+\begin{beamercolorbox}{postit}
+Observemos que si una disyunción es verdadera en $\M$ entonces no necesariamente lo es alguna de sus subf\'ormulas.
+Es decir, $\M\models \vp\lor\psi$ no implica que $\M\models\vp$ o 
+$\M\models\psi$.
+\end{beamercolorbox}
+}
+
+\frame{\titulos{Propiedades noción verdad}{}
+Veamos ahora algunas propiedades de la relaci\'on de verdad.
+\begin{exampleblock}{}
+Sean $\M$ una $\L$-interpretaci\'on y $\vp,\psi$ f\'ormulas. Entonces
+\bi
+\item Si $\M\models\vp$ entonces $\M\not\models\neg\vp$.
+\item Si $\M\models\vp\imp\psi$ y $\M\models\vp$ entonces
+  $\M\models\psi$.
+\item Si $\M\models\vp$ entonces $\M\models\vp\lor\psi$.
+  \item $\M\models\vp\land\psi$ si y sólo si $\M\models\vp$ y $\M\models\psi$.
+\item $\M\models\vp\;\mbox{si y sólo si}\;\M\models\fa\vp.$ donde
+  $\fa\vp$ denota a la cerradura universal de $\vp$, es decir a la
+  fórmula obtenida al cuantificar universalmente todas las variables
+  libres de $\vp$.
+  
+\ei
+\end{exampleblock}
+}
+
+
+%\frame{\titulos{}{}
+%\begin{block}{}
+%
+%\end{block}
+%}
+%
+%\frame{\titulos{}{}
+%\begin{exampleblock}{}
+%
+%\end{exampleblock}
+%}
+%
+%\frame{\titulos{}{}
+%
+%}
+
+
+
+\end{document}
